@@ -96,7 +96,6 @@ void ConnectionTab::on_ctrlEnter_triggered()
 	QSqlQuery q(m_database);
 	//q.setForwardOnly(true);
 	q.prepare(query);
-	q.exec();
 
 	if (q.exec() == true)
 	{
@@ -116,10 +115,10 @@ void ConnectionTab::on_ctrlEnter_triggered()
 			//not a select statement
 
 			m_tabBar->setCurrentIndex(1);
-			m_messagesText->appendPlainText(QDateTime::currentDateTime().toString("yyyy-mm-dd hh:mm:ss"));
+			m_messagesText->appendPlainText("Timestamp: " + QDateTime::currentDateTime().toString("yyyy-mm-dd hh:mm:ss"));
 			m_messagesText->appendPlainText("Number of rows affected: " + QString::number(q.numRowsAffected()));
 			m_messagesText->appendPlainText("");
-			m_messagesText->appendPlainText(q.lastQuery());
+			m_messagesText->appendPlainText(q.executedQuery());
 		}
 	}
 	else
@@ -129,7 +128,7 @@ void ConnectionTab::on_ctrlEnter_triggered()
 		m_messagesText->appendPlainText("");
 		m_messagesText->appendPlainText("Query:");
 		m_messagesText->appendPlainText("-------------------------------");
-		m_messagesText->appendPlainText(q.lastQuery());
+		m_messagesText->appendPlainText(q.executedQuery());
 	}
 }
 
