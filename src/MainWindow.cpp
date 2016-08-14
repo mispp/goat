@@ -2,7 +2,8 @@
 #include "ui_MainWindow.h"
 #include "NewConnectionDialog.h"
 #include "Connection.h"
-#include "ConnectionTab.h"
+#include "ui/ConnectionTab.h"
+
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QSettings>

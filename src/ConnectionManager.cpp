@@ -90,6 +90,7 @@ void ConnectionManager::updateModel(Connection* connection)
 {
 	QStandardItem* item = new QStandardItem();
 	item->setText(connection->getName());
+	item->setData(connection->getConnectionId(), Qt::UserRole);
 
 	m_model->appendRow(item);
 }

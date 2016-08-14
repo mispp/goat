@@ -11,7 +11,7 @@ class CodeEditor : public QPlainTextEdit
 
 public:
 	CodeEditor(QWidget *parent);
-	const QShortcut* m_shortcut;
+	//const QShortcut* m_shortcut;
 	QString getSqlStatement();
 };
 

@@ -17,7 +17,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 	this->appendPlainText("from");
 	this->appendPlainText("information_schema.tables");
 
-	m_shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), this);
+	//m_shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), this);
 
 
 	/*
@@ -30,8 +30,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 	*/
 
 	//connect(m_shortcut,		SIGNAL(activated()), this		, SLOT(on_ctrlEnter_triggered())	);
-	connect(m_shortcut,		SIGNAL(activated()), parent		, SLOT(on_ctrlEnter_triggered())	);
-
+	//connect(m_shortcut,		SIGNAL(activated()), parent		, SLOT(on_ctrlEnter_triggered())	);
 }
 
 QString CodeEditor::getSqlStatement()
