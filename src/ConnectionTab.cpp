@@ -30,13 +30,16 @@ ConnectionTab::ConnectionTab(QWidget *parent) : QSplitter(parent)
 
 	m_comboBox = new QComboBox();
 	m_comboBox->setModel(ConnectionManager::getInstance()->getModel());
-	m_comboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-	m_frame->layout()->addWidget(m_comboBox);
+	QFrame* h_frame = new QFrame(m_frame);
+	QHBoxLayout* h_layout= new QHBoxLayout();
+	h_frame->setLayout(h_layout);
+	h_layout->addWidget(m_comboBox);
+	h_layout->addStretch();
+
+	m_frame->layout()->addWidget(h_frame);
 	m_frame->layout()->addWidget(m_codeEditor);
 	addWidget(m_frame);
-
-	//addWidget(m_codeEditor);
 
 	//create tab container
 	m_tabBar = new QTabWidget(this);
@@ -108,8 +111,6 @@ void ConnectionTab::on_ctrlEnter_triggered()
 			m_resultsGrid->resizeColumnsToContents();
 
 			m_tabBar->setCurrentIndex(0);
-			//resultsGrid->setVisible(false);
-			//resultsGrid->setVisible(true);
 		} else
 		{
 			//not a select statement
