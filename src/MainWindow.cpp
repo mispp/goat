@@ -33,7 +33,7 @@ void MainWindow::on_actionNew_connection_triggered()
 	dialog.setModal(true);
 	if (dialog.exec())
 	{
-		qDebug() << "OK Clicked, creating tab";
+		//qDebug() << "OK Clicked, creating tab";
 
 		Connection* connection = dialog.getConnection();
 		ConnectionManager::getInstance()->addConnection(connection);

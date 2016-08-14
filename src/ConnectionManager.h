@@ -25,6 +25,8 @@ private:
 	static ConnectionManager* m_instance;
 	static QMutex m_mutex;
 
+	int counter;
+
 };
 
 #endif // CONNECTIONMANAGER_H

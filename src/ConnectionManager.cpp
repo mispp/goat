@@ -13,6 +13,7 @@ ConnectionManager* ConnectionManager::m_instance = 0;
 ConnectionManager::ConnectionManager()
 {
 	m_model = new QStandardItemModel();
+	counter = 0;
 }
 
 ConnectionManager* ConnectionManager::getInstance()
@@ -37,11 +38,11 @@ void ConnectionManager::addConnection(Connection *connection)
 
 	bool ok = db.open();
 
-	qDebug() << "Number of currently opened connections: " + QString::number(db.connectionNames().count());
+	//qDebug() << "Number of currently opened connections: " + QString::number(db.connectionNames().count());
 
 	if (ok == true)
 	{
-		qDebug() << "Connection opened, id is " + connection->getConnectionId();
+		//qDebug() << "Connection opened, id is " + connection->getConnectionId();
 
 		m_connectionsList.append(connection);
 
@@ -89,10 +90,12 @@ QStandardItemModel* ConnectionManager::getModel()
 void ConnectionManager::updateModel(Connection* connection)
 {
 	QStandardItem* item = new QStandardItem();
-	item->setText(connection->getName());
+	/* string for driver should be replaced with an icon */
+	item->setText(connection->getDriver() + ": " + connection->getName() + " (" + connection->getDatabase() + ") " + QString::number(counter+1));
 	item->setData(connection->getConnectionId(), Qt::UserRole);
 
 	m_model->appendRow(item);
+	++counter;
 }
 
 Connection* ConnectionManager::getDefaultConnection()
