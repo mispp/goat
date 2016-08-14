@@ -15,8 +15,6 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-
-	//m_connectionManager = ConnectionManager::getInstance();
 	ui->connectionTreeView->setModel(ConnectionManager::getInstance()->getModel());
 
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "settings");
@@ -47,7 +45,7 @@ void MainWindow::on_actionNew_connection_triggered()
 
 	} else
 	{
-		qDebug() << "Cancelled";
+		//qDebug() << "Cancelled";
 	}
 }
 
@@ -120,7 +118,7 @@ void MainWindow::writeSettings()
 
 	settings.endGroup();
 
-	qDebug() << settings.fileName();
+	//qDebug() << settings.fileName();
 }
 
 

@@ -27,7 +27,7 @@ ConnectionManager* ConnectionManager::getInstance()
 
 void ConnectionManager::addConnection(Connection *connection)
 {
-	QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", connection->getConnectionId());
+	QSqlDatabase db = QSqlDatabase::addDatabase(connection->getDriver(), connection->getConnectionId());
 
 	db.setHostName(connection->getServer());
 	db.setDatabaseName(connection->getDatabase());

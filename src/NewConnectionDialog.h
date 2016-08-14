@@ -5,6 +5,9 @@
 #include <QStandardItemModel>
 #include <QAbstractButton>
 #include <QListWidgetItem>
+#include <QStandardItemModel>
+#include <QStandardItem>
+
 #include "Connection.h"
 
 namespace Ui {
@@ -33,6 +36,8 @@ private:
 	QString m_connnectionId;
 	void saveConnections();
 	Connection* m_connection;
+	QStandardItemModel* m_model;
+	QMap<QString, QString> m_drivers;
 };
 
 #endif // NEWCONNECTIONDIALOG_H

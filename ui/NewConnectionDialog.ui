@@ -77,21 +77,6 @@
          <property name="toolTipDuration">
           <number>-1</number>
          </property>
-         <item>
-          <property name="text">
-           <string>QMYSQL</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>QPSQL</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>QDB2</string>
-          </property>
-         </item>
         </widget>
        </item>
       </layout>

@@ -1,14 +1,18 @@
-#include "NewConnectionDialog.h"
-#include "ui_NewConnectionDialog.h"
 #include <QSqlDatabase>
 #include <QDebug>
 #include <QSettings>
+#include <QMessageBox>
+
+#include "NewConnectionDialog.h"
+#include "ui_NewConnectionDialog.h"
 #include "Connection.h"
 
 NewConnectionDialog::NewConnectionDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::NewConnectionDialog)
 {
 	ui->setupUi(this);
 	//m_connnectionId = getRandomString();
+
+	m_model = new QStandardItemModel(this);
 
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
 
@@ -39,6 +43,15 @@ NewConnectionDialog::NewConnectionDialog(QWidget *parent) :	QDialog(parent), ui(
 
 		settings.endGroup();
 	}
+
+	m_drivers.insert("QMYSQL", "MySQL");
+	m_drivers.insert("QPSQL", "PostgreSQL");
+	m_drivers.insert("QDB2", "DB2");
+
+	for (auto key: m_drivers.keys())
+	{
+		ui->listDropdownDBDriver->addItem(m_drivers.value(key), key);
+	}
 }
 
 NewConnectionDialog::~NewConnectionDialog()
@@ -48,7 +61,8 @@ NewConnectionDialog::~NewConnectionDialog()
 
 void NewConnectionDialog::on_buttonBox_accepted()
 {
-	m_connection = new Connection("QMYSQL", ui->txtUser->text(), ui->txtPass->text(), ui->txtServer->text(), ui->txtPort->text().toInt(), ui->txtDatabase->text(), "","");
+	QString driver = ui->listDropdownDBDriver->currentData(Qt::UserRole).toString();
+	m_connection = new Connection(driver, ui->txtUser->text(), ui->txtPass->text(), ui->txtServer->text(), ui->txtPort->text().toInt(), ui->txtDatabase->text(), "","");
 
 	accept();
 }
@@ -91,12 +105,38 @@ void NewConnectionDialog::on_listWidgetConnections_currentItemChanged(QListWidge
 {
 	Connection *connection = qvariant_cast<Connection*>(current->data(Qt::UserRole));
 
-	//ui->listDropdownDBDriver->setCurrentIndex();
-	ui->txtUser->setText(connection->getUser());
-	ui->txtPass->setText(connection->getPass());
-	ui->txtServer->setText(connection->getServer());
-	ui->txtPort->setText(QString::number(connection->getPort()));
-	ui->txtDatabase->setText(connection->getDatabase());
+	QString driver = connection->getDriver();
+
+	int index = ui->listDropdownDBDriver->findData(connection->getDriver());
+	if (index != -1)
+	{
+		ui->listDropdownDBDriver->setCurrentIndex(index);
+		ui->txtUser->setText(connection->getUser());
+		ui->txtPass->setText(connection->getPass());
+		ui->txtServer->setText(connection->getServer());
+		ui->txtPort->setText(QString::number(connection->getPort()));
+		ui->txtDatabase->setText(connection->getDatabase());
+
+		ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+	}
+	else
+	{
+		QMessageBox errorDialog;
+		errorDialog.setWindowTitle("Configuration problem");
+		errorDialog.setText("Driver " + driver + " doesn't exits");
+		errorDialog.setInformativeText("It seems that non-existent driver has been referenced in the connections.ini");
+		errorDialog.setIcon(QMessageBox::Critical);
+		errorDialog.setStandardButtons(QMessageBox::Ok);
+		errorDialog.setMinimumSize(QSize(600, 120));
+		QSpacerItem* horizontalSpacer = new QSpacerItem(500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+		QGridLayout* layout = (QGridLayout*)errorDialog.layout();
+		layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+
+		errorDialog.exec();
+
+		ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+	}
+
 }
 
 Connection* NewConnectionDialog::getConnection()
