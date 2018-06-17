@@ -108,3 +108,8 @@ Connection* ConnectionManager::getDefaultConnection()
 		return NULL;
 	}
 }
+
+int ConnectionManager::connectionsAvailable()
+{
+    return m_connectionsList.count() > 0;
+}

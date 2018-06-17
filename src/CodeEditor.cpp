@@ -6,31 +6,9 @@
 #include <QTextCursor>
 #include <QTextBlock>
 
-CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
+CodeEditor::CodeEditor(QWidget *parent) : QTextEdit(parent)
 {
-	this->setStyleSheet("QPlainTextEdit { font-family: Courier }");
-	this->appendPlainText("select * from information_schema.tables");
-	this->appendPlainText("");
-	this->appendPlainText("");
-	this->appendPlainText("select");
-	this->appendPlainText("*");
-	this->appendPlainText("from");
-	this->appendPlainText("information_schema.tables");
-
-	//m_shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), this);
-
-
-	/*
-
-		https://wiki.qt.io/New_Signal_Slot_Syntax
-		new connect syntax:
-		connect(sender, &Sender::valueChanged, receiver, &Receiver::updateValue );
-		connect(sender, &Sender::valueChanged, someFunction);
-
-	*/
-
-	//connect(m_shortcut,		SIGNAL(activated()), this		, SLOT(on_ctrlEnter_triggered())	);
-	//connect(m_shortcut,		SIGNAL(activated()), parent		, SLOT(on_ctrlEnter_triggered())	);
+    this->setStyleSheet("QTextEdit { font-family: Courier }");
 }
 
 QString CodeEditor::getSqlStatement()

@@ -11,6 +11,7 @@ class ConnectionManager
 public:
 	void addConnection(Connection* connection);
 	bool connectionAvailable(Connection* connection);
+    int connectionsAvailable();
 	QStandardItemModel* getModel();
 	static ConnectionManager* getInstance();
 	Connection* getDefaultConnection();

@@ -29,14 +29,7 @@ ConnectionTab::ConnectionTab(QWidget *parent) :	QWidget(parent), ui(new Ui::Conn
 	setConnection();
 
 	// insert test-sql code
-	ui->codeEditor->setStyleSheet("QPlainTextEdit { font-family: Courier }");
-	ui->codeEditor->appendPlainText("select * from information_schema.tables");
-	ui->codeEditor->appendPlainText("");
-	ui->codeEditor->appendPlainText("");
-	ui->codeEditor->appendPlainText("select");
-	ui->codeEditor->appendPlainText("*");
-	ui->codeEditor->appendPlainText("from");
-	ui->codeEditor->appendPlainText("information_schema.tables");
+    ui->codeEditor->setStyleSheet("QPlainTextEdit { font-family: Courier }");
 
 	connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->codeEditor), SIGNAL(activated()), this, SLOT(onctrlEnter_triggered()));
 }

@@ -15,7 +15,6 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	ui->connectionTreeView->setModel(ConnectionManager::getInstance()->getModel());
 
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "settings");
 	readSettings();
@@ -96,11 +95,6 @@ void MainWindow::readSettings()
 	resize(settings.value("size",  QSize(640, 480)).toSize());
 	move(settings.value("position", QPoint(200, 200)).toPoint());
 
-	QList<int> sectionSizes = ui->mainSplitter->sizes();
-	sectionSizes[0] = settings.value("connectionBarSize", this->width()*0.2).toInt();
-	sectionSizes[1] = this->width() - sectionSizes[0];
-	ui->mainSplitter->setSizes(sectionSizes);
-
 	settings.endGroup();
 }
 
@@ -131,7 +125,12 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 
 void MainWindow::on_actionNew_query_triggered()
 {
-	addTab();
+    if (ConnectionManager::getInstance()->connectionsAvailable())
+    {
+        addTab();
+    } else {
+        // error dialog?
+    }
 }
 
 void MainWindow::addTab()

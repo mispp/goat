@@ -44,14 +44,19 @@ NewConnectionDialog::NewConnectionDialog(QWidget *parent) :	QDialog(parent), ui(
 		settings.endGroup();
 	}
 
-	m_drivers.insert("QMYSQL", "MySQL");
 	m_drivers.insert("QPSQL", "PostgreSQL");
-	m_drivers.insert("QDB2", "DB2");
+    m_drivers.insert("QMYSQL", "MySQL");
+    /*m_drivers.insert("QDB2", "DB2");*/
 
 	for (auto key: m_drivers.keys())
 	{
 		ui->listDropdownDBDriver->addItem(m_drivers.value(key), key);
 	}
+
+    ui->listDropdownDBDriver->setCurrentIndex(1);
+    /*
+     *  insert here some autopopluate code for new connection mask
+    */
 }
 
 NewConnectionDialog::~NewConnectionDialog()
