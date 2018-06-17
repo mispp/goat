@@ -97,6 +97,7 @@
    </attribute>
    <addaction name="actionNew_connection"/>
    <addaction name="actionNew_query"/>
+   <addaction name="action_Open"/>
   </widget>
   <action name="actionExit">
    <property name="text">
@@ -105,7 +106,8 @@
   </action>
   <action name="actionNew_connection">
    <property name="icon">
-    <iconset theme="add"/>
+    <iconset theme="add">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;New connection</string>
@@ -116,7 +118,8 @@
   </action>
   <action name="actionNew_query">
    <property name="icon">
-    <iconset theme="tab"/>
+    <iconset theme="tab">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>New tab</string>
@@ -126,6 +129,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="action_Open">
+   <property name="icon">
+    <iconset theme="document-open"/>
+   </property>
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
  </widget>

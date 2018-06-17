@@ -26,7 +26,7 @@ ConnectionTab::ConnectionTab(QWidget *parent) :	QWidget(parent), ui(new Ui::Conn
 	m_model = new QSqlQueryModel(this);
 	ui->resultsGrid->setModel(m_model);
 
-	setConnection();
+    //setConnection();
 
 	// insert test-sql code
     ui->codeEditor->setStyleSheet("QPlainTextEdit { font-family: Courier }");

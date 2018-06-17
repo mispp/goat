@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QSqlError>
 #include <QStandardItem>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWindow)
 {
@@ -125,12 +126,13 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 
 void MainWindow::on_actionNew_query_triggered()
 {
-    if (ConnectionManager::getInstance()->connectionsAvailable())
+    addTab();
+    /*if (ConnectionManager::getInstance()->connectionsAvailable())
     {
         addTab();
     } else {
         // error dialog?
-    }
+    }*/
 }
 
 void MainWindow::addTab()
@@ -141,4 +143,17 @@ void MainWindow::addTab()
 	ConnectionTab *connectionTab = new ConnectionTab(ui->tabBarConnections);
 	ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, tabName);
 	ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
+}
+
+void MainWindow::on_action_Open_triggered()
+{
+    QString filename = QFileDialog::getOpenFileName(this, "Open file", "", "");
+
+    //qDebug() << "opened filename: " + filename;
+    //qDebug() << QString::number(ui->tabBarConnections->count() > 0);
+
+    /*if (ui->tabBarConnections->count() > 0) {
+        int index = ui->tabBarConnections->widget(index);
+         QFile
+    }*/
 }
