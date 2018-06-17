@@ -28,16 +28,18 @@ private slots:
 	void on_buttonBox_accepted();
 	void on_buttonBox_rejected();
 	void on_buttonBox_clicked(QAbstractButton *button);
-
 	void on_listWidgetConnections_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 
 private:
 	Ui::NewConnectionDialog *ui;
-	QString m_connnectionId;
-	void saveConnections();
-	Connection* m_connection;
-	QStandardItemModel* m_model;
-	QMap<QString, QString> m_drivers;
+
+    void saveConnections();
+
+    Connection* m_connection;
+
+    QStandardItemModel* m_model;
+    QStandardItemModel* m_driversModel;
+    QStandardItemModel* m_connectionListModel;
 };
 
 #endif // NEWCONNECTIONDIALOG_H

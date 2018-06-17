@@ -9,25 +9,25 @@
 class ConnectionManager
 {
 public:
-	void addConnection(Connection* connection);
-	bool connectionAvailable(Connection* connection);
-    int connectionsAvailable();
-	QStandardItemModel* getModel();
-	static ConnectionManager* getInstance();
 	Connection* getDefaultConnection();
+    QStandardItemModel* getModel();
+
+    static ConnectionManager* getInstance();
+    void establishConnection(Connection* connection);
+    void loadSavedConnections();
+    int connectionsAvailable();
+
 
 private:
 	ConnectionManager();
 
-	QList<Connection*> m_connectionsList;
-	QStandardItemModel* m_model;
-	void updateModel(Connection* connection);
+    QList<Connection*> m_availableConnectionList;
+    QList<Connection*> m_establishedConnectionsList;
 
+    QStandardItemModel* m_connectionListModel;
+
+    void updateModel();
 	static ConnectionManager* m_instance;
-	static QMutex m_mutex;
-
-	int counter;
-
 };
 
 #endif // CONNECTIONMANAGER_H

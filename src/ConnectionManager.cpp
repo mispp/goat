@@ -7,27 +7,23 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QStandardItemModel>
+#include <QSettings>
 
 ConnectionManager* ConnectionManager::m_instance = 0;
 
-ConnectionManager::ConnectionManager()
-{
-	m_model = new QStandardItemModel();
-	counter = 0;
+ConnectionManager::ConnectionManager() {
+    m_connectionListModel = new QStandardItemModel();
 }
 
-ConnectionManager* ConnectionManager::getInstance()
-{
-	if(m_instance==0)
-	{
+ConnectionManager* ConnectionManager::getInstance() {
+    if(m_instance==0) {
 		m_instance = new ConnectionManager();
 	}
 	return m_instance;
 }
 
 
-void ConnectionManager::addConnection(Connection *connection)
-{
+void ConnectionManager::establishConnection(Connection *connection) {
 	QSqlDatabase db = QSqlDatabase::addDatabase(connection->getDriver(), connection->getConnectionId());
 
 	db.setHostName(connection->getServer());
@@ -38,23 +34,11 @@ void ConnectionManager::addConnection(Connection *connection)
 
 	bool ok = db.open();
 
-	//qDebug() << "Number of currently opened connections: " + QString::number(db.connectionNames().count());
-
-	if (ok == true)
-	{
-		//qDebug() << "Connection opened, id is " + connection->getConnectionId();
-
-		m_connectionsList.append(connection);
-
-		if (m_connectionsList.count() == 1)
-		{
-			//set default connection somehow
-		}
-
-		updateModel(connection);
-
-	} else
-	{
+    if (ok)	{
+        updateModel();
+        qDebug() << "Updated connection model";
+    }
+    else {
 		qDebug() << "Error making connection";
 
 		QString e1 = db.lastError().driverText() + "\n\n"
@@ -74,42 +58,53 @@ void ConnectionManager::addConnection(Connection *connection)
 
 		errorCreatingDBConnectionDialog.exec();
 	}
-
 }
 
-bool ConnectionManager::connectionAvailable(Connection* connection)
-{
-	return m_connectionsList.contains(connection);
+QStandardItemModel* ConnectionManager::getModel() {
+    return m_connectionListModel;
 }
 
-QStandardItemModel* ConnectionManager::getModel()
-{
-	return m_model;
+void ConnectionManager::updateModel() {
+    foreach (QString single_db_connection, QSqlDatabase::connectionNames()) {
+        if (m_connectionListModel->findItems(single_db_connection).count() == 0) {
+            QStandardItem* item = new QStandardItem();
+
+            item->setText(single_db_connection);
+            item->setData(single_db_connection, Qt::UserRole);
+            m_connectionListModel->appendRow(item);
+        }
+    }
 }
 
-void ConnectionManager::updateModel(Connection* connection)
-{
-	QStandardItem* item = new QStandardItem();
-	/* string for driver should be replaced with an icon */
-	item->setText(connection->getDriver() + ": " + connection->getName() + " (" + connection->getDatabase() + ") " + QString::number(counter+1));
-	item->setData(connection->getConnectionId(), Qt::UserRole);
+void ConnectionManager::loadSavedConnections() {
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
 
-	m_model->appendRow(item);
-	++counter;
-}
+    for (int i=0; i<settings.childGroups().count(); ++i) {
+        QString groupName = settings.childGroups()[i];
 
-Connection* ConnectionManager::getDefaultConnection()
-{
-	if (m_connectionsList.count() > 0)
-	{
-		return m_connectionsList[0];
-	} else
-	{
-		return NULL;
-	}
-}
+        settings.beginGroup(groupName);
 
-int ConnectionManager::connectionsAvailable()
-{
-    return m_connectionsList.count() > 0;
+        Connection *connection = new Connection(
+                     settings.value("driver").toString()
+                    ,settings.value("user").toString()
+                    ,settings.value("pass").toString()
+                    ,settings.value("server").toString()
+                    ,settings.value("port").toInt()
+                    ,settings.value("database").toString()
+                    ,settings.value("name").toString()
+                    ,groupName
+        );
+
+        /*
+        QVariant itemData = QVariant::fromValue(connection);
+
+        QListWidgetItem *item = new QListWidgetItem(ui->listWidgetConnections);
+        item->setText(connection->getName());
+        item->setData(Qt::UserRole, itemData);
+
+        ui->listWidgetConnections->addItem(item);
+        */
+
+        settings.endGroup();
+    }
 }

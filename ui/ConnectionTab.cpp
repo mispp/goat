@@ -51,8 +51,8 @@ QString ConnectionTab::getDriverName()
 
 void ConnectionTab::setConnection()
 {
-	QVariant v_item = ui->comboBoxConnections->currentData();
-	m_database = QSqlDatabase::database(ConnectionManager::getInstance()->getDefaultConnection()->getConnectionId());
+    //QVariant v_item = ui->comboBoxConnections->currentData();
+    //m_database = QSqlDatabase::database(ConnectionManager::getInstance()->getDefaultConnection()->getConnectionId());
 }
 
 void ConnectionTab::onctrlEnter_triggered()

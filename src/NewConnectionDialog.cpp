@@ -6,92 +6,80 @@
 #include "NewConnectionDialog.h"
 #include "ui_NewConnectionDialog.h"
 #include "Connection.h"
+#include "ConnectionManager.h"
 
-NewConnectionDialog::NewConnectionDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::NewConnectionDialog)
-{
+NewConnectionDialog::NewConnectionDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::NewConnectionDialog) {
 	ui->setupUi(this);
-	//m_connnectionId = getRandomString();
 
-	m_model = new QStandardItemModel(this);
+    m_model = new QStandardItemModel(this);
+    m_driversModel = new QStandardItemModel(this);
+    m_connectionListModel = new QStandardItemModel(this);
 
-	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+    //ConnectionManager::load bla bla
 
-	for (int i=0; i<settings.childGroups().count(); ++i)
-	{
-		QString groupName = settings.childGroups()[i];
+    QStandardItem* item_psql = new QStandardItem();
+    item_psql->setText("PostgreSQL");
+    item_psql->setData("QPSQL", Qt::UserRole);
+    m_driversModel->appendRow(item_psql);
 
-		settings.beginGroup(groupName);
+    QStandardItem* item_mysql = new QStandardItem();
+    item_mysql->setText("MySQL/MariaDB");
+    item_mysql->setData("QMYSQL", Qt::UserRole);
+    m_driversModel->appendRow(item_mysql);
 
-		Connection *connection = new Connection(
-					 settings.value("driver").toString()
-					,settings.value("user").toString()
-					,settings.value("pass").toString()
-					,settings.value("server").toString()
-					,settings.value("port").toInt()
-					,settings.value("database").toString()
-					,settings.value("name").toString()
-					,groupName
-					);
+    ui->listDropdownDBDriver->setModel(m_driversModel);
 
-		QVariant itemData = QVariant::fromValue(connection);
-
-		QListWidgetItem *item = new QListWidgetItem(ui->listWidgetConnections);
-		item->setText(connection->getName());
-		item->setData(Qt::UserRole, itemData);
-
-		ui->listWidgetConnections->addItem(item);
-
-		settings.endGroup();
-	}
-
-	m_drivers.insert("QPSQL", "PostgreSQL");
-    m_drivers.insert("QMYSQL", "MySQL");
-    /*m_drivers.insert("QDB2", "DB2");*/
-
-	for (auto key: m_drivers.keys())
-	{
-		ui->listDropdownDBDriver->addItem(m_drivers.value(key), key);
-	}
-
-    ui->listDropdownDBDriver->setCurrentIndex(1);
+    //ui->listDropdownDBDriver->setCurrentIndex(1);
     /*
      *  insert here some autopopluate code for new connection mask
     */
 }
 
-NewConnectionDialog::~NewConnectionDialog()
-{
+NewConnectionDialog::~NewConnectionDialog() {
 	delete ui;
 }
 
-void NewConnectionDialog::on_buttonBox_accepted()
-{
-	QString driver = ui->listDropdownDBDriver->currentData(Qt::UserRole).toString();
-	m_connection = new Connection(driver, ui->txtUser->text(), ui->txtPass->text(), ui->txtServer->text(), ui->txtPort->text().toInt(), ui->txtDatabase->text(), "","");
+void NewConnectionDialog::on_buttonBox_accepted() {
+    /* TODO: get this from model instead of GUI */
+    QString driver = ui->listDropdownDBDriver->currentData(Qt::UserRole).toString();
+    //QString driver = m_driversModel->
+    Connection *connection = new Connection(driver, ui->txtUser->text(), ui->txtPass->text(), ui->txtServer->text(), ui->txtPort->text().toInt(), ui->txtDatabase->text(), "","");
+
+    ConnectionManager::getInstance()->establishConnection(connection);
 
 	accept();
 }
 
-void NewConnectionDialog::on_buttonBox_rejected()
-{
+void NewConnectionDialog::on_buttonBox_rejected() {
 	m_connection = NULL;
 
 	reject();
 }
 
-QString NewConnectionDialog::getConnectionId()
-{
-	return m_connnectionId;
+QString NewConnectionDialog::getConnectionId() {
+    return m_connection->getConnectionId();
 }
 
 
-void NewConnectionDialog::saveConnections()
-{
+void NewConnectionDialog::saveConnections() {
 
+    /*
+        move connection i/o to connection manager
+    */
+
+    /*qDebug() << "updating connections";
+
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+    settings.beginGroup("MainWindow");
+
+    settings.setValue("size", this->size());
+    settings.setValue("position", this->pos());
+    settings.setValue("connectionBarSize", ui->mainSplitter->sizes()[0]);
+
+    settings.endGroup();*/
 }
 
-void NewConnectionDialog::on_buttonBox_clicked(QAbstractButton *button)
-{
+void NewConnectionDialog::on_buttonBox_clicked(QAbstractButton *button) {
 	if (button == ui->buttonBox->button(QDialogButtonBox::Apply))
 	{
 		qDebug() << "Apply clicked";
@@ -106,8 +94,7 @@ void NewConnectionDialog::on_buttonBox_clicked(QAbstractButton *button)
 	}
 }
 
-void NewConnectionDialog::on_listWidgetConnections_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
-{
+void NewConnectionDialog::on_listWidgetConnections_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous) {
 	Connection *connection = qvariant_cast<Connection*>(current->data(Qt::UserRole));
 
 	QString driver = connection->getDriver();
@@ -144,7 +131,6 @@ void NewConnectionDialog::on_listWidgetConnections_currentItemChanged(QListWidge
 
 }
 
-Connection* NewConnectionDialog::getConnection()
-{
+Connection* NewConnectionDialog::getConnection() {
 	return m_connection;
 }

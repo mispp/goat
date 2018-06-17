@@ -13,8 +13,7 @@
 #include <QStandardItem>
 #include <QFileDialog>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWindow)
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWindow) {
 	ui->setupUi(this);
 
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "settings");
@@ -22,26 +21,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 	m_tabSeq = 1;
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
 	delete ui;
 }
 
-void MainWindow::on_actionNew_connection_triggered()
-{
+void MainWindow::on_actionNew_connection_triggered() {
 	NewConnectionDialog dialog;
 	dialog.setModal(true);
 	if (dialog.exec())
 	{
 		//qDebug() << "OK Clicked, creating tab";
 
-		Connection* connection = dialog.getConnection();
-		ConnectionManager::getInstance()->addConnection(connection);
+        //Connection* connection = dialog.getConnection();
+        //ConnectionManager::getInstance()->establishConnection(connection);
 
-		if (ConnectionManager::getInstance()->connectionAvailable(connection))
+        if (QSqlDatabase::connectionNames().count() > 0)
 		{
-			addTab();
-		}
+            qDebug() << "Numer of established connections: " + QString::number(QSqlDatabase::connectionNames().count());
+        }
 
 	} else
 	{
@@ -49,14 +46,12 @@ void MainWindow::on_actionNew_connection_triggered()
 	}
 }
 
-void MainWindow::on_actionExit_triggered()
-{
+void MainWindow::on_actionExit_triggered() {
 	//this->close();
 	QApplication::exit();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
-{
+void MainWindow::closeEvent(QCloseEvent *event) {
 	/*
 		here:
 		loop over all code editors and find unsaved changes, then trigger qmessage box
@@ -124,8 +119,7 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 	clickedTab->deleteLater();
 }
 
-void MainWindow::on_actionNew_query_triggered()
-{
+void MainWindow::on_actionNew_query_triggered() {
     addTab();
     /*if (ConnectionManager::getInstance()->connectionsAvailable())
     {
@@ -135,8 +129,7 @@ void MainWindow::on_actionNew_query_triggered()
     }*/
 }
 
-void MainWindow::addTab()
-{
+void MainWindow::addTab() {
 	QString tabName = "Tab " + QString::number(m_tabSeq);
 	++m_tabSeq;
 
@@ -145,8 +138,7 @@ void MainWindow::addTab()
 	ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
 }
 
-void MainWindow::on_action_Open_triggered()
-{
+void MainWindow::on_action_Open_triggered() {
     QString filename = QFileDialog::getOpenFileName(this, "Open file", "", "");
 
     //qDebug() << "opened filename: " + filename;
