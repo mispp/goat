@@ -99,7 +99,7 @@ QList<Connection*> ConnectionManager::loadSavedConnections()
 
         Connection *connection = new Connection(
                      settings.value("driver").toString()
-                    ,settings.value("user").toString()
+                    ,settings.value("username").toString()
                     ,settings.value("pass").toString()
                     ,settings.value("server").toString()
                     ,settings.value("port").toInt()
@@ -120,60 +120,6 @@ QStringList ConnectionManager::getEstablishedConnectionList()
 {
    return QSqlDatabase::connectionNames();
 }
-
-
-/*
-bool ConnectionManager::createConnection(Connection* connection)
-{
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
-
-    settings.beginGroup(connection->getConnectionId());
-
-    qDebug() << "creating connection with id: " + connection->getConnectionId();
-
-    settings.setValue("name", connection->getName());
-    settings.setValue("driver", connection->getDriver());
-    settings.setValue("server", connection->getServer());
-    settings.setValue("port", connection->getPort());
-    settings.setValue("database", connection->getDatabase());
-    settings.setValue("username", connection->getUser());
-    settings.setValue("pass", connection->getPass());
-
-    settings.endGroup();
-
-    return true;
-}
-*/
-
-/*
-bool ConnectionManager::updateConnection(Connection* connection)
-{
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
-
-    bool connection_exists = false;
-
-    foreach (QString group, settings.childGroups())
-    {
-        if (group == connection->getConnectionId())
-        {
-            connection_exists = true;
-            settings.beginGroup(connection->getConnectionId());
-
-            settings.setValue("name", connection->getName());
-            settings.setValue("driver", connection->getDriver());
-            settings.setValue("server", connection->getServer());
-            settings.setValue("port", connection->getPort());
-            settings.setValue("database", connection->getDatabase());
-            settings.setValue("username", connection->getUser());
-            settings.setValue("pass", connection->getPass());
-
-            settings.endGroup();
-        }
-    }
-
-    return connection_exists;
-}
-*/
 
 QMap<QString, QStringList> ConnectionManager::getSavedConnections()
 {
