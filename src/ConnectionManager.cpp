@@ -27,7 +27,11 @@ ConnectionManager* ConnectionManager::getInstance()
 
 void ConnectionManager::establishConnection(Connection *connection)
 {
-	QSqlDatabase db = QSqlDatabase::addDatabase(connection->getDriver(), connection->getConnectionId());
+    const QString cn = connection->getName();
+
+    qDebug() << cn;
+
+    QSqlDatabase db = QSqlDatabase::addDatabase(connection->getDriver(), cn);
 
 	db.setHostName(connection->getServer());
 	db.setDatabaseName(connection->getDatabase());
@@ -40,7 +44,6 @@ void ConnectionManager::establishConnection(Connection *connection)
     if (ok)
     {
         updateModel();
-        qDebug() << "Updated connection model";
     }
     else
     {
@@ -74,14 +77,11 @@ void ConnectionManager::updateModel()
 {
     foreach (QString single_db_connection, QSqlDatabase::connectionNames())
     {
-        if (m_connectionListModel->findItems(single_db_connection).count() == 0)
-        {
-            QStandardItem* item = new QStandardItem();
+        QStandardItem* item = new QStandardItem();
 
-            item->setText(single_db_connection);
-            item->setData(single_db_connection, Qt::UserRole);
-            m_connectionListModel->appendRow(item);
-        }
+        item->setText(single_db_connection);
+        item->setData(single_db_connection, Qt::UserRole);
+        m_connectionListModel->appendRow(item);
     }
 }
 

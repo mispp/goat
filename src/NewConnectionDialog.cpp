@@ -75,8 +75,10 @@ NewConnectionDialog::~NewConnectionDialog() {
 
 void NewConnectionDialog::on_buttonBox_accepted() {
     /* TODO: get this from model instead of GUI */
-    QString driver = ui->listDropdownDBDriver->currentData(Qt::UserRole).toString();
-    Connection *connection = new Connection(driver, ui->txtUser->text(), ui->txtPass->text(), ui->txtServer->text(), ui->txtPort->text().toInt(), ui->txtDatabase->text(), "","");
+    //QString driver = ui->listDropdownDBDriver->currentData(Qt::UserRole).toString();
+    const QModelIndex index = ui->listViewConnections->currentIndex();
+    Connection* connection = m_connectionListModel->itemFromIndex(index)->data(Qt::UserRole).value<Connection*>();
+
     ConnectionManager::getInstance()->establishConnection(connection);
 
 	accept();
