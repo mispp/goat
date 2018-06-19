@@ -3,9 +3,7 @@
 
 #include <QString>
 #include <QVariant>
-#include <QListWidgetItem>
-
-
+#include <QSettings>
 
 class Connection
 {
@@ -18,21 +16,27 @@ public:
 	int getPort();
 	QString getDatabase();
 	QString getName();
-	void setChanged();
 	QString getConnectionId();
 
-private:
-	QString m_Name;
-	QString m_Driver;
-	QString m_User;
-	QString m_Pass;
-	QString m_Server;
-	int m_Port;
-	QString m_Database;
-	QString m_GroupName;
-	QString m_connectionId;
+    void setDriver(QString newDriver);
+    void setUser(QString newUser);
+    void setPass(QString newPass);
+    void setServer(QString newServer);
+    void setPort(int newPort);
+    void setDatabase(QString newDatabase);
+    void setName(QString newName);
 
-	bool m_changed;
+    void persistConnection();
+
+private:
+    QString m_name;
+    QString m_driver;
+    QString m_user;
+    QString m_pass;
+    QString m_server;
+    int m_port;
+    QString m_database;
+    QString m_connectionId;
 };
 
 Q_DECLARE_METATYPE(Connection*)

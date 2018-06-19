@@ -11,11 +11,13 @@
 
 ConnectionManager* ConnectionManager::m_instance = 0;
 
-ConnectionManager::ConnectionManager() {
+ConnectionManager::ConnectionManager()
+{
     m_connectionListModel = new QStandardItemModel();
 }
 
-ConnectionManager* ConnectionManager::getInstance() {
+ConnectionManager* ConnectionManager::getInstance()
+{
     if(m_instance==0) {
 		m_instance = new ConnectionManager();
 	}
@@ -23,7 +25,8 @@ ConnectionManager* ConnectionManager::getInstance() {
 }
 
 
-void ConnectionManager::establishConnection(Connection *connection) {
+void ConnectionManager::establishConnection(Connection *connection)
+{
 	QSqlDatabase db = QSqlDatabase::addDatabase(connection->getDriver(), connection->getConnectionId());
 
 	db.setHostName(connection->getServer());
@@ -34,11 +37,13 @@ void ConnectionManager::establishConnection(Connection *connection) {
 
 	bool ok = db.open();
 
-    if (ok)	{
+    if (ok)
+    {
         updateModel();
         qDebug() << "Updated connection model";
     }
-    else {
+    else
+    {
 		qDebug() << "Error making connection";
 
 		QString e1 = db.lastError().driverText() + "\n\n"
@@ -60,13 +65,17 @@ void ConnectionManager::establishConnection(Connection *connection) {
 	}
 }
 
-QStandardItemModel* ConnectionManager::getModel() {
+QStandardItemModel* ConnectionManager::getModel()
+{
     return m_connectionListModel;
 }
 
-void ConnectionManager::updateModel() {
-    foreach (QString single_db_connection, QSqlDatabase::connectionNames()) {
-        if (m_connectionListModel->findItems(single_db_connection).count() == 0) {
+void ConnectionManager::updateModel()
+{
+    foreach (QString single_db_connection, QSqlDatabase::connectionNames())
+    {
+        if (m_connectionListModel->findItems(single_db_connection).count() == 0)
+        {
             QStandardItem* item = new QStandardItem();
 
             item->setText(single_db_connection);
@@ -76,10 +85,14 @@ void ConnectionManager::updateModel() {
     }
 }
 
-void ConnectionManager::loadSavedConnections() {
+QList<Connection*> ConnectionManager::loadSavedConnections()
+{
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
 
-    for (int i=0; i<settings.childGroups().count(); ++i) {
+    QList<Connection*> connectionList;
+
+    for (int i=0; i<settings.childGroups().count(); ++i)
+    {
         QString groupName = settings.childGroups()[i];
 
         settings.beginGroup(groupName);
@@ -95,16 +108,93 @@ void ConnectionManager::loadSavedConnections() {
                     ,groupName
         );
 
-        /*
-        QVariant itemData = QVariant::fromValue(connection);
+        settings.endGroup();
 
-        QListWidgetItem *item = new QListWidgetItem(ui->listWidgetConnections);
-        item->setText(connection->getName());
-        item->setData(Qt::UserRole, itemData);
+        connectionList.append(connection);
+    }
 
-        ui->listWidgetConnections->addItem(item);
-        */
+    return connectionList;
+}
+
+QStringList ConnectionManager::getEstablishedConnectionList()
+{
+   return QSqlDatabase::connectionNames();
+}
+
+
+/*
+bool ConnectionManager::createConnection(Connection* connection)
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+
+    settings.beginGroup(connection->getConnectionId());
+
+    qDebug() << "creating connection with id: " + connection->getConnectionId();
+
+    settings.setValue("name", connection->getName());
+    settings.setValue("driver", connection->getDriver());
+    settings.setValue("server", connection->getServer());
+    settings.setValue("port", connection->getPort());
+    settings.setValue("database", connection->getDatabase());
+    settings.setValue("username", connection->getUser());
+    settings.setValue("pass", connection->getPass());
+
+    settings.endGroup();
+
+    return true;
+}
+*/
+
+/*
+bool ConnectionManager::updateConnection(Connection* connection)
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+
+    bool connection_exists = false;
+
+    foreach (QString group, settings.childGroups())
+    {
+        if (group == connection->getConnectionId())
+        {
+            connection_exists = true;
+            settings.beginGroup(connection->getConnectionId());
+
+            settings.setValue("name", connection->getName());
+            settings.setValue("driver", connection->getDriver());
+            settings.setValue("server", connection->getServer());
+            settings.setValue("port", connection->getPort());
+            settings.setValue("database", connection->getDatabase());
+            settings.setValue("username", connection->getUser());
+            settings.setValue("pass", connection->getPass());
+
+            settings.endGroup();
+        }
+    }
+
+    return connection_exists;
+}
+*/
+
+QMap<QString, QStringList> ConnectionManager::getSavedConnections()
+{
+
+    QMap<QString, QStringList> results;
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+
+    foreach (QString groupid, settings.childGroups())
+    {
+        settings.beginGroup(groupid);
+
+        QStringList keys = settings.allKeys();
+
+        results["groupid"].append(groupid);
+
+        foreach (QString key, keys) {
+            results[key].append(settings.value(key).toString());
+        }
 
         settings.endGroup();
     }
+
+    return results;
 }

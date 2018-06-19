@@ -13,18 +13,25 @@ public:
     QStandardItemModel* getModel();
 
     static ConnectionManager* getInstance();
+    static QList<Connection*> loadSavedConnections();
+
     void establishConnection(Connection* connection);
-    void loadSavedConnections();
     int connectionsAvailable();
 
+    //static bool createConnection(Connection* connection);
+    //static bool updateConnection(Connection* connection);
+
+    static QMap<QString, QStringList> getSavedConnections();
+    QStringList getEstablishedConnectionList();
 
 private:
 	ConnectionManager();
 
     QList<Connection*> m_availableConnectionList;
-    QList<Connection*> m_establishedConnectionsList;
 
     QStandardItemModel* m_connectionListModel;
+
+    QString m_lastUsedConnection;
 
     void updateModel();
 	static ConnectionManager* m_instance;

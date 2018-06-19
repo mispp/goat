@@ -107,8 +107,6 @@ void MainWindow::writeSettings()
 	settings.setValue("connectionBarSize", ui->mainSplitter->sizes()[0]);
 
 	settings.endGroup();
-
-	//qDebug() << settings.fileName();
 }
 
 
