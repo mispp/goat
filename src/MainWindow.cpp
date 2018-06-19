@@ -37,7 +37,8 @@ void MainWindow::on_actionNew_connection_triggered() {
 
         if (QSqlDatabase::connectionNames().count() > 0)
 		{
-            qDebug() << "Numer of established connections: " + QString::number(QSqlDatabase::connectionNames().count());
+            //qDebug() << "Numer of established connections: " + QString::number(QSqlDatabase::connectionNames().count());
+            addTab();
         }
 
 	} else
