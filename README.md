@@ -7,7 +7,7 @@ This app was made for 2 reasons:
 1. necessity: there is no app in native toolkit available for linux that has querying functionality (there is a plugin for kate in kde, but this just doesnt work for me; not sure about gnome)
 2. learning: improve my qt skill. i'm not a c++ developer, so please excuse shitty code quality
 
-If someone wants to contribute, please do so.
+Contributions are welcome!
 
 What works:
 - connection manager saves information
