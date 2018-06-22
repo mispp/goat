@@ -1,19 +1,19 @@
 #include "ConnectionManager.h"
-#include <QJsonDocument>
 #include <QSqlDatabase>
 #include <QMessageBox>
-#include <QSpacerItem>
-#include <QGridLayout>
 #include <QDebug>
 #include <QSqlError>
 #include <QStandardItemModel>
 #include <QSettings>
+#include <QSpacerItem>
+#include <QGridLayout>
+#include <QRandomGenerator64>
 
 ConnectionManager* ConnectionManager::m_instance = 0;
 
 ConnectionManager::ConnectionManager()
 {
-    m_connectionListModel = new QStandardItemModel();
+    m_establishedConnectionModel = new QStandardItemModel();
 }
 
 ConnectionManager* ConnectionManager::getInstance()
@@ -24,26 +24,38 @@ ConnectionManager* ConnectionManager::getInstance()
 	return m_instance;
 }
 
-
-void ConnectionManager::establishConnection(Connection *connection)
+QStandardItemModel* ConnectionManager::getEstablishedConnectionModel()
 {
-    const QString cn = connection->getName();
+    return m_establishedConnectionModel;
+}
 
-    qDebug() << cn;
+void ConnectionManager::establishConnection(ConnectionStandardItem *connection)
+{
+    QRandomGenerator64 random = QRandomGenerator64::securelySeeded();
+    qint64 newId = random.generate64();
 
-    QSqlDatabase db = QSqlDatabase::addDatabase(connection->getDriver(), cn);
+    QMap<QString, QVariant> connectionDefinition = connection->data(Qt::UserRole+1).value<QMap<QString, QVariant>>();
+    connectionDefinition["establishedConnectionId"] = QString("EC_" + QString::number(newId));
 
-	db.setHostName(connection->getServer());
-	db.setDatabaseName(connection->getDatabase());
-	db.setUserName(connection->getUser());
-	db.setPassword(connection->getPass());
-	db.setPort(connection->getPort());
+    QSqlDatabase db = QSqlDatabase::addDatabase(connectionDefinition["driver"].toString(), connectionDefinition["establishedConnectionId"].toString());
+
+    db.setHostName(connectionDefinition["server"].toString());
+    db.setDatabaseName(connectionDefinition["database"].toString());
+    db.setUserName(connectionDefinition["username"].toString());
+    db.setPassword(connectionDefinition["pass"].toString());
+    db.setPort(connectionDefinition["port"].toInt());
 
 	bool ok = db.open();
 
     if (ok)
     {
-        updateModel();
+        //do nothing?
+
+        QStandardItem* establishedConnection = new QStandardItem();
+        establishedConnection->setText(connectionDefinition["name"].toString());
+        establishedConnection->setData(connectionDefinition["establishedConnectionId"].toString(), Qt::UserRole+1);
+
+        m_establishedConnectionModel->appendRow(establishedConnection);
     }
     else
     {
@@ -68,79 +80,7 @@ void ConnectionManager::establishConnection(Connection *connection)
 	}
 }
 
-QStandardItemModel* ConnectionManager::getModel()
-{
-    return m_connectionListModel;
-}
-
-void ConnectionManager::updateModel()
-{
-    foreach (QString single_db_connection, QSqlDatabase::connectionNames())
-    {
-        QStandardItem* item = new QStandardItem();
-
-        item->setText(single_db_connection);
-        item->setData(single_db_connection, Qt::UserRole);
-        m_connectionListModel->appendRow(item);
-    }
-}
-
-QList<Connection*> ConnectionManager::loadSavedConnections()
-{
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
-
-    QList<Connection*> connectionList;
-
-    for (int i=0; i<settings.childGroups().count(); ++i)
-    {
-        QString groupName = settings.childGroups()[i];
-
-        settings.beginGroup(groupName);
-
-        Connection *connection = new Connection(
-                     settings.value("driver").toString()
-                    ,settings.value("username").toString()
-                    ,settings.value("pass").toString()
-                    ,settings.value("server").toString()
-                    ,settings.value("port").toInt()
-                    ,settings.value("database").toString()
-                    ,settings.value("name").toString()
-                    ,groupName
-        );
-
-        settings.endGroup();
-
-        connectionList.append(connection);
-    }
-
-    return connectionList;
-}
-
 QStringList ConnectionManager::getEstablishedConnectionList()
 {
    return QSqlDatabase::connectionNames();
-}
-
-QMap<QString, QStringList> ConnectionManager::getSavedConnections()
-{
-
-    QMap<QString, QStringList> results;
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
-
-    foreach (QString groupid, settings.childGroups())
-    {
-        settings.beginGroup(groupid);
-
-        QStringList keys = settings.allKeys();
-
-        results["groupid"].append(groupid);
-
-        foreach (QString key, keys) {
-            results[key].append(settings.value(key).toString());
-        }
-
-        settings.endGroup();
-    }
-
-    return results;
 }

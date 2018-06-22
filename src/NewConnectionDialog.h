@@ -9,7 +9,7 @@
 #include <QStandardItem>
 #include <QDataWidgetMapper>
 
-#include "Connection.h"
+#include "ConnectionStandardItem.h"
 
 namespace Ui {
 class NewConnectionDialog;
@@ -22,23 +22,18 @@ class NewConnectionDialog : public QDialog
 public:
 	explicit NewConnectionDialog(QWidget *parent = 0);
 	~NewConnectionDialog();
-	QString getConnectionId();
-	Connection* getConnection();
 
 private slots:
 	void on_buttonBox_accepted();
 	void on_buttonBox_rejected();
 	void on_buttonBox_clicked(QAbstractButton *button);
-    //void on_listWidgetConnections_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
-
     void on_buttonNewConnection_released();
-    void handleSelectionChanged(QItemSelection current, QItemSelection previous);
-    void updateListViewItem(QStandardItem* changedItem);
+    void on_listViewSelectionChanged(QItemSelection current, QItemSelection previous);
+    void on_rowsInserted(const QModelIndex &source_parent, int start, int end);
+    void on_renameListViewItem(QStandardItem* changedItem);
 
 private:
 	Ui::NewConnectionDialog *ui;
-
-    Connection* m_connection;
 
     QStandardItemModel* m_model;
     QStandardItemModel* m_driversModel;
@@ -46,6 +41,8 @@ private:
     QDataWidgetMapper* m_dataWidgetMapper;
     void updateConnectionListModel();
     void updateCurrentlySelectedConnection();
+    QMap<QString, QVariant> getSelectedConnectionDefinition();
+    ConnectionStandardItem* getCurrentlySelectedConnection();
 };
 
 #endif // NEWCONNECTIONDIALOG_H

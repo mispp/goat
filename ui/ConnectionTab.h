@@ -34,8 +34,8 @@ private slots:
 private:
 	Ui::ConnectionTab *ui;
 
-	QSqlDatabase m_database;
-	QSqlQueryModel* m_model;
+    QSqlDatabase m_establishedConnection;
+    QSqlQueryModel* m_queryResultsModel;
 
 	void setConnection();
 

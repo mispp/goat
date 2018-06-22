@@ -1,7 +1,6 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "NewConnectionDialog.h"
-#include "Connection.h"
 #include "ui/ConnectionTab.h"
 
 #include <QDebug>
@@ -84,8 +83,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::readSettings()
 {
-	qDebug() << "reading settings";
-
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "settings");
 	settings.beginGroup("MainWindow");
 
@@ -98,8 +95,6 @@ void MainWindow::readSettings()
 
 void MainWindow::writeSettings()
 {
-	qDebug() << "updating settings";
-
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "settings");
 	settings.beginGroup("MainWindow");
 

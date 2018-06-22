@@ -21,15 +21,16 @@
 ConnectionTab::ConnectionTab(QWidget *parent) :	QWidget(parent), ui(new Ui::ConnectionTab)
 {
 	ui->setupUi(this);
-	ui->comboBoxConnections->setModel(ConnectionManager::getInstance()->getModel());
+    ui->comboBoxConnections->setModel(ConnectionManager::getInstance()->getEstablishedConnectionModel());
 
-	m_model = new QSqlQueryModel(this);
-	ui->resultsGrid->setModel(m_model);
+    m_queryResultsModel = new QSqlQueryModel(this);
+    ui->resultsGrid->setModel(m_queryResultsModel);
 
     //setConnection();
+    m_establishedConnection = QSqlDatabase::database(ui->comboBoxConnections->itemData(0, Qt::UserRole+1).toString());
 
 	// insert test-sql code
-    ui->codeEditor->setStyleSheet("QPlainTextEdit { font-family: Courier }");
+    //ui->codeEditor->setStyleSheet("QPlainTextEdit { font-family: Courier }");
 
 	connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->codeEditor), SIGNAL(activated()), this, SLOT(onctrlEnter_triggered()));
 }
@@ -39,29 +40,39 @@ ConnectionTab::~ConnectionTab()
 	delete ui;
 }
 
+void ConnectionTab::on_comboBoxConnections_currentIndexChanged(int index)
+{
+    //ConnectionManager::getInstance()->getModel()->item(index)->data(Qt::UserRole).toString();
+
+    //QMap<QString, QVariant> connectionDefinition = ConnectionManager::getInstance()->getEstablishedConnectionModel()->item(index)->data(Qt::UserRole).value<QMap<QString, QVariant>>();
+    m_establishedConnection = QSqlDatabase::database(ui->comboBoxConnections->currentData(Qt::UserRole+1).toString());
+}
+
 QString ConnectionTab::getConnectionId()
 {
-	return m_database.connectionName();
+    return m_establishedConnection.connectionName();
 }
 
 QString ConnectionTab::getDriverName()
 {
-	return m_database.driverName();
+    return m_establishedConnection.driverName();
 }
 
 void ConnectionTab::setConnection()
 {
     //QVariant v_item = ui->comboBoxConnections->currentData();
-    //m_database = QSqlDatabase::database(ConnectionManager::getInstance()->getDefaultConnection()->getConnectionId());
+    m_establishedConnection = QSqlDatabase::database();
 }
 
 void ConnectionTab::onctrlEnter_triggered()
 {
 	const QString query = getSqlStatement(ui->codeEditor).trimmed();
-	m_model->clear();
+    m_queryResultsModel->clear();
 	ui->resultsText->clear();
 
-	QSqlQuery q(m_database);
+    qDebug() << "Established connection count: " + QString::number(QSqlDatabase::connectionNames().count());
+
+    QSqlQuery q(m_establishedConnection);
 	//q.setForwardOnly(true);
 	q.prepare(query);
 
@@ -72,7 +83,7 @@ void ConnectionTab::onctrlEnter_triggered()
 			//size is not -1, so probably an select statement
 			qDebug() << "Number of rows in result set: " + QString::number(q.size());
 
-			m_model->setQuery(q);
+            m_queryResultsModel->setQuery(q);
 			ui->resultsGrid->resizeColumnsToContents();
 
 			ui->resultsTabBar->setCurrentIndex(0);
@@ -128,8 +139,4 @@ QString ConnectionTab::getSqlStatement(QPlainTextEdit* codeEditor)
 }
 
 
-void ConnectionTab::on_comboBoxConnections_currentIndexChanged(int index)
-{
-	//ConnectionManager::getInstance()->getModel()->item(index)->data(Qt::UserRole).toString();
-	m_database = QSqlDatabase::database(ConnectionManager::getInstance()->getModel()->item(index)->data(Qt::UserRole).toString());
-}
+
