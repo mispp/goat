@@ -5,8 +5,8 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
 
-    keywordFormat.setForeground(Qt::darkBlue);
-    keywordFormat.setFontWeight(QFont::Bold);
+    keywordFormat.setForeground(Qt::blue);
+    //keywordFormat.setFontWeight(QFont::Bold);
     QStringList keywordPatterns;
     keywordPatterns << "\\bselect\\b" << "\\bfrom\\b" << "\\bwhere\\b"
                     << "\\bhaving\\b" << "\\group\\b" << "\\bby\\b"

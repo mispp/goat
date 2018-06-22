@@ -26,7 +26,7 @@ ConnectionTab::ConnectionTab(QWidget *parent) :	QWidget(parent), ui(new Ui::Conn
     m_queryResultsModel = new QSqlQueryModel(this);
     ui->resultsGrid->setModel(m_queryResultsModel);
 
-    ui->codeEditor->setStyleSheet("font: 18px;");
+    ui->codeEditor->setStyleSheet("QPlainTextEdit { font: 18px; }");
 
     m_establishedConnection = QSqlDatabase::database(ui->comboBoxConnections->itemData(0, Qt::UserRole+1).toString());
 
