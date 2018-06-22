@@ -11,6 +11,8 @@
 #include <QSplitter>
 #include <QComboBox>
 
+#include "Highlighter.h"
+
 namespace Ui {
 class ConnectionTab;
 }
@@ -20,26 +22,24 @@ class ConnectionTab : public QWidget
 	Q_OBJECT
 
 public slots:
-	void onctrlEnter_triggered();
+    void on_ctrlEnter_triggered();
 
 public:
 	explicit ConnectionTab(QWidget *parent = 0);
 	~ConnectionTab();
-	QString getDriverName();
-	QString getConnectionId();
 
 private slots:
 	void on_comboBoxConnections_currentIndexChanged(int index);
+    void on_button_selectionQuery_released();
 
 private:
 	Ui::ConnectionTab *ui;
 
     QSqlDatabase m_establishedConnection;
     QSqlQueryModel* m_queryResultsModel;
+    void runQuery(const QString query);
+    Highlighter* highlighter;
 
-	void setConnection();
-
-	QString getSqlStatement(QPlainTextEdit* codeEditor);
 };
 
 #endif // CONNECTIONTAB_H

@@ -14,20 +14,20 @@ TEMPLATE = app
 
 SOURCES += \
     src/MainWindow.cpp \
-    src/CodeEditor.cpp \
     src/ConnectionManager.cpp \
     src/main.cpp \
     ui/ConnectionTab.cpp \
     src/ConnectionStandardItem.cpp \
-    src/NewConnectionDialog.cpp
+    src/NewConnectionDialog.cpp \
+    ui/Highlighter.cpp
 
 HEADERS  += \
     src/MainWindow.h \
-    src/CodeEditor.h \
     src/ConnectionManager.h \
     ui/ConnectionTab.h \
     src/ConnectionStandardItem.h \
-    src/NewConnectionDialog.h
+    src/NewConnectionDialog.h \
+    ui/Highlighter.h
 
 FORMS    += \
     ui/MainWindow.ui \
