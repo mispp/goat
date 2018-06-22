@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "settings");
 	readSettings();
 	m_tabSeq = 1;
+
+    on_actionNew_connection_triggered();
 }
 
 MainWindow::~MainWindow() {

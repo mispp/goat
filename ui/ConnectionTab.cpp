@@ -61,7 +61,7 @@ void ConnectionTab::runQuery(const QString query)
 {
     if (!query.trimmed().isEmpty())
     {
-        executeQuery(query);
+        executeQuery(query.simplified());
     }
 }
 
