@@ -38,6 +38,7 @@ private:
     QSqlDatabase m_establishedConnection;
     QSqlQueryModel* m_queryResultsModel;
     void runQuery(const QString query);
+    void executeQuery(const QString query);
     Highlighter* highlighter;
 
 };

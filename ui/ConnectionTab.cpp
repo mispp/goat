@@ -59,6 +59,14 @@ void ConnectionTab::on_button_selectionQuery_released()
 
 void ConnectionTab::runQuery(const QString query)
 {
+    if (!query.trimmed().isEmpty())
+    {
+        executeQuery(query);
+    }
+}
+
+void ConnectionTab::executeQuery(const QString query)
+{
     m_queryResultsModel->clear();
     ui->resultsText->clear();
 
