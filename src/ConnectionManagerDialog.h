@@ -1,5 +1,5 @@
-#ifndef NEWCONNECTIONDIALOG_H
-#define NEWCONNECTIONDIALOG_H
+#ifndef CONNECTIONMANAGERDIALOG_H
+#define CONNECTIONMANAGERDIALOG_H
 
 #include <QDialog>
 #include <QStandardItemModel>
@@ -12,16 +12,16 @@
 #include "ConnectionStandardItem.h"
 
 namespace Ui {
-class NewConnectionDialog;
+class ConnectionManagerDialog;
 }
 
-class NewConnectionDialog : public QDialog
+class ConnectionManagerDialog : public QDialog
 {
 	Q_OBJECT
 
 public:
-	explicit NewConnectionDialog(QWidget *parent = 0);
-	~NewConnectionDialog();
+    explicit ConnectionManagerDialog(QWidget *parent = 0);
+    ~ConnectionManagerDialog();
 
 private slots:
 	void on_buttonBox_accepted();
@@ -33,7 +33,7 @@ private slots:
     void on_renameListViewItem(QStandardItem* changedItem);
 
 private:
-	Ui::NewConnectionDialog *ui;
+    Ui::ConnectionManagerDialog *ui;
 
     QStandardItemModel* m_model;
     QStandardItemModel* m_driversModel;
@@ -45,4 +45,4 @@ private:
     ConnectionStandardItem* getCurrentlySelectedConnection();
 };
 
-#endif // NEWCONNECTIONDIALOG_H
+#endif // CONNECTIONMANAGERDIALOG_H

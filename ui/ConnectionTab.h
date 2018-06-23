@@ -40,6 +40,7 @@ private:
     void runQuery(const QString query);
     void executeQuery(const QString query);
     Highlighter* highlighter;
+    QString getQueryAtCursor(const QTextBlock & block);
 
 };
 

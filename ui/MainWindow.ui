@@ -70,7 +70,7 @@
     <property name="title">
      <string>Fi&amp;le</string>
     </property>
-    <addaction name="actionNew_connection"/>
+    <addaction name="action_showConnectionManager"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -95,7 +95,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionNew_connection"/>
+   <addaction name="action_showConnectionManager"/>
    <addaction name="actionNew_query"/>
    <addaction name="action_Open"/>
   </widget>
@@ -104,16 +104,22 @@
     <string>&amp;Exit</string>
    </property>
   </action>
-  <action name="actionNew_connection">
+  <action name="action_showConnectionManager">
    <property name="icon">
     <iconset theme="add">
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>&amp;New connection</string>
+    <string>&amp;Show Connection Manager</string>
+   </property>
+   <property name="iconText">
+    <string>Connection Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>Connection Manager</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+N</string>
+    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="actionNew_query">
@@ -133,7 +139,8 @@
   </action>
   <action name="action_Open">
    <property name="icon">
-    <iconset theme="document-open"/>
+    <iconset theme="document-open">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Open</string>

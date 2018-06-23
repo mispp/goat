@@ -4,11 +4,11 @@
 #include <QMessageBox>
 #include <QRandomGenerator64>
 
-#include "NewConnectionDialog.h"
-#include "ui_NewConnectionDialog.h"
+#include "ConnectionManagerDialog.h"
+#include "ui_ConnectionManagerDialog.h"
 #include "ConnectionManager.h"
 
-NewConnectionDialog::NewConnectionDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::NewConnectionDialog) {
+ConnectionManagerDialog::ConnectionManagerDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::ConnectionManagerDialog) {
 	ui->setupUi(this);
 
     m_model = new QStandardItemModel(this);
@@ -48,11 +48,11 @@ NewConnectionDialog::NewConnectionDialog(QWidget *parent) :	QDialog(parent), ui(
     ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
 }
 
-NewConnectionDialog::~NewConnectionDialog() {
+ConnectionManagerDialog::~ConnectionManagerDialog() {
 	delete ui;
 }
 
-void NewConnectionDialog::on_buttonBox_accepted() {
+void ConnectionManagerDialog::on_buttonBox_accepted() {
     /* TODO: get this from model instead of GUI */
     //QString driver = ui->listDropdownDBDriver->currentData(Qt::UserRole).toString();
     //const QModelIndex index = ui->listViewConnections->currentIndex();
@@ -63,11 +63,11 @@ void NewConnectionDialog::on_buttonBox_accepted() {
 	accept();
 }
 
-void NewConnectionDialog::on_buttonBox_rejected() {
+void ConnectionManagerDialog::on_buttonBox_rejected() {
 	reject();
 }
 
-void NewConnectionDialog::on_buttonBox_clicked(QAbstractButton *button) {
+void ConnectionManagerDialog::on_buttonBox_clicked(QAbstractButton *button) {
 	if (button == ui->buttonBox->button(QDialogButtonBox::Apply))
 	{
         updateCurrentlySelectedConnection();
@@ -84,7 +84,7 @@ void NewConnectionDialog::on_buttonBox_clicked(QAbstractButton *button) {
 	}
 }
 
-void NewConnectionDialog::on_rowsInserted(const QModelIndex &source_parent, int start, int end)
+void ConnectionManagerDialog::on_rowsInserted(const QModelIndex &source_parent, int start, int end)
 {
     QModelIndex index = m_connectionListModel->index(start, 0);
     if (index.isValid())
@@ -94,7 +94,7 @@ void NewConnectionDialog::on_rowsInserted(const QModelIndex &source_parent, int 
     }
 }
 
-void NewConnectionDialog::on_buttonNewConnection_released()
+void ConnectionManagerDialog::on_buttonNewConnection_released()
 {
     QRandomGenerator64 random = QRandomGenerator64::securelySeeded();
     qint64 newId = random.generate64();
@@ -103,7 +103,7 @@ void NewConnectionDialog::on_buttonNewConnection_released()
     m_connectionListModel->appendRow(item);
 }
 
-void NewConnectionDialog::on_renameListViewItem(QStandardItem* changedItem)
+void ConnectionManagerDialog::on_renameListViewItem(QStandardItem* changedItem)
 {
     QMap<QString, QVariant> connectionDefinition = changedItem->data(Qt::UserRole+1).value<QMap<QString, QVariant>>();
     QString newName = changedItem->text();
@@ -112,7 +112,7 @@ void NewConnectionDialog::on_renameListViewItem(QStandardItem* changedItem)
     getCurrentlySelectedConnection()->updateConnectionDefinition(connectionDefinition);
 }
 
-void NewConnectionDialog::on_listViewSelectionChanged(QItemSelection current, QItemSelection previous) {
+void ConnectionManagerDialog::on_listViewSelectionChanged(QItemSelection current, QItemSelection previous) {
     QMap<QString, QVariant> connectionDefinition = getSelectedConnectionDefinition();
 
     //ui->listDropdownDBDriver->setCurrentIndex(index);
@@ -133,7 +133,7 @@ void NewConnectionDialog::on_listViewSelectionChanged(QItemSelection current, QI
     ui->listDropdownDBDriver->setEnabled(true);
 }
 
-void NewConnectionDialog::updateConnectionListModel() {
+void ConnectionManagerDialog::updateConnectionListModel() {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
 
     foreach(QString key, settings.childGroups())
@@ -143,7 +143,7 @@ void NewConnectionDialog::updateConnectionListModel() {
     }
 }
 
-void NewConnectionDialog::updateCurrentlySelectedConnection()
+void ConnectionManagerDialog::updateCurrentlySelectedConnection()
 {
     QMap<QString, QVariant> connectionDefinition = getSelectedConnectionDefinition();
 
@@ -157,14 +157,14 @@ void NewConnectionDialog::updateCurrentlySelectedConnection()
     getCurrentlySelectedConnection()->updateConnectionDefinition(connectionDefinition);
 }
 
-ConnectionStandardItem* NewConnectionDialog::getCurrentlySelectedConnection()
+ConnectionStandardItem* ConnectionManagerDialog::getCurrentlySelectedConnection()
 {
     QStandardItem* currentlySelectedConnection = m_connectionListModel->itemFromIndex(ui->listViewConnections->currentIndex());
 
     return (ConnectionStandardItem*) currentlySelectedConnection;
 }
 
-QMap<QString, QVariant> NewConnectionDialog::getSelectedConnectionDefinition()
+QMap<QString, QVariant> ConnectionManagerDialog::getSelectedConnectionDefinition()
 {
     return getCurrentlySelectedConnection()->data().value<QMap<QString, QVariant>>();
 }

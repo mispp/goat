@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NewConnectionDialog</class>
- <widget class="QDialog" name="NewConnectionDialog">
+ <class>ConnectionManagerDialog</class>
+ <widget class="QDialog" name="ConnectionManagerDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -45,7 +45,8 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset theme="remove"/>
+          <iconset theme="remove">
+           <normaloff>.</normaloff>.</iconset>
          </property>
         </widget>
        </item>

@@ -18,13 +18,11 @@ public:
 	~MainWindow();
 
 private slots:
-	void on_actionNew_connection_triggered();
 	void on_actionExit_triggered();
 	void on_tabBarConnections_tabCloseRequested(int index);
-
 	void on_actionNew_query_triggered();
-
     void on_action_Open_triggered();
+    void on_action_showConnectionManager_triggered();
 
 private:
 	Ui::MainWindow *ui;

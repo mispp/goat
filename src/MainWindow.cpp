@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include "NewConnectionDialog.h"
+#include "ConnectionManagerDialog.h"
 #include "ui/ConnectionTab.h"
 
 #include <QDebug>
@@ -19,33 +19,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 	readSettings();
 	m_tabSeq = 1;
 
-    on_actionNew_connection_triggered();
+    on_action_showConnectionManager_triggered();
 }
 
 MainWindow::~MainWindow() {
 	delete ui;
-}
-
-void MainWindow::on_actionNew_connection_triggered() {
-	NewConnectionDialog dialog;
-	dialog.setModal(true);
-	if (dialog.exec())
-	{
-		//qDebug() << "OK Clicked, creating tab";
-
-        //Connection* connection = dialog.getConnection();
-        //ConnectionManager::getInstance()->establishConnection(connection);
-
-        if (QSqlDatabase::connectionNames().count() > 0)
-		{
-            //qDebug() << "Numer of established connections: " + QString::number(QSqlDatabase::connectionNames().count());
-            addTab();
-        }
-
-	} else
-	{
-		//qDebug() << "Cancelled";
-	}
 }
 
 void MainWindow::on_actionExit_triggered() {
@@ -144,4 +122,27 @@ void MainWindow::on_action_Open_triggered() {
         int index = ui->tabBarConnections->widget(index);
          QFile
     }*/
+}
+
+void MainWindow::on_action_showConnectionManager_triggered()
+{
+    ConnectionManagerDialog dialog;
+    dialog.setModal(true);
+    if (dialog.exec())
+    {
+        //qDebug() << "OK Clicked, creating tab";
+
+        //Connection* connection = dialog.getConnection();
+        //ConnectionManager::getInstance()->establishConnection(connection);
+
+        if (QSqlDatabase::connectionNames().count() > 0)
+        {
+            //qDebug() << "Numer of established connections: " + QString::number(QSqlDatabase::connectionNames().count());
+            addTab();
+        }
+
+    } else
+    {
+        //qDebug() << "Cancelled";
+    }
 }

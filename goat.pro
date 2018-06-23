@@ -18,21 +18,21 @@ SOURCES += \
     src/main.cpp \
     ui/ConnectionTab.cpp \
     src/ConnectionStandardItem.cpp \
-    src/NewConnectionDialog.cpp \
-    ui/Highlighter.cpp
+    ui/Highlighter.cpp \
+    src/ConnectionManagerDialog.cpp
 
 HEADERS  += \
     src/MainWindow.h \
     src/ConnectionManager.h \
     ui/ConnectionTab.h \
     src/ConnectionStandardItem.h \
-    src/NewConnectionDialog.h \
-    ui/Highlighter.h
+    ui/Highlighter.h \
+    src/ConnectionManagerDialog.h
 
 FORMS    += \
     ui/MainWindow.ui \
     ui/ConnectionTab.ui \
-    ui/NewConnectionDialog.ui
+    ui/ConnectionManagerDialog.ui
 
 DISTFILES += \
     LICENSE \
