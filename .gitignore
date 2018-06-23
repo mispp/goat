@@ -25,9 +25,10 @@ ui_*.h
 Makefile*
 *build-*
 
-# QtCreator
-
 *.autosave
+goat.pro.user
+goat.pro.user.*
+goat.pro.user.c83d1f9
 
 # QtCtreator Qml
 *.qmlproject.user
