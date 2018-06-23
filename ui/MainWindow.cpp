@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 	readSettings();
 	m_tabSeq = 1;
 
-    on_action_showConnectionManager_triggered();
+    //on_action_showConnectionManager_triggered();
 }
 
 MainWindow::~MainWindow() {
@@ -127,6 +127,7 @@ void MainWindow::on_action_Open_triggered() {
 void MainWindow::on_action_showConnectionManager_triggered()
 {
     ConnectionManagerDialog dialog;
+
     dialog.setModal(true);
     if (dialog.exec())
     {

@@ -8,7 +8,8 @@
 #include "ui_ConnectionManagerDialog.h"
 #include "src/ConnectionManager.h"
 
-ConnectionManagerDialog::ConnectionManagerDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::ConnectionManagerDialog) {
+ConnectionManagerDialog::ConnectionManagerDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::ConnectionManagerDialog)
+{
 	ui->setupUi(this);
 
     m_model = new QStandardItemModel(this);

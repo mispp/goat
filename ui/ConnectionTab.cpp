@@ -21,15 +21,12 @@
 ConnectionTab::ConnectionTab(QWidget *parent) :	QWidget(parent), ui(new Ui::ConnectionTab)
 {
 	ui->setupUi(this);
-    ui->codeEditor->setStyleSheet("QPlainTextEdit { font: 18px; }");
     ui->comboBoxConnections->setModel(ConnectionManager::getInstance()->getEstablishedConnectionModel());
 
     m_queryResultsModel = new QSqlQueryModel(this);
     ui->resultsGrid->setModel(m_queryResultsModel);
 
     m_establishedConnection = QSqlDatabase::database(ui->comboBoxConnections->itemData(0, Qt::UserRole+1).toString());
-
-    highlighter = new Highlighter(ui->codeEditor->document());
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->codeEditor), SIGNAL(activated()), this, SLOT(on_ctrlEnter_triggered()));
 }
@@ -46,7 +43,7 @@ void ConnectionTab::on_comboBoxConnections_currentIndexChanged(int index)
 
 void ConnectionTab::on_ctrlEnter_triggered()
 {
-    runQuery(getQueryAtCursor(ui->codeEditor->textCursor().block()));
+    runQuery(ui->codeEditor->getQueryAtCursor());
 }
 
 void ConnectionTab::on_button_selectionQuery_released()
@@ -60,35 +57,6 @@ void ConnectionTab::runQuery(const QString query)
     {
         executeQuery(query.trimmed().simplified());
     }
-}
-
-QString ConnectionTab::getQueryAtCursor(const QTextBlock & block)
-{
-    //https://stackoverflow.com/questions/50995743/qplaintextedit-qtextcursor-how-to-get-lines-above-and-below-cursor-until-abo
-    QTextBlock before = block;
-    QTextBlock after = block;
-
-    if(block.text().trimmed().isEmpty()) return "";
-
-    QStringList lines{block.text()};
-
-    do
-    {
-        before = before.previous();
-        if(before.text().trimmed().isEmpty()) break;
-        lines.prepend(before.text());
-    }
-    while(before.isValid());
-
-    do
-    {
-        after = after.next();
-        if(after.text().trimmed().isEmpty()) break;
-        lines.append(after.text());
-    }
-    while(after.isValid());
-
-    return lines.join("\n");
 }
 
 void ConnectionTab::executeQuery(const QString query)

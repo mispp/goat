@@ -1,47 +1,44 @@
 #include "Highlighter.h"
 
+#include <QSettings>
+#include <QResource>
 
 Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
 
     keywordFormat.setForeground(Qt::blue);
-    //keywordFormat.setFontWeight(QFont::Bold);
-    QStringList keywordPatterns;
-    keywordPatterns << "\\bselect\\b" << "\\bfrom\\b" << "\\bwhere\\b"
-                    << "\\bhaving\\b" << "\\group\\b" << "\\bby\\b"
-                    << "\\bin\\b" << "\\bunion\\b" << "\\bexcept\\b"
-                    ;
-    foreach (const QString &pattern, keywordPatterns)
+    QStringList keywords = QString("select,from,where,having,group,by,in,union,except").split(",");
+
+    foreach (const QString &keyword, keywords)
     {
-        rule.pattern = QRegularExpression(pattern);
+        QString keywordPattern = QString( "\\b" + keyword + "\\b");
+        rule.pattern = QRegularExpression(keywordPattern);
         rule.format = keywordFormat;
         highlightingRules.append(rule);
     }
 
-    classFormat.setFontWeight(QFont::Bold);
-    classFormat.setForeground(Qt::darkMagenta);
-    rule.pattern = QRegularExpression("\\bQ[A-Za-z]+\\b");
-    rule.format = classFormat;
-    highlightingRules.append(rule);
-
-    quotationFormat.setForeground(Qt::darkGreen);
+    quotationFormat.setForeground(Qt::darkRed);
     rule.pattern = QRegularExpression("\".*\"");
     rule.format = quotationFormat;
     highlightingRules.append(rule);
 
-    functionFormat.setFontItalic(true);
-    functionFormat.setForeground(Qt::blue);
+    numberFormat.setForeground(Qt::darkCyan);
+    rule.pattern = QRegularExpression("\\b[0-9]\\b");
+    rule.format = numberFormat;
+    highlightingRules.append(rule);
+
+    functionFormat.setForeground(Qt::magenta);
     rule.pattern = QRegularExpression("\\b[A-Za-z0-9_]+(?=\\()");
     rule.format = functionFormat;
     highlightingRules.append(rule);
 
-    singleLineCommentFormat.setForeground(Qt::red);
+    singleLineCommentFormat.setForeground(Qt::darkGreen);
     rule.pattern = QRegularExpression("//[^\n]*");
     rule.format = singleLineCommentFormat;
     highlightingRules.append(rule);
 
-    multiLineCommentFormat.setForeground(Qt::red);
+    multiLineCommentFormat.setForeground(Qt::darkGreen);
 
     commentStartExpression = QRegularExpression("/\\*");
     commentEndExpression = QRegularExpression("\\*/");

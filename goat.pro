@@ -16,9 +16,10 @@ SOURCES += \
     src/main.cpp \
     src/ConnectionStandardItem.cpp \
     src/ConnectionManager.cpp \
-    ui/ConnectionManagerDialog.cpp \
     ui/MainWindow.cpp \
+    ui/ConnectionManagerDialog.cpp \
     ui/ConnectionTab.cpp \
+    ui/CodeEditor.cpp \
     ui/Highlighter.cpp
 
 HEADERS  += \
@@ -27,6 +28,7 @@ HEADERS  += \
     ui/ConnectionManagerDialog.h \
     ui/MainWindow.h \
     ui/ConnectionTab.h \
+    ui/CodeEditor.h \
     ui/Highlighter.h
 
 FORMS    += \
@@ -38,3 +40,4 @@ DISTFILES += \
     LICENSE \
     README.md \
     CMakeLists.txt
+

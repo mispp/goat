@@ -44,7 +44,8 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset theme="kt-start"/>
+            <iconset theme="run-build">
+             <normaloff>.</normaloff>.</iconset>
            </property>
           </widget>
          </item>
@@ -54,7 +55,14 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset theme="kt-start-all"/>
+            <iconset theme="run-build-file">
+             <normaloff>.</normaloff>.</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
            </property>
           </widget>
          </item>
@@ -78,6 +86,9 @@
           </widget>
          </item>
          <item>
+          <widget class="QComboBox" name="comboBoxSyntaxColor"/>
+         </item>
+         <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -93,7 +104,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="codeEditor"/>
+        <widget class="CodeEditor" name="codeEditor"/>
        </item>
       </layout>
      </widget>
@@ -107,7 +118,45 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QTableView" name="resultsGrid"/>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QTableView" name="resultsGrid"/>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QToolButton" name="button_exportQueryResults">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset theme="document-export">
+                <normaloff>.</normaloff>.</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -126,6 +175,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CodeEditor</class>
+   <extends>QPlainTextEdit</extends>
+   <header>ui/CodeEditor.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

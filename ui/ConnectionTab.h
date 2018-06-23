@@ -11,8 +11,6 @@
 #include <QSplitter>
 #include <QComboBox>
 
-#include "ui/Highlighter.h"
-
 namespace Ui {
 class ConnectionTab;
 }
@@ -39,9 +37,6 @@ private:
     QSqlQueryModel* m_queryResultsModel;
     void runQuery(const QString query);
     void executeQuery(const QString query);
-    Highlighter* highlighter;
-    QString getQueryAtCursor(const QTextBlock & block);
-
 };
 
 #endif // CONNECTIONTAB_H
