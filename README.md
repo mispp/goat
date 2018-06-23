@@ -34,4 +34,12 @@ Todos:
 
 
 
-[![Screenshot](https://i.imgur.com/ATAl83M.png)](https://i.imgur.com/ATAl83M.png)
+Screenshots:
+
+Connection manager
+
+[![Connection manager](https://i.imgur.com/YCDsRwq.png)](https://i.imgur.com/YCDsRwq.png)
+
+Query results
+
+[![Query resuls](https://i.imgur.com/jnWIdCT.png)](https://i.imgur.com/jnWIdCT.png)
