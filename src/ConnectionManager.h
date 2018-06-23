@@ -5,7 +5,7 @@
 #include <QStandardItemModel>
 #include <QMutex>
 
-#include "ConnectionStandardItem.h"
+#include "src/ConnectionStandardItem.h"
 
 class ConnectionManager
 {

@@ -4,9 +4,9 @@
 #include <QMessageBox>
 #include <QRandomGenerator64>
 
-#include "ConnectionManagerDialog.h"
+#include "ui/ConnectionManagerDialog.h"
 #include "ui_ConnectionManagerDialog.h"
-#include "ConnectionManager.h"
+#include "src/ConnectionManager.h"
 
 ConnectionManagerDialog::ConnectionManagerDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::ConnectionManagerDialog) {
 	ui->setupUi(this);

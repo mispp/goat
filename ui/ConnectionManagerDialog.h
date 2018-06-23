@@ -9,7 +9,7 @@
 #include <QStandardItem>
 #include <QDataWidgetMapper>
 
-#include "ConnectionStandardItem.h"
+#include "src/ConnectionStandardItem.h"
 
 namespace Ui {
 class ConnectionManagerDialog;

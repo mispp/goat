@@ -13,21 +13,21 @@ TEMPLATE = app
 
 
 SOURCES += \
-    src/MainWindow.cpp \
-    src/ConnectionManager.cpp \
     src/main.cpp \
-    ui/ConnectionTab.cpp \
     src/ConnectionStandardItem.cpp \
-    ui/Highlighter.cpp \
-    src/ConnectionManagerDialog.cpp
+    src/ConnectionManager.cpp \
+    ui/ConnectionManagerDialog.cpp \
+    ui/MainWindow.cpp \
+    ui/ConnectionTab.cpp \
+    ui/Highlighter.cpp
 
 HEADERS  += \
-    src/MainWindow.h \
-    src/ConnectionManager.h \
-    ui/ConnectionTab.h \
     src/ConnectionStandardItem.h \
-    ui/Highlighter.h \
-    src/ConnectionManagerDialog.h
+    src/ConnectionManager.h \
+    ui/ConnectionManagerDialog.h \
+    ui/MainWindow.h \
+    ui/ConnectionTab.h \
+    ui/Highlighter.h
 
 FORMS    += \
     ui/MainWindow.ui \
@@ -36,4 +36,5 @@ FORMS    += \
 
 DISTFILES += \
     LICENSE \
-    README.md
+    README.md \
+    CMakeLists.txt

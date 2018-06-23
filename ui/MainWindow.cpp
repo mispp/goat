@@ -1,6 +1,6 @@
-#include "MainWindow.h"
+#include "ui/MainWindow.h"
 #include "ui_MainWindow.h"
-#include "ConnectionManagerDialog.h"
+#include "ui/ConnectionManagerDialog.h"
 #include "ui/ConnectionTab.h"
 
 #include <QDebug>
@@ -130,19 +130,10 @@ void MainWindow::on_action_showConnectionManager_triggered()
     dialog.setModal(true);
     if (dialog.exec())
     {
-        //qDebug() << "OK Clicked, creating tab";
-
-        //Connection* connection = dialog.getConnection();
-        //ConnectionManager::getInstance()->establishConnection(connection);
-
         if (QSqlDatabase::connectionNames().count() > 0)
         {
-            //qDebug() << "Numer of established connections: " + QString::number(QSqlDatabase::connectionNames().count());
             addTab();
         }
 
-    } else
-    {
-        //qDebug() << "Cancelled";
     }
 }

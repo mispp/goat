@@ -11,7 +11,7 @@
 #include <QSplitter>
 #include <QComboBox>
 
-#include "Highlighter.h"
+#include "ui/Highlighter.h"
 
 namespace Ui {
 class ConnectionTab;

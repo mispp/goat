@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "ConnectionManager.h"
 #include <QStandardItemModel>
+
+#include "src/ConnectionManager.h"
 
 namespace Ui {
 class MainWindow;
