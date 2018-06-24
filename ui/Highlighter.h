@@ -22,6 +22,7 @@ private:
         QTextCharFormat format;
     };
     QVector<HighlightingRule> highlightingRules;
+    QVector<HighlightingRule> highlightingRules_new;
 
     QRegularExpression commentStartExpression;
     QRegularExpression commentEndExpression;

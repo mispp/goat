@@ -1,79 +1,71 @@
 #include "Highlighter.h"
 
+#include <QDebug>
 #include <QSettings>
 #include <QResource>
+#include <QXmlStreamReader>
 
 Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
 
-    keywordFormat.setForeground(Qt::blue);
-    QStringList keywords = QString("select,from,where,having,group,by,in,union,except").split(",");
+    QSettings settings(":/syntax/sql.ini", QSettings::IniFormat, this);
 
-    foreach (const QString &keyword, keywords)
+    QStringList keys;
+    keys.append("1");
+    keys.append("2");
+    keys.append("3");
+    keys.append("4");
+    keys.append("5");
+    keys.append("6");
+    keys.append("7");
+    keys.append("8");
+
+    foreach (QString key, keys)
     {
-        QString keywordPattern = QString( "\\b" + keyword + "\\b");
-        rule.pattern = QRegularExpression(keywordPattern);
-        rule.format = keywordFormat;
-        highlightingRules.append(rule);
+        settings.beginGroup(key);
+
+        QString type = settings.value("TYPE").toString();
+        QStringList items = settings.value("ITEMS").toStringList();
+        QString color = settings.value("COLOR").toString();
+        QString regexp = settings.value("REGEXP").toString();
+        QStringList modifiers = settings.value("MODIFIERS").toStringList();
+
+        settings.endGroup();
+
+        QTextCharFormat format;
+        format.setForeground(QColor(color));
+        rule.format = format;
+
+        QString string_expression;
+        if (items.isEmpty()) string_expression = regexp;
+        else string_expression = regexp.replace("___ITEMLIST___", items.join("|"), Qt::CaseInsensitive);
+
+        QRegularExpression expression;
+        expression.setPattern(string_expression);
+
+        foreach (QString modifier, modifiers)
+        {
+            if (modifier == "i") expression.setPatternOptions(expression.patternOptions() | QRegularExpression::CaseInsensitiveOption);
+            if (modifier == "m") expression.setPatternOptions(expression.patternOptions() | QRegularExpression::MultilineOption);
+            if (modifier == "s") expression.setPatternOptions(expression.patternOptions() | QRegularExpression::DotMatchesEverythingOption);
+        }
+
+        rule.format=format;
+        rule.pattern = expression;
+
+        highlightingRules_new.append(rule);
     }
-
-    quotationFormat.setForeground(Qt::darkRed);
-    rule.pattern = QRegularExpression("\".*\"");
-    rule.format = quotationFormat;
-    highlightingRules.append(rule);
-
-    numberFormat.setForeground(Qt::darkCyan);
-    rule.pattern = QRegularExpression("\\b[0-9]\\b");
-    rule.format = numberFormat;
-    highlightingRules.append(rule);
-
-    functionFormat.setForeground(Qt::magenta);
-    rule.pattern = QRegularExpression("\\b[A-Za-z0-9_]+(?=\\()");
-    rule.format = functionFormat;
-    highlightingRules.append(rule);
-
-    singleLineCommentFormat.setForeground(Qt::darkGreen);
-    rule.pattern = QRegularExpression("//[^\n]*");
-    rule.format = singleLineCommentFormat;
-    highlightingRules.append(rule);
-
-    multiLineCommentFormat.setForeground(Qt::darkGreen);
-
-    commentStartExpression = QRegularExpression("/\\*");
-    commentEndExpression = QRegularExpression("\\*/");
 }
 
 
 void Highlighter::highlightBlock(const QString &text)
 {
-    foreach (const HighlightingRule &rule, highlightingRules) {
+    foreach (const HighlightingRule &rule, highlightingRules_new) {
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
         while (matchIterator.hasNext()) {
             QRegularExpressionMatch match = matchIterator.next();
             setFormat(match.capturedStart(), match.capturedLength(), rule.format);
         }
-    }
-
-    setCurrentBlockState(0);
-
-    int startIndex = 0;
-    if (previousBlockState() != 1)
-        startIndex = text.indexOf(commentStartExpression);
-
-    while (startIndex >= 0)
-    {
-        QRegularExpressionMatch match = commentEndExpression.match(text, startIndex);
-        int endIndex = match.capturedStart();
-        int commentLength = 0;
-        if (endIndex == -1) {
-            setCurrentBlockState(1);
-            commentLength = text.length() - startIndex;
-        } else {
-            commentLength = endIndex - startIndex
-                            + match.capturedLength();
-        }
-        setFormat(startIndex, commentLength, multiLineCommentFormat);
-        startIndex = text.indexOf(commentStartExpression, startIndex + commentLength);
     }
 }

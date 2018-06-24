@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/highlighting-keywords">
-        <file>highlighting-rules.ini</file>
-    </qresource>
-</RCC>

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/syntax">
+        <file>sql.ini</file>
+    </qresource>
+</RCC>

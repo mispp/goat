@@ -41,3 +41,6 @@ DISTFILES += \
     README.md \
     CMakeLists.txt
 
+RESOURCES += \
+    resources/data.qrc
+

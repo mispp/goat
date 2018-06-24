@@ -49,13 +49,14 @@ QString CodeEditor::getQueryAtCursor()
 
     if(block.text().trimmed().isEmpty()) return "";
 
-    QStringList lines{block.text()};
+    QStringList lines;
+    if (!block.text().trimmed().startsWith("--")) lines.append(block.text().trimmed());
 
     do
     {
         before = before.previous();
         if(before.text().trimmed().isEmpty()) break;
-        lines.prepend(before.text());
+        if(!before.text().trimmed().startsWith("--")) lines.prepend(before.text());
     }
     while(before.isValid());
 
@@ -63,7 +64,7 @@ QString CodeEditor::getQueryAtCursor()
     {
         after = after.next();
         if(after.text().trimmed().isEmpty()) break;
-        lines.append(after.text());
+        if(!after.text().trimmed().startsWith("--")) lines.append(after.text());
     }
     while(after.isValid());
 
