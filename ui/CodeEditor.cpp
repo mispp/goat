@@ -38,6 +38,18 @@ void CodeEditor::highlightCurrentLine()
     setExtraSelections(extraSelections);
 }
 
+QString CodeEditor::getSelection()
+{
+    QStringList lines = textCursor().selectedText().split("\u2029");
+    QStringList lines_without_comments;
+    foreach (QString line, lines)
+    {
+        if (!line.trimmed().startsWith("--")) lines_without_comments.append(line);
+    }
+
+    return lines_without_comments.join(" ");
+}
+
 QString CodeEditor::getQueryAtCursor()
 {
     //https://stackoverflow.com/questions/50995743/qplaintextedit-qtextcursor-how-to-get-lines-above-and-below-cursor-until-abo

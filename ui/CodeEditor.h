@@ -13,6 +13,7 @@ public:
     ~CodeEditor();
 
     QString getQueryAtCursor();
+    QString getSelection();
 
 private:
     void highlightCurrentLine();

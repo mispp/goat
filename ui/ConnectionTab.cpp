@@ -48,7 +48,7 @@ void ConnectionTab::on_ctrlEnter_triggered()
 
 void ConnectionTab::on_button_selectionQuery_released()
 {
-    runQuery(ui->codeEditor->textCursor().selectedText().trimmed());
+    runQuery(ui->codeEditor->getSelection());
 }
 
 void ConnectionTab::runQuery(const QString query)
