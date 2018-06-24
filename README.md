@@ -34,7 +34,7 @@ Todos:
 
 
 
-Screenshots:
+# Screenshots:
 
 Connection manager
 
@@ -42,4 +42,4 @@ Connection manager
 
 Query results
 
-[![Query resuls](https://i.imgur.com/jnWIdCT.png)](https://i.imgur.com/jnWIdCT.png)
+[![Query resuls](https://i.imgur.com/IimqoT3.png)](https://i.imgur.com/IimqoT3.png)
