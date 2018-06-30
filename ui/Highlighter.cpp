@@ -11,17 +11,7 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 
     QSettings settings(":/syntax/sql.ini", QSettings::IniFormat, this);
 
-    QStringList keys;
-    keys.append("1");
-    keys.append("2");
-    keys.append("3");
-    keys.append("4");
-    keys.append("5");
-    keys.append("6");
-    keys.append("7");
-    keys.append("8");
-
-    foreach (QString key, keys)
+    foreach (QString key, settings.childGroups())
     {
         settings.beginGroup(key);
 
@@ -67,5 +57,32 @@ void Highlighter::highlightBlock(const QString &text)
             QRegularExpressionMatch match = matchIterator.next();
             setFormat(match.capturedStart(), match.capturedLength(), rule.format);
         }
+    }
+
+    /* below code is to handle multiline comments */
+    QTextCharFormat multilineCommentFormat;
+    multilineCommentFormat.setForeground(QColor("#199e59"));
+
+    commentStartExpression = QRegularExpression("/\\*");
+    commentEndExpression = QRegularExpression("\\*/");
+
+    int startIndex = 0;
+    if (previousBlockState() != 1) startIndex = text.indexOf(commentStartExpression);
+    while (startIndex >= 0)
+    {
+        QRegularExpressionMatch match = commentEndExpression.match(text, startIndex);
+        int endIndex = match.capturedStart();
+        int commentLength = 0;
+        if (endIndex == -1)
+        {
+            setCurrentBlockState(1);
+            commentLength = text.length() - startIndex;
+        }
+        else
+        {
+            commentLength = endIndex - startIndex + match.capturedLength();
+        }
+        setFormat(startIndex, commentLength, multilineCommentFormat);
+        startIndex = text.indexOf(commentStartExpression, startIndex + commentLength);
     }
 }
