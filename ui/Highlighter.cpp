@@ -63,6 +63,8 @@ void Highlighter::highlightBlock(const QString &text)
     QTextCharFormat multilineCommentFormat;
     multilineCommentFormat.setForeground(QColor("#199e59"));
 
+    setCurrentBlockState(0);
+
     commentStartExpression = QRegularExpression("/\\*");
     commentEndExpression = QRegularExpression("\\*/");
 
