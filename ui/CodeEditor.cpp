@@ -15,6 +15,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this, &QPlainTextEdit::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
     //connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), this), SIGNAL(activated()), parent, SLOT(on_ctrlEnter_triggered()));
 
+    multilineCommentExpression.setPattern("/\\*+[^*]*\\*+(?:[^/*][^*]*\\*+)*/");
+    singlelineCommentExpression.setPattern("--[^\n]*");
+
     m_highlighter.setDocument(document());
 
     highlightCurrentLine();
@@ -40,14 +43,7 @@ void CodeEditor::highlightCurrentLine()
 
 QString CodeEditor::getSelection()
 {
-    QStringList lines = textCursor().selectedText().split("\u2029");
-    QStringList lines_without_comments;
-    foreach (QString line, lines)
-    {
-        if (!line.trimmed().startsWith("--")) lines_without_comments.append(line);
-    }
-
-    return lines_without_comments.join(" ");
+    return textCursor().selectedText().replace("\u2029", "\n", Qt::CaseInsensitive).replace(multilineCommentExpression, "").replace(singlelineCommentExpression, "");
 }
 
 QString CodeEditor::getQueryAtCursor()
@@ -80,5 +76,5 @@ QString CodeEditor::getQueryAtCursor()
     }
     while(after.isValid());
 
-    return lines.join("\n");
+    return lines.join("\n").replace(multilineCommentExpression, "").replace(singlelineCommentExpression, "");
 }

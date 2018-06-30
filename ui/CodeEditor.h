@@ -19,6 +19,9 @@ private:
     void highlightCurrentLine();
     Highlighter m_highlighter;
 
+    QRegularExpression multilineCommentExpression;
+    QRegularExpression singlelineCommentExpression;
+
 };
 
 #endif // CODEEDITOR_H
