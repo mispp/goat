@@ -37,6 +37,7 @@ private:
     QSqlQueryModel* m_queryResultsModel;
     void runQuery(const QString query);
     void executeQuery(const QString query);
+
 };
 
 #endif // CONNECTIONTAB_H

@@ -26,6 +26,8 @@ ConnectionTab::ConnectionTab(QWidget *parent) :	QWidget(parent), ui(new Ui::Conn
     m_queryResultsModel = new QSqlQueryModel(this);
     ui->resultsGrid->setModel(m_queryResultsModel);
 
+    ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+
     m_establishedConnection = QSqlDatabase::database(ui->comboBoxConnections->itemData(0, Qt::UserRole+1).toString());
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->codeEditor), SIGNAL(activated()), this, SLOT(on_ctrlEnter_triggered()));
@@ -65,10 +67,8 @@ void ConnectionTab::executeQuery(const QString query)
     ui->resultsText->clear();
 
     QSqlQuery q(m_establishedConnection);
-    //q.setForwardOnly(true);
-    q.prepare(query);
 
-    if (q.exec() == true)
+    if (q.exec(query))
     {
         if (q.size() != -1)
         {
@@ -95,6 +95,7 @@ void ConnectionTab::executeQuery(const QString query)
         ui->resultsText->appendPlainText("");
         ui->resultsText->appendPlainText("Query:");
         ui->resultsText->appendPlainText("-------------------------------");
-        ui->resultsText->appendPlainText(q.executedQuery());
+        ui->resultsText->appendPlainText(query);
     }
 }
+
