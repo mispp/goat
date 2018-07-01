@@ -34,8 +34,8 @@
        <item>
         <widget class="QPushButton" name="buttonNewConnection">
          <property name="icon">
-          <iconset theme="list-add">
-           <normaloff>.</normaloff>.</iconset>
+          <iconset resource="../resources/icons.qrc">
+           <normaloff>:/icons/silk/icons/silk/add.png</normaloff>:/icons/silk/icons/silk/add.png</iconset>
          </property>
         </widget>
        </item>
@@ -45,8 +45,8 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset theme="remove">
-           <normaloff>.</normaloff>.</iconset>
+          <iconset resource="../resources/icons.qrc">
+           <normaloff>:/icons/silk/icons/silk/delete.png</normaloff>:/icons/silk/icons/silk/delete.png</iconset>
          </property>
         </widget>
        </item>
@@ -315,6 +315,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>
