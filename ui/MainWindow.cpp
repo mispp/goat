@@ -2,6 +2,7 @@
 #include "ui_MainWindow.h"
 #include "ui/ConnectionManagerDialog.h"
 #include "ui/ConnectionTab.h"
+#include "ui/AboutDialog.h"
 
 #include <QDebug>
 #include <QSqlDatabase>
@@ -137,4 +138,12 @@ void MainWindow::on_action_showConnectionManager_triggered()
         }
 
     }
+}
+
+
+void MainWindow::on_actionAbout_triggered()
+{
+    AboutDialog dialog;
+    dialog.setModal(true);
+    dialog.exec();
 }
