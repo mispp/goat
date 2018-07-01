@@ -9,7 +9,7 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
 
-    QSettings settings(":/syntax/sql.ini", QSettings::IniFormat, this);
+    QSettings settings(":/syntax/syntax-highlight/sql.ini", QSettings::IniFormat, this);
 
     foreach (QString key, settings.childGroups())
     {
