@@ -3,21 +3,22 @@
 Goat - something between Heidi (sql) and Toad.
 
 An attempt in making alternative DB frontend using QT5.
+
 This app was made for 2 reasons:
 1. necessity: there is no app in native toolkit available for linux that has querying functionality (there is a plugin for kate in kde, but this just doesnt work for me; not sure about gnome)
 2. learning: improve my qt skills. i'm not a c++ developer, so please excuse shitty code quality
 
 Contributions are welcome!
 
-What (partially) works:
+What works:
 - connection manager saves information
     - warning! connection manager saves passwords. always!
-- simple queries can be executed with ctrl-enter for current query (query where cursor is currently located), as well as for selection with a button
-- syntax highlighter (with some issues)
+- queries can be executed with ctrl-enter for current query (query where cursor is currently located), as well as for selection with a button (but not as as script yet)
+- basic syntax highlighter
 
 Todos:
-- move from qt classes to libpq for better error reporting (should check if it would work better)
-    - postgres is a priority here, mariadb/mysql should maybe stay with qt classes for now
+- change how results are fetched from database, now it doesn't work with big amounts of data
+- execute query as a script
 - further improve connection manager
     - delete connections
     - option to save or not to save password (per connection)
@@ -29,12 +30,17 @@ Todos:
 - settings dialog
 - export data
 - import data
-- evaluate scintilla/qscintilla or ktextedit/ktexteditor
 - general code quality improvement
     - connection handling moved to model (i have no idea how to do that now, so this is far, far away)
 
+To be considered:
+- move from qt classes to libpq for better error reporting (should check if it would work better)
+    - postgres is a priority here, mariadb/mysql should maybe stay with qt classes for now
+- evaluate scintilla/qscintilla or ktextedit/ktexteditor
 
+# Recognitions
 
+Icons used are called Silk. From [here](http://www.famfamfam.com/lab/icons/silk/).
 
 # Screenshots
 
@@ -42,6 +48,6 @@ Connection manager
 
 [![Connection manager](https://i.imgur.com/YCDsRwq.png)](https://i.imgur.com/YCDsRwq.png)
 
-Query results
+Main window
 
-[![Query resuls](https://i.imgur.com/IimqoT3.png)](https://i.imgur.com/IimqoT3.png)
+[![Main window](https://i.imgur.com/NJjdtkH.png)](https://i.imgur.com/NJjdtkH.png)
