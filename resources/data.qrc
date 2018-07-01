@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/syntax">
-        <file>sql.ini</file>
+        <file>syntax-highlight/sql.ini</file>
     </qresource>
 </RCC>

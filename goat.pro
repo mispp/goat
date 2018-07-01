@@ -45,5 +45,6 @@ DISTFILES += \
     CMakeLists.txt
 
 RESOURCES += \
-    resources/data.qrc
+    resources/data.qrc \
+    resources/icons.qrc
 

@@ -28,14 +28,21 @@
       <set>Qt::AlignCenter</set>
      </property>
      <property name="margin">
-      <number>80</number>
+      <number>60</number>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QPlainTextEdit" name="plainTextEdit">
      <property name="plainText">
-      <string>https://github.com/mispp/goat</string>
+      <string>Code
+https://github.com/mispp/goat
+License: GPL v3
+
+Icons: Silk
+Author: Mark James
+Source: http://www.famfamfam.com/lab/icons/silk/
+License: Creative Commons Attribution 2.5 License</string>
      </property>
     </widget>
    </item>

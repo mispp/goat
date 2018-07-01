@@ -44,8 +44,8 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset theme="run-build">
-             <normaloff>.</normaloff>.</iconset>
+            <iconset resource="../resources/icons.qrc">
+             <normaloff>:/icons/silk/icons/silk/resultset_next.png</normaloff>:/icons/silk/icons/silk/resultset_next.png</iconset>
            </property>
           </widget>
          </item>
@@ -55,8 +55,8 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset theme="run-build-file">
-             <normaloff>.</normaloff>.</iconset>
+            <iconset resource="../resources/icons.qrc">
+             <normaloff>:/icons/silk/icons/silk/script_go.png</normaloff>:/icons/silk/icons/silk/script_go.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -84,9 +84,6 @@
             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
            </property>
           </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBoxSyntaxColor"/>
          </item>
          <item>
           <spacer name="horizontalSpacer">
@@ -136,8 +133,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="document-export">
-                <normaloff>.</normaloff>.</iconset>
+               <iconset resource="../resources/icons.qrc">
+                <normaloff>:/icons/silk/icons/silk/page_white_go.png</normaloff>:/icons/silk/icons/silk/page_white_go.png</iconset>
               </property>
              </widget>
             </item>
@@ -182,6 +179,8 @@
    <header>ui/CodeEditor.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

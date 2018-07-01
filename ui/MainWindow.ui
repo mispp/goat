@@ -107,14 +107,18 @@
    <addaction name="action_Open"/>
   </widget>
   <action name="actionExit">
+   <property name="icon">
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/cross.png</normaloff>:/icons/silk/icons/silk/cross.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Exit</string>
    </property>
   </action>
   <action name="action_showConnectionManager">
    <property name="icon">
-    <iconset theme="add">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/database_link.png</normaloff>:/icons/silk/icons/silk/database_link.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Show Connection Manager</string>
@@ -131,8 +135,8 @@
   </action>
   <action name="actionNew_query">
    <property name="icon">
-    <iconset theme="tab">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/tab_add.png</normaloff>:/icons/silk/icons/silk/tab_add.png</iconset>
    </property>
    <property name="text">
     <string>New tab</string>
@@ -146,8 +150,8 @@
   </action>
   <action name="action_Open">
    <property name="icon">
-    <iconset theme="document-open">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/page_white_get.png</normaloff>:/icons/silk/icons/silk/page_white_get.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Open</string>
@@ -157,12 +161,18 @@
    </property>
   </action>
   <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/information.png</normaloff>:/icons/silk/icons/silk/information.png</iconset>
+   </property>
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../resources/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>
