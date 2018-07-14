@@ -7,7 +7,7 @@
 #include <QSettings>
 #include <QSpacerItem>
 #include <QGridLayout>
-#include <QRandomGenerator64>
+#include <QUuid>
 
 ConnectionManager* ConnectionManager::m_instance = 0;
 
@@ -31,11 +31,10 @@ QStandardItemModel* ConnectionManager::getEstablishedConnectionModel()
 
 void ConnectionManager::establishConnection(ConnectionStandardItem *connection)
 {
-    QRandomGenerator64 random = QRandomGenerator64::securelySeeded();
-    qint64 newId = random.generate64();
+    QUuid newId = QUuid::createUuid();
 
     QMap<QString, QVariant> connectionDefinition = connection->data(Qt::UserRole+1).value<QMap<QString, QVariant>>();
-    connectionDefinition["establishedConnectionId"] = QString("EC_" + QString::number(newId));
+    connectionDefinition["establishedConnectionId"] = QString("EC_" + newId.toString().mid(1, 36));
 
     QSqlDatabase db = QSqlDatabase::addDatabase(connectionDefinition["driver"].toString(), connectionDefinition["establishedConnectionId"].toString());
 

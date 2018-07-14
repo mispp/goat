@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QSettings>
 #include <QMessageBox>
-#include <QRandomGenerator64>
+#include <QUuid>
 
 #include "ui/ConnectionManagerDialog.h"
 #include "ui_ConnectionManagerDialog.h"
@@ -97,9 +97,8 @@ void ConnectionManagerDialog::on_rowsInserted(const QModelIndex &source_parent, 
 
 void ConnectionManagerDialog::on_buttonNewConnection_released()
 {
-    QRandomGenerator64 random = QRandomGenerator64::securelySeeded();
-    qint64 newId = random.generate64();
-    ConnectionStandardItem* item = new ConnectionStandardItem(QString::number(newId));
+    QUuid newId = QUuid::createUuid();
+    ConnectionStandardItem* item = new ConnectionStandardItem(newId.toString().mid(1, 36));
 
     m_connectionListModel->appendRow(item);
 }
