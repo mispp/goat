@@ -1,60 +1,41 @@
 #include "ConnectionManager.h"
-#include <QSqlDatabase>
-#include <QMessageBox>
+
 #include <QDebug>
-#include <QSqlError>
-#include <QStandardItemModel>
+#include <QGridLayout>
+#include <QMessageBox>
 #include <QSettings>
 #include <QSpacerItem>
-#include <QGridLayout>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QString>
 #include <QUuid>
-
-ConnectionManager* ConnectionManager::m_instance = 0;
 
 ConnectionManager::ConnectionManager()
 {
-    m_establishedConnectionModel = new QStandardItemModel();
+    foreach(Connection connection, loadConnections())
+    {
+        m_connections[connection.connectionId()] = connection;
+    }
 }
 
-ConnectionManager* ConnectionManager::getInstance()
+void ConnectionManager::openConnection(const Connection &connection)
 {
-    if(m_instance==0) {
-		m_instance = new ConnectionManager();
-	}
-	return m_instance;
-}
+    if (m_openConnections.contains(connection.connectionId()))
+        return;
 
-QStandardItemModel* ConnectionManager::getEstablishedConnectionModel()
-{
-    return m_establishedConnectionModel;
-}
+    QSqlDatabase db = QSqlDatabase::addDatabase(connection.driver(), connection.connectionId());
 
-void ConnectionManager::establishConnection(ConnectionStandardItem *connection)
-{
-    QUuid newId = QUuid::createUuid();
-
-    QMap<QString, QVariant> connectionDefinition = connection->data(Qt::UserRole+1).value<QMap<QString, QVariant>>();
-    connectionDefinition["establishedConnectionId"] = QString("EC_" + newId.toString().mid(1, 36));
-
-    QSqlDatabase db = QSqlDatabase::addDatabase(connectionDefinition["driver"].toString(), connectionDefinition["establishedConnectionId"].toString());
-
-    db.setHostName(connectionDefinition["server"].toString());
-    db.setDatabaseName(connectionDefinition["database"].toString());
-    db.setUserName(connectionDefinition["username"].toString());
-    db.setPassword(connectionDefinition["pass"].toString());
-    db.setPort(connectionDefinition["port"].toInt());
+    db.setHostName(connection.details()["server"]);
+    db.setDatabaseName(connection.details()["database"]);
+    db.setUserName(connection.details()["username"]);
+    db.setPassword(connection.details()["pass"]);
+    db.setPort(connection.details()["port"].toInt());
 
 	bool ok = db.open();
 
     if (ok)
     {
-        //do nothing?
-
-        QStandardItem* establishedConnection = new QStandardItem();
-        establishedConnection->setText(connectionDefinition["name"].toString());
-        establishedConnection->setData(connectionDefinition["establishedConnectionId"].toString(), Qt::UserRole+1);
-
-        m_establishedConnectionModel->appendRow(establishedConnection);
+        m_openConnections[connection.connectionId()] = db;
     }
     else
     {
@@ -79,7 +60,87 @@ void ConnectionManager::establishConnection(ConnectionStandardItem *connection)
 	}
 }
 
-QStringList ConnectionManager::getEstablishedConnectionList()
+void ConnectionManager::closeConnection(const QString &connectionId)
 {
-   return QSqlDatabase::connectionNames();
+    if (!m_openConnections.contains(connectionId))
+        return;
+
+    m_openConnections[connectionId].close();
+    m_openConnections.remove(connectionId);
+    QSqlDatabase::removeDatabase(connectionId);
+}
+
+void ConnectionManager::saveConnection(const Connection &connection)
+{
+    if (m_connections.contains(connection.connectionId()))
+        closeConnection(connection.connectionId());
+
+    m_connections[connection.connectionId()] = connection;
+
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+
+    settings.beginGroup(connection.connectionId());
+
+    settings.setValue("connectionId", connection.connectionId());
+    settings.setValue("driver", connection.driver());
+    settings.setValue("name", connection.name());
+
+    foreach(QString key, connection.details().keys())
+    {
+        settings.setValue(key, connection.details()[key]);
+    }
+
+    settings.endGroup();
+    settings.sync();
+}
+
+void ConnectionManager::deleteConnection(const QString &connectionId)
+{
+    closeConnection(connectionId);
+    m_connections.remove(connectionId);
+
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+    settings.remove(connectionId);
+    settings.sync();
+}
+
+QMap<QString, QSqlDatabase> ConnectionManager::getOpenConnections() const
+{
+    return m_openConnections;
+}
+
+QMap<QString, Connection> ConnectionManager::getConnections() const
+{
+    return m_connections;
+}
+
+QList<Connection> ConnectionManager::loadConnections()
+{
+    QList<Connection> connections;
+
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+
+    foreach(QString connectionId, settings.childGroups())
+    {
+        settings.beginGroup(connectionId);
+
+        QString driver = settings.value("driver").toString();
+        QString name = settings.value("name").toString();
+
+        QMap<QString, QString> details;
+
+        foreach(QString key, settings.childKeys())
+        {
+            details[key] = settings.value(key).toString();
+        }
+        details.remove("connectionId");
+        details.remove("driver");
+        details.remove("name");
+
+        Connection connection(connectionId, driver, name, details);
+        connections.append(connection);
+
+        settings.endGroup();
+    }
+    return connections;
 }

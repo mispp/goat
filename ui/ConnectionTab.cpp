@@ -21,16 +21,11 @@
 ConnectionTab::ConnectionTab(QWidget *parent) :	QWidget(parent), ui(new Ui::ConnectionTab)
 {
 	ui->setupUi(this);
-    ui->comboBoxConnections->setModel(ConnectionManager::getInstance()->getEstablishedConnectionModel());
 
     m_queryResultsModel = new QSqlQueryModel(this);
     ui->resultsGrid->setModel(m_queryResultsModel);
 
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-
-    m_establishedConnection = QSqlDatabase::database(ui->comboBoxConnections->itemData(0, Qt::UserRole+1).toString());
-
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->codeEditor), SIGNAL(activated()), this, SLOT(on_ctrlEnter_triggered()));
 }
 
 ConnectionTab::~ConnectionTab()
@@ -38,35 +33,18 @@ ConnectionTab::~ConnectionTab()
 	delete ui;
 }
 
-void ConnectionTab::on_comboBoxConnections_currentIndexChanged(int index)
+void ConnectionTab::executeQueryAtCursor(QSqlDatabase sqlDatabase)
 {
-    m_establishedConnection = QSqlDatabase::database(ConnectionManager::getInstance()->getEstablishedConnectionModel()->item(index)->data(Qt::UserRole+1).toString());
+    executeQuery(sqlDatabase, ui->codeEditor->getQueryAtCursor());
 }
 
-void ConnectionTab::on_ctrlEnter_triggered()
+void ConnectionTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
 {
-    runQuery(ui->codeEditor->getQueryAtCursor());
-}
+    if (query.trimmed().isEmpty())
+        return;
 
-void ConnectionTab::on_button_selectionQuery_released()
-{
-    runQuery(ui->codeEditor->getSelection());
-}
-
-void ConnectionTab::runQuery(const QString query)
-{
-    if (!query.trimmed().isEmpty())
-    {
-        executeQuery(query.trimmed().simplified());
-    }
-}
-
-void ConnectionTab::executeQuery(const QString query)
-{
-    m_queryResultsModel->clear();
     ui->resultsText->clear();
-
-    QSqlQuery q(m_establishedConnection);
+    QSqlQuery q(sqlDatabase);
 
     if (q.exec(query))
     {

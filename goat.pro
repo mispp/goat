@@ -14,30 +14,30 @@ TEMPLATE = app
 
 SOURCES += \
     src/main.cpp \
-    src/ConnectionStandardItem.cpp \
     src/ConnectionManager.cpp \
     ui/MainWindow.cpp \
-    ui/ConnectionManagerDialog.cpp \
     ui/ConnectionTab.cpp \
     ui/CodeEditor.cpp \
     ui/Highlighter.cpp \
-    ui/AboutDialog.cpp
+    ui/AboutDialog.cpp \
+    src/Connection.cpp \
+    ui/ConnectionDialog.cpp
 
 HEADERS  += \
-    src/ConnectionStandardItem.h \
     src/ConnectionManager.h \
-    ui/ConnectionManagerDialog.h \
     ui/MainWindow.h \
     ui/ConnectionTab.h \
     ui/CodeEditor.h \
     ui/Highlighter.h \
-    ui/AboutDialog.h
+    ui/AboutDialog.h \
+    src/Connection.h \
+    ui/ConnectionDialog.h
 
 FORMS    += \
     ui/MainWindow.ui \
     ui/ConnectionTab.ui \
-    ui/ConnectionManagerDialog.ui \
-    ui/AboutDialog.ui
+    ui/AboutDialog.ui \
+    ui/ConnectionDialog.ui
 
 DISTFILES += \
     LICENSE \

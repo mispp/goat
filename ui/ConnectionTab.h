@@ -19,25 +19,18 @@ class ConnectionTab : public QWidget
 {
 	Q_OBJECT
 
-public slots:
-    void on_ctrlEnter_triggered();
+//public slots:
+//    void on_ctrlEnter_triggered();
 
 public:
 	explicit ConnectionTab(QWidget *parent = 0);
 	~ConnectionTab();
-
-private slots:
-	void on_comboBoxConnections_currentIndexChanged(int index);
-    void on_button_selectionQuery_released();
+    void executeQueryAtCursor(QSqlDatabase sqlDatabase);
+    void executeQuery(QSqlDatabase sqlDatabase, QString query);
 
 private:
-	Ui::ConnectionTab *ui;
-
-    QSqlDatabase m_establishedConnection;
+    Ui::ConnectionTab *ui;
     QSqlQueryModel* m_queryResultsModel;
-    void runQuery(const QString query);
-    void executeQuery(const QString query);
-
 };
 
 #endif // CONNECTIONTAB_H
