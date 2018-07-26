@@ -13,13 +13,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setTabStopWidth(fontMetrics().width(' ') * 4);
 
     connect(this, &QPlainTextEdit::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
-    //connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), this), SIGNAL(activated()), parent, SLOT(on_ctrlEnter_triggered()));
 
     multilineCommentExpression.setPattern("/\\*+[^*]*\\*+(?:[^/*][^*]*\\*+)*/");
     singlelineCommentExpression.setPattern("--[^\n]*");
-
     m_highlighter.setDocument(document());
-
     highlightCurrentLine();
 }
 

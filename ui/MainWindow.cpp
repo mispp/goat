@@ -4,14 +4,15 @@
 #include "ui/ConnectionTab.h"
 #include "ui/AboutDialog.h"
 
-#include <QDebug>
-#include <QSqlDatabase>
-#include <QSettings>
 #include <QCloseEvent>
+#include <QDebug>
+#include <QFileDialog>
+#include <QFileInfo>
 #include <QMessageBox>
+#include <QSettings>
+#include <QSqlDatabase>
 #include <QSqlError>
 #include <QStandardItem>
-#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWindow) {
 	ui->setupUi(this);
@@ -34,34 +35,36 @@ void MainWindow::on_actionExit_triggered() {
 	QApplication::exit();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event) {
-	/*
-		here:
-		loop over all code editors and find unsaved changes, then trigger qmessage box
-		otherwise just exit
-	*/
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    bool unsavedChanges = false;
+    for (int i = 0; i < ui->tabBarConnections->count(); ++i)
+    {
+        ConnectionTab *connectionTab = ((ConnectionTab*) ui->tabBarConnections->widget(i));
+        unsavedChanges |= connectionTab->modified();
+    }
 
-//	QMessageBox exitConfirmationDialog;
-//	exitConfirmationDialog.setWindowTitle("Exit?");
-//	exitConfirmationDialog.setText("Are you sure you want to exit?");
-//	exitConfirmationDialog.setInformativeText("All unsaved changes will be lost.");
-//	exitConfirmationDialog.setIcon(QMessageBox::Warning);
-//	exitConfirmationDialog.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-//	exitConfirmationDialog.setMinimumSize(QSize(600, 120));
-//	QSpacerItem* horizontalSpacer = new QSpacerItem(500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-//	QGridLayout* layout = (QGridLayout*)exitConfirmationDialog.layout();
-//	layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+    QMessageBox exitConfirmationDialog;
+    exitConfirmationDialog.setWindowTitle(tr("Exit?"));
+    exitConfirmationDialog.setText(tr("Are you sure you want to exit?"));
+    exitConfirmationDialog.setInformativeText(tr("All unsaved changes will be lost."));
+    exitConfirmationDialog.setIcon(QMessageBox::Warning);
+    exitConfirmationDialog.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    exitConfirmationDialog.setMinimumSize(QSize(600, 120));
+    QSpacerItem* horizontalSpacer = new QSpacerItem(500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QGridLayout* layout = (QGridLayout*)exitConfirmationDialog.layout();
+    layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+    //TODO option to ignore this warning in the future
 
-//	if(exitConfirmationDialog.exec() == QMessageBox::Yes)
+    if(!unsavedChanges || exitConfirmationDialog.exec() == QMessageBox::Yes)
 	{
 		writeSettings();
 		event->accept();
     }
-//    else
-//    {
-//		event->ignore();
-//	}
-
+    else
+    {
+        event->ignore();
+    }
 }
 
 void MainWindow::readSettings()
@@ -87,19 +90,13 @@ void MainWindow::writeSettings()
 	settings.endGroup();
 }
 
-
-void MainWindow::refreshFileActions()
-{
-    ui->actionCloseFile->setDisabled(ui->tabBarConnections->tabBar()->currentIndex() == -1);  //FIXME bug when clicking close button on last tab
-}
-
 void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 {
 	QWidget *clickedTab = ui->tabBarConnections->widget(index);
 	clickedTab->close();
     clickedTab->deleteLater();
 
-    refreshFileActions();
+    invalidateEnabledStates();
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -111,11 +108,12 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_newFileButton_clicked()
 {
-    ConnectionTab *connectionTab = new ConnectionTab(ui->tabBarConnections);
-    ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, "Untitled");
+    ConnectionTab *connectionTab = new ConnectionTab("", ui->tabBarConnections);
+    ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, tr("Untitled"));
     ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
 
-    refreshFileActions();
+    connect(connectionTab, SIGNAL(textChanged()), this, SLOT(on_currentTabTextChanged()));
+    invalidateEnabledStates();
 }
 
 void MainWindow::on_newConnectionButton_clicked()
@@ -134,11 +132,18 @@ void MainWindow::on_newConnectionButton_clicked()
 
 void MainWindow::on_connectionComboBox_currentIndexChanged(int index)
 {
-    refreshConnectionActions();
+    invalidateEnabledStates();
 }
 
-void MainWindow::refreshConnectionActions()
+void MainWindow::invalidateEnabledStates()
 {
+    ConnectionTab *currentTab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+
+    ui->actionCloseFile->setDisabled(currentTab == nullptr); //FIXME bug when last tab is closed
+    ui->saveFileButton->setDisabled(currentTab == nullptr);
+    ui->actionSaveFile->setDisabled(currentTab == nullptr);
+    ui->actionSaveFileAs->setDisabled(currentTab == nullptr);
+
     int index = ui->connectionComboBox->currentIndex();
     bool connectionAtIndex = index != -1;
 
@@ -148,6 +153,7 @@ void MainWindow::refreshConnectionActions()
     ui->actionDeleteConnection->setDisabled(!connectionAtIndex);
 
     bool isOpen = false;
+    bool queryExists = ui->tabBarConnections->currentIndex() != -1;
 
     if (connectionAtIndex)
     {
@@ -160,10 +166,10 @@ void MainWindow::refreshConnectionActions()
     ui->actionOpenConnection->setDisabled(isOpen);
     ui->closeConnectionButton->setDisabled(!isOpen);
     ui->actionCloseConnection->setDisabled(!isOpen);
-    ui->queryBlockButton->setDisabled(!isOpen);
-    ui->actionQueryBlockAtCursor->setDisabled(!isOpen);
-//    ui->queryFileButton->setDisabled(!isOpen);
-//    ui->actionQuery_File->setDisabled(!isOpen);
+    ui->queryBlockButton->setDisabled(!isOpen || !queryExists);
+    ui->actionQueryBlockAtCursor->setDisabled(!isOpen || !queryExists);
+//    ui->queryFileButton->setDisabled(!isOpen || !queryExists);
+//    ui->actionQuery_File->setDisabled(!isOpen || !queryExists);
 }
 
 void MainWindow::on_editConnectionButton_clicked()
@@ -177,7 +183,7 @@ void MainWindow::on_editConnectionButton_clicked()
         connection = dialog.getConnection();
         m_connectionManager.saveConnection(connection);
         ui->connectionComboBox->setItemText(index, connection.name());
-        refreshConnectionActions();
+        invalidateEnabledStates();
     }
 }
 
@@ -187,7 +193,7 @@ void MainWindow::on_deleteConnectionButton_clicked()
     QString connectionId = ui->connectionComboBox->itemData(index).toString();
     m_connectionManager.deleteConnection(connectionId);
     ui->connectionComboBox->removeItem(index);
-    refreshConnectionActions();
+    invalidateEnabledStates();
 }
 
 void MainWindow::on_openConnectionButton_clicked()
@@ -195,7 +201,7 @@ void MainWindow::on_openConnectionButton_clicked()
     int index = ui->connectionComboBox->currentIndex();
     QString connectionId = ui->connectionComboBox->itemData(index).toString();
     m_connectionManager.openConnection(m_connectionManager.getConnections()[connectionId]);
-    refreshConnectionActions();
+    invalidateEnabledStates();
 }
 
 void MainWindow::on_closeConnectionButton_clicked()
@@ -203,7 +209,7 @@ void MainWindow::on_closeConnectionButton_clicked()
     int index = ui->connectionComboBox->currentIndex();
     QString connectionId = ui->connectionComboBox->itemData(index).toString();
     m_connectionManager.closeConnection(connectionId);
-    refreshConnectionActions();
+    invalidateEnabledStates();
 }
 
 void MainWindow::on_queryBlockButton_clicked()
@@ -218,4 +224,69 @@ void MainWindow::on_queryBlockButton_clicked()
 void MainWindow::on_actionCloseFile_triggered()
 {
     ui->tabBarConnections->removeTab(ui->tabBarConnections->currentIndex());
+}
+
+void MainWindow::on_openFileButton_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::homePath(), tr("All files (*.*) ;; Sql files (*.sql)"));
+
+    if (!filename.isEmpty())
+    {
+        QFileInfo fileInfo(filename);
+        ConnectionTab *connectionTab = new ConnectionTab(filename, ui->tabBarConnections);
+        ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, fileInfo.fileName());
+        ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
+
+        connect(connectionTab, SIGNAL(textChanged()), this, SLOT(on_currentTabTextChanged()));
+        invalidateEnabledStates();
+    }
+}
+
+void MainWindow::changeTabFilename(ConnectionTab *connectionTab)
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save As"), QDir::homePath(), tr("All files (*.*) ;; Sql files (*.sql)"));
+    connectionTab->setFilename(filename);
+}
+
+void MainWindow::saveTab(ConnectionTab *connectionTab)
+{
+    connectionTab->writeFile();
+    QString text = connectionTab->filename();
+    if (text.isEmpty())
+        text = tr("Untitled");
+    else
+        text = QFileInfo(connectionTab->filename()).fileName();
+    ui->tabBarConnections->setTabText(ui->tabBarConnections->currentIndex(), text);
+}
+
+void MainWindow::on_saveFileButton_clicked()
+{
+    ConnectionTab *connectionTab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+    if (connectionTab->filename().isEmpty())
+    {
+        changeTabFilename(connectionTab);
+    }
+    saveTab(connectionTab);
+}
+
+void MainWindow::on_actionSaveFileAs_triggered()
+{
+    ConnectionTab *connectionTab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+    changeTabFilename(connectionTab);
+    saveTab(connectionTab);
+}
+
+void MainWindow::on_currentTabTextChanged()
+{
+    invalidateEnabledStates(); //save button
+
+    ConnectionTab *connectionTab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+    if (connectionTab->modified())
+    {
+        //have tab text show file has been changed
+        int index = ui->tabBarConnections->currentIndex();
+        QString currentTabText = ui->tabBarConnections->tabText(index);
+        if (!currentTabText.startsWith("*"))
+            ui->tabBarConnections->setTabText(index, "*" + currentTabText);
+    }
 }

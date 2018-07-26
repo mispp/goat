@@ -40,7 +40,7 @@
         <item>
          <widget class="QPushButton" name="openFileButton">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="toolTip">
            <string>Open File</string>
@@ -286,6 +286,7 @@
     <addaction name="actionNewFile"/>
     <addaction name="actionOpenFile"/>
     <addaction name="actionSaveFile"/>
+    <addaction name="actionSaveFileAs"/>
     <addaction name="actionCloseFile"/>
     <addaction name="actionExit"/>
    </widget>
@@ -353,7 +354,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Open File</string>
+    <string>&amp;Open File</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -364,7 +365,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save File</string>
+    <string>&amp;Save File</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -372,7 +373,7 @@
   </action>
   <action name="actionNewConnection">
    <property name="text">
-    <string>New Connection</string>
+    <string>&amp;New Connection</string>
    </property>
   </action>
   <action name="actionEditConnection">
@@ -380,7 +381,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Edit Connection</string>
+    <string>&amp;Edit Connection</string>
    </property>
   </action>
   <action name="actionDeleteConnection">
@@ -388,7 +389,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Delete Connection</string>
+    <string>&amp;Delete Connection</string>
    </property>
   </action>
   <action name="actionOpenConnection">
@@ -396,7 +397,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Open Connection</string>
+    <string>&amp;Open Connection</string>
    </property>
   </action>
   <action name="actionCloseConnection">
@@ -404,7 +405,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Close Connection</string>
+    <string>&amp;Close Connection</string>
    </property>
   </action>
   <action name="actionQueryBlockAtCursor">
@@ -412,7 +413,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Query Block At Cursor</string>
+    <string>&amp;Query Block At Cursor</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Return</string>
@@ -423,15 +424,26 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Query File</string>
+    <string>Query &amp;File</string>
    </property>
   </action>
   <action name="actionCloseFile">
    <property name="text">
-    <string>Close File</string>
+    <string>&amp;Close File</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionSaveFileAs">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Save &amp;File As...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
  </widget>
@@ -564,6 +576,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>739</x>
+     <y>53</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSaveFile</sender>
+   <signal>triggered()</signal>
+   <receiver>saveFileButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>97</x>
      <y>53</y>
     </hint>
    </hints>

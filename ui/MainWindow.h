@@ -6,6 +6,7 @@
 
 #include "src/Connection.h"
 #include "src/ConnectionManager.h"
+#include "ui/ConnectionTab.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,7 +20,8 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
-    void refreshFileActions();
+    void changeTabFilename(ConnectionTab *connectionTab);
+    void saveTab(ConnectionTab *connectionTab);
 
 private slots:
 	void on_actionExit_triggered();
@@ -33,14 +35,17 @@ private slots:
     void on_openConnectionButton_clicked();
     void on_closeConnectionButton_clicked();
     void on_queryBlockButton_clicked();
-
     void on_actionCloseFile_triggered();
+    void on_openFileButton_clicked();
+    void on_saveFileButton_clicked();
+    void on_currentTabTextChanged();
+    void on_actionSaveFileAs_triggered();
 
 private:
     void closeEvent(QCloseEvent *event);
     void writeSettings();
     void readSettings();
-    void refreshConnectionActions();
+    void invalidateEnabledStates();
 
 	Ui::MainWindow *ui;
     ConnectionManager m_connectionManager;
