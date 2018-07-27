@@ -92,11 +92,28 @@ void MainWindow::writeSettings()
 
 void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 {
-	QWidget *clickedTab = ui->tabBarConnections->widget(index);
-	clickedTab->close();
-    clickedTab->deleteLater();
+    ConnectionTab *tab = (ConnectionTab*) ui->tabBarConnections->currentWidget();
 
-    invalidateEnabledStates();
+    QMessageBox closeConfirmationDialog;
+    closeConfirmationDialog.setWindowTitle(tr("Close?"));
+    closeConfirmationDialog.setText(tr("Are you sure you want to close?"));
+    closeConfirmationDialog.setInformativeText(tr("All unsaved changes will be lost."));
+    closeConfirmationDialog.setIcon(QMessageBox::Warning);
+    closeConfirmationDialog.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    closeConfirmationDialog.setMinimumSize(QSize(600, 120));
+    QSpacerItem* horizontalSpacer = new QSpacerItem(500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QGridLayout* layout = (QGridLayout*)closeConfirmationDialog.layout();
+    layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+    //TODO option to ignore this warning in the future
+
+    if(!tab->modified() || closeConfirmationDialog.exec() == QMessageBox::Yes)
+    {
+        ui->tabBarConnections->removeTab(index);
+        tab->close();
+        tab->deleteLater();
+
+        invalidateEnabledStates();
+    }
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -139,7 +156,7 @@ void MainWindow::invalidateEnabledStates()
 {
     ConnectionTab *currentTab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
 
-    ui->actionCloseFile->setDisabled(currentTab == nullptr); //FIXME bug when last tab is closed
+    ui->actionCloseFile->setDisabled(currentTab == nullptr);
     ui->saveFileButton->setDisabled(currentTab == nullptr);
     ui->actionSaveFile->setDisabled(currentTab == nullptr);
     ui->actionSaveFileAs->setDisabled(currentTab == nullptr);
@@ -223,7 +240,7 @@ void MainWindow::on_queryBlockButton_clicked()
 
 void MainWindow::on_actionCloseFile_triggered()
 {
-    ui->tabBarConnections->removeTab(ui->tabBarConnections->currentIndex());
+    on_tabBarConnections_tabCloseRequested(ui->tabBarConnections->currentIndex());
 }
 
 void MainWindow::on_openFileButton_clicked()
