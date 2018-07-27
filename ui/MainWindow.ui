@@ -426,6 +426,9 @@
    <property name="text">
     <string>Query &amp;File</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+X</string>
+   </property>
   </action>
   <action name="actionCloseFile">
    <property name="text">
