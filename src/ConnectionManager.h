@@ -12,18 +12,19 @@ class ConnectionManager
 {
 public:
     ConnectionManager();
+    ~ConnectionManager();
     void saveConnection(const Connection &connection);
     void deleteConnection(const QString &connectionId);
     void openConnection(const Connection &connection);
     void closeConnection(const QString &connectionId);
     QMap<QString, Connection> getConnections() const;
-    QMap<QString, QSqlDatabase> getOpenConnections() const;
+    bool isOpen(const QString &connectionId) const;
+    QSqlDatabase getOpenConnection(const QString &connectionId);
 
 private:
     QList<Connection> loadConnections();
 
     QMap<QString, Connection> m_connections;
-    QMap<QString, QSqlDatabase> m_openConnections;
 };
 
 #endif // CONNECTIONMANAGER_H

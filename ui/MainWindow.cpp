@@ -176,7 +176,7 @@ void MainWindow::invalidateEnabledStates()
     {
         QString connectionId = ui->connectionComboBox->itemData(index).toString();
         Connection connection = m_connectionManager.getConnections()[connectionId];
-        isOpen = m_connectionManager.getOpenConnections().contains(connectionId);
+        isOpen = m_connectionManager.isOpen(connectionId);
     }
 
     ui->openConnectionButton->setDisabled(isOpen);
@@ -233,8 +233,8 @@ void MainWindow::on_queryBlockButton_clicked()
 {
     int index = ui->connectionComboBox->currentIndex();
     QString connectionId = ui->connectionComboBox->itemData(index).toString();
-    QSqlDatabase db = m_connectionManager.getOpenConnections()[connectionId];
     ConnectionTab *tab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+    QSqlDatabase db = m_connectionManager.getOpenConnection(connectionId);
     tab->executeQueryAtCursor(db);
 }
 

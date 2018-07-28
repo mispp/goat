@@ -18,9 +18,18 @@ ConnectionManager::ConnectionManager()
     }
 }
 
+ConnectionManager::~ConnectionManager()
+{
+    foreach(Connection connection, m_connections.values())
+    {
+        closeConnection(connection.connectionId());
+    }
+    m_connections.clear();
+}
+
 void ConnectionManager::openConnection(const Connection &connection)
 {
-    if (m_openConnections.contains(connection.connectionId()))
+    if (QSqlDatabase::contains(connection.connectionId()))
         return;
 
     QSqlDatabase db = QSqlDatabase::addDatabase(connection.driver(), connection.connectionId());
@@ -33,12 +42,10 @@ void ConnectionManager::openConnection(const Connection &connection)
 
 	bool ok = db.open();
 
-    if (ok)
+    if (!ok)
     {
-        m_openConnections[connection.connectionId()] = db;
-    }
-    else
-    {
+        QSqlDatabase::removeDatabase(connection.connectionId());
+
 		qDebug() << "Error making connection";
 
 		QString e1 = db.lastError().driverText() + "\n\n"
@@ -62,11 +69,10 @@ void ConnectionManager::openConnection(const Connection &connection)
 
 void ConnectionManager::closeConnection(const QString &connectionId)
 {
-    if (!m_openConnections.contains(connectionId))
+    if (!QSqlDatabase::contains(connectionId))
         return;
 
-    m_openConnections[connectionId].close();
-    m_openConnections.remove(connectionId);
+    QSqlDatabase::database(connectionId).close();
     QSqlDatabase::removeDatabase(connectionId);
 }
 
@@ -104,9 +110,17 @@ void ConnectionManager::deleteConnection(const QString &connectionId)
     settings.sync();
 }
 
-QMap<QString, QSqlDatabase> ConnectionManager::getOpenConnections() const
+bool ConnectionManager::isOpen(const QString &connectionId) const
 {
-    return m_openConnections;
+    return QSqlDatabase::contains(connectionId);
+}
+
+QSqlDatabase ConnectionManager::getOpenConnection(const QString &connectionId)
+{
+    if (!isOpen(connectionId))
+        qDebug() << "Call to ConnectionManager::getOpenConnection() was make with non-open connectionId " << connectionId;
+
+    return QSqlDatabase::database(connectionId);
 }
 
 QMap<QString, Connection> ConnectionManager::getConnections() const
