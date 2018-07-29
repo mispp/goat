@@ -3,6 +3,66 @@
 #include <QUuid>
 #include <assert.h>
 
+Connection Connection::defaultConnection(const QString &driver)
+{
+    Connection connection;
+    connection.setDriver(driver);
+
+    QMap<QString, QString> details;
+
+    if (connection.driver() == "QPSQL")
+    {
+        details["server"] = "localhost";
+        details["port"] = "5432";
+        details["database"] = "public";
+        details["username"] = "postgres";
+        details["pass"] = "";
+    }
+    else if (connection.driver() == "QMYSQL")
+    {
+        details["server"] = "localhost";
+        details["port"] = "3306";
+        details["database"] = "";
+        details["username"] = "root";
+        details["pass"] = "";
+    }
+
+    connection.setDetails(details);
+    connection.setName(defaultName(connection));
+    return connection;
+}
+
+QString Connection::defaultName(const Connection &connection)
+{
+    QString type = "?";
+
+    if (connection.driver() == "QPSQL")
+    {
+        type = "psql";
+    }
+    else if (connection.driver() == "QMYSQL")
+    {
+        type = "mysql";
+    }
+
+    if (type == "?")
+        return "New Connection";
+
+    QString user = connection.details().contains("username") ? connection.details()[("username")] : "";
+    QString server = connection.details().contains("server") ? connection.details()[("server")] : "";
+    QString port = connection.details().contains("port") ? connection.details()[("port")] : "";
+    QString database = connection.details().contains("database") ? connection.details()[("database")] : "";
+
+    QString name = "";
+    name += user + (user.isEmpty() ? "" : "@");
+    name += server;
+    name += (port.isEmpty() ? "" : ":") + port;
+    name += (database.isEmpty() ? "" : "/") + database;
+    name += " [" + type + "]";
+
+    return name;
+}
+
 Connection::Connection()
 {
     m_connectionId = QUuid::createUuid().toString().mid(1, 36);

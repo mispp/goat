@@ -135,7 +135,7 @@ void MainWindow::on_newFileButton_clicked()
 
 void MainWindow::on_newConnectionButton_clicked()
 {
-    Connection connection;
+    Connection connection = Connection::defaultConnection();
     ConnectionDialog dialog(connection);
     if(dialog.exec() == QDialog::Accepted)
     {
