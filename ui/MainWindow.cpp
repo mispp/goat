@@ -253,7 +253,7 @@ void MainWindow::on_actionCloseFile_triggered()
 
 void MainWindow::on_openFileButton_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::homePath(), tr("All files (*.*) ;; Sql files (*.sql)"));
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::homePath(), tr("Sql files (*.sql) ;; All files (*.*)"));
 
     if (!filename.isEmpty())
     {
@@ -269,7 +269,7 @@ void MainWindow::on_openFileButton_clicked()
 
 void MainWindow::changeTabFilename(ConnectionTab *connectionTab)
 {
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save As"), QDir::homePath(), tr("All files (*.*) ;; Sql files (*.sql)"));
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save As"), QDir::homePath(), tr("Sql files (*.sql) ;; All files (*.*)"));
     connectionTab->setFilename(filename);
 }
 
