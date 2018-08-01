@@ -58,17 +58,14 @@ void ConnectionTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
 
     if (q.exec(query))
     {
-        if (q.size() != -1)
+        if (q.isSelect())
         {
-            //size is not -1, so probably an select statement
-
             m_queryResultsModel->setQuery(q);
             ui->resultsGrid->resizeColumnsToContents();
             ui->resultsTabBar->setCurrentIndex(0);
-        } else
+        }
+        else
         {
-            //not a select statement
-
             ui->resultsTabBar->setCurrentIndex(1);
             ui->resultsText->appendPlainText("Timestamp: " + QDateTime::currentDateTime().toString("yyyy-mm-dd hh:mm:ss"));
             ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(q.numRowsAffected()));
