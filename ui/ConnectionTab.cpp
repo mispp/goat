@@ -56,32 +56,33 @@ void ConnectionTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
     ui->resultsText->clear();
     QSqlQuery q(sqlDatabase);
 
-    if (q.exec(query))
+    QDateTime start = QDateTime::currentDateTime();
+    bool success = q.exec(query);
+    QDateTime end = QDateTime::currentDateTime();
+    bool displayGrid = success && q.isSelect();
+
+    if (displayGrid)
     {
-        if (q.isSelect())
-        {
-            m_queryResultsModel->setQuery(q);
-            ui->resultsGrid->resizeColumnsToContents();
-            ui->resultsTabBar->setCurrentIndex(0);
-        }
-        else
-        {
-            ui->resultsTabBar->setCurrentIndex(1);
-            ui->resultsText->appendPlainText("Timestamp: " + QDateTime::currentDateTime().toString("yyyy-mm-dd hh:mm:ss"));
-            ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(q.numRowsAffected()));
-            ui->resultsText->appendPlainText("");
-            ui->resultsText->appendPlainText(q.executedQuery());
-        }
+        m_queryResultsModel->setQuery(q);
+        ui->resultsGrid->resizeColumnsToContents();
+        ui->resultsTabBar->setCurrentIndex(0);
     }
     else
     {
+        m_queryResultsModel->clear();
         ui->resultsTabBar->setCurrentIndex(1);
-        ui->resultsText->appendPlainText(q.lastError().text());
-        ui->resultsText->appendPlainText("");
-        ui->resultsText->appendPlainText("Query:");
-        ui->resultsText->appendPlainText("-------------------------------");
-        ui->resultsText->appendPlainText(query);
     }
+
+    ui->resultsText->appendPlainText("Timestamp: " + end.toString("yyyy-mm-dd hh:mm:ss"));
+    ui->resultsText->appendPlainText("Elapsed: " + QString::number(start.msecsTo(end)) + " ms");
+    if (success && !displayGrid)
+        ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(q.numRowsAffected()));
+    else if (!success)
+        ui->resultsText->appendPlainText(q.lastError().text());
+    ui->resultsText->appendPlainText("");
+    ui->resultsText->appendPlainText("Query:");
+    ui->resultsText->appendPlainText("-------------------------------");
+    ui->resultsText->appendPlainText(q.lastQuery());
 }
 
 bool ConnectionTab::modified() const
