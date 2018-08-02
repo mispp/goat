@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>703</width>
-    <height>303</height>
+    <width>763</width>
+    <height>432</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>New connection</string>
+   <string>Connection Manager</string>
   </property>
   <property name="modal">
    <bool>true</bool>
