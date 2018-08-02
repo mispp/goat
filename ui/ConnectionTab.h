@@ -19,25 +19,25 @@ class ConnectionTab : public QWidget
 {
 	Q_OBJECT
 
-public slots:
-    void on_ctrlEnter_triggered();
+signals:
+   void textChanged();
 
 public:
-	explicit ConnectionTab(QWidget *parent = 0);
+    explicit ConnectionTab(QString filename, QWidget *parent = 0);
 	~ConnectionTab();
-
-private slots:
-	void on_comboBoxConnections_currentIndexChanged(int index);
-    void on_button_selectionQuery_released();
+    void executeQueryAtCursor(QSqlDatabase sqlDatabase);
+    void executeQuery(QSqlDatabase sqlDatabase, QString query);
+    QString filename() const;
+    void setFilename(const QString &filename);
+    bool modified() const;
+    void setModified(const bool &modified);
+    void readFile();
+    void writeFile();
 
 private:
-	Ui::ConnectionTab *ui;
-
-    QSqlDatabase m_establishedConnection;
+    Ui::ConnectionTab *ui;
     QSqlQueryModel* m_queryResultsModel;
-    void runQuery(const QString query);
-    void executeQuery(const QString query);
-
+    QString m_filename;
 };
 
 #endif // CONNECTIONTAB_H

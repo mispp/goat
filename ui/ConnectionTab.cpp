@@ -2,35 +2,40 @@
 #include "ui_ConnectionTab.h"
 #include "src/ConnectionManager.h"
 
-#include <QTabWidget>
-#include <QSqlQueryModel>
+#include <QAction>
+#include <QComboBox>
+#include <QDateTime>
+#include <QDebug>
+#include <QDir>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QShortcut>
 #include <QSplitter>
-#include <QTextCursor>
-#include <QTextBlock>
-#include <QSqlQuery>
-#include <QSqlResult>
 #include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlQueryModel>
+#include <QSqlResult>
 #include <QTabBar>
-#include <QDateTime>
-#include <QComboBox>
-#include <QDebug>
+#include <QTabWidget>
+#include <QTextBlock>
+#include <QTextCursor>
 #include <QVBoxLayout>
-#include <QAction>
 
-ConnectionTab::ConnectionTab(QWidget *parent) :	QWidget(parent), ui(new Ui::ConnectionTab)
+ConnectionTab::ConnectionTab(QString filename, QWidget *parent) : QWidget(parent), ui(new Ui::ConnectionTab)
 {
 	ui->setupUi(this);
-    ui->comboBoxConnections->setModel(ConnectionManager::getInstance()->getEstablishedConnectionModel());
 
     m_queryResultsModel = new QSqlQueryModel(this);
+    m_filename = filename;
+
     ui->resultsGrid->setModel(m_queryResultsModel);
 
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
-    m_establishedConnection = QSqlDatabase::database(ui->comboBoxConnections->itemData(0, Qt::UserRole+1).toString());
+    readFile();
+    setModified(false);
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->codeEditor), SIGNAL(activated()), this, SLOT(on_ctrlEnter_triggered()));
+    connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
 }
 
 ConnectionTab::~ConnectionTab()
@@ -38,35 +43,18 @@ ConnectionTab::~ConnectionTab()
 	delete ui;
 }
 
-void ConnectionTab::on_comboBoxConnections_currentIndexChanged(int index)
+void ConnectionTab::executeQueryAtCursor(QSqlDatabase sqlDatabase)
 {
-    m_establishedConnection = QSqlDatabase::database(ConnectionManager::getInstance()->getEstablishedConnectionModel()->item(index)->data(Qt::UserRole+1).toString());
+    executeQuery(sqlDatabase, ui->codeEditor->getQueryAtCursor());
 }
 
-void ConnectionTab::on_ctrlEnter_triggered()
+void ConnectionTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
 {
-    runQuery(ui->codeEditor->getQueryAtCursor());
-}
+    if (query.trimmed().isEmpty())
+        return;
 
-void ConnectionTab::on_button_selectionQuery_released()
-{
-    runQuery(ui->codeEditor->getSelection());
-}
-
-void ConnectionTab::runQuery(const QString query)
-{
-    if (!query.trimmed().isEmpty())
-    {
-        executeQuery(query.trimmed().simplified());
-    }
-}
-
-void ConnectionTab::executeQuery(const QString query)
-{
-    m_queryResultsModel->clear();
     ui->resultsText->clear();
-
-    QSqlQuery q(m_establishedConnection);
+    QSqlQuery q(sqlDatabase);
 
     if (q.exec(query))
     {
@@ -99,3 +87,82 @@ void ConnectionTab::executeQuery(const QString query)
     }
 }
 
+bool ConnectionTab::modified() const
+{
+    return ui->codeEditor->document()->isModified();
+}
+
+void ConnectionTab::setModified(const bool &modified)
+{
+    ui->codeEditor->document()->setModified(modified);
+}
+
+QString ConnectionTab::filename() const
+{
+    return m_filename;
+}
+
+void ConnectionTab::readFile()
+{
+    if (m_filename.isEmpty())
+        return;
+
+    ui->codeEditor->document()->clear();
+
+    QFile file(m_filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Error reading file: " + m_filename;
+
+        QMessageBox messageBox;
+        messageBox.setWindowTitle("Error");
+        messageBox.setText("Error reading file: " + m_filename);
+        messageBox.setIcon(QMessageBox::Critical);
+        messageBox.setStandardButtons(QMessageBox::Ok);
+
+        messageBox.exec();
+        return;
+    }
+
+    ui->codeEditor->document()->setPlainText(QString(file.readAll()));
+    file.close();
+}
+
+void ConnectionTab::writeFile()
+{
+    if (m_filename.isEmpty())
+    {
+        return;
+    }
+
+    QFile file(m_filename);
+    bool error = !file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    if (!error)
+    {
+        error = file.write(ui->codeEditor->document()->toPlainText().toUtf8()) == -1;
+        file.close();
+    }
+
+    if (error)
+    {
+        qDebug() << "Error writing file: " + m_filename;
+
+        QMessageBox messageBox;
+        messageBox.setWindowTitle("Error");
+        messageBox.setText("Error writing file: " + m_filename);
+        messageBox.setIcon(QMessageBox::Critical);
+        messageBox.setStandardButtons(QMessageBox::Ok);
+
+        messageBox.exec();
+    }
+    else
+    {
+        setModified(false);
+    }
+}
+
+void ConnectionTab::setFilename(const QString &filename)
+{
+    m_filename = filename;
+}

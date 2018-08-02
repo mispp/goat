@@ -10,16 +10,13 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     setStyleSheet("CodeEditor { font: 18px; }");
-    setTabStopDistance(fontMetrics().width(' ') * 4);
+    setTabStopWidth(fontMetrics().width(' ') * 4);
 
     connect(this, &QPlainTextEdit::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
-    //connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), this), SIGNAL(activated()), parent, SLOT(on_ctrlEnter_triggered()));
 
     multilineCommentExpression.setPattern("/\\*+[^*]*\\*+(?:[^/*][^*]*\\*+)*/");
     singlelineCommentExpression.setPattern("--[^\n]*");
-
     m_highlighter.setDocument(document());
-
     highlightCurrentLine();
 }
 

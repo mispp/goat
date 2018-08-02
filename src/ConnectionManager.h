@@ -2,27 +2,29 @@
 #define CONNECTIONMANAGER_H
 
 #include <QList>
-#include <QStandardItemModel>
-#include <QMutex>
+#include <QMap>
+#include <QSqlDatabase>
+#include<QStandardItemModel>
 
-#include "src/ConnectionStandardItem.h"
+#include "src/Connection.h"
 
 class ConnectionManager
 {
 public:
-    QStandardItemModel* getModel();
-    static ConnectionManager* getInstance();
-
-    void establishConnection(ConnectionStandardItem* connection);
-    int connectionsAvailable();
-    QStringList getEstablishedConnectionList();
-    QStandardItemModel* getEstablishedConnectionModel();
+    ConnectionManager();
+    ~ConnectionManager();
+    void saveConnection(const Connection &connection);
+    void deleteConnection(const QString &connectionId);
+    void openConnection(const Connection &connection);
+    void closeConnection(const QString &connectionId);
+    QMap<QString, Connection> getConnections() const;
+    bool isOpen(const QString &connectionId) const;
+    QSqlDatabase getOpenConnection(const QString &connectionId);
 
 private:
-	ConnectionManager();
+    QList<Connection> loadConnections();
 
-	static ConnectionManager* m_instance;
-    QStandardItemModel* m_establishedConnectionModel;
+    QMap<QString, Connection> m_connections;
 };
 
 #endif // CONNECTIONMANAGER_H
