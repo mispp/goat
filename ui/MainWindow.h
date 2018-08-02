@@ -41,6 +41,8 @@ private slots:
     void on_currentTabTextChanged();
     void on_actionSaveFileAs_triggered();
 
+    void on_actionConnection_Manager_triggered();
+
 private:
     void closeEvent(QCloseEvent *event);
     void writeSettings();

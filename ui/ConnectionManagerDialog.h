@@ -1,6 +1,8 @@
 #ifndef CONNECTIONMANAGERDIALOG_H
 #define CONNECTIONMANAGERDIALOG_H
 
+#include "src/ConnectionManager.h"
+
 #include <QDialog>
 #include <QStandardItemModel>
 #include <QAbstractButton>
@@ -8,8 +10,6 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QDataWidgetMapper>
-
-#include "src/ConnectionStandardItem.h"
 
 namespace Ui {
 class ConnectionManagerDialog;
@@ -35,14 +35,15 @@ private slots:
 private:
     Ui::ConnectionManagerDialog *ui;
 
-    QStandardItemModel* m_model;
+    //QStandardItemModel* m_model;
     QStandardItemModel* m_driversModel;
     QStandardItemModel* m_connectionListModel;
     QDataWidgetMapper* m_dataWidgetMapper;
     void updateConnectionListModel();
     void updateCurrentlySelectedConnection();
     QMap<QString, QVariant> getSelectedConnectionDefinition();
-    ConnectionStandardItem* getCurrentlySelectedConnection();
+    //ConnectionStandardItem* getCurrentlySelectedConnection();
+    ConnectionManager m_connectionManager;
 };
 
 #endif // CONNECTIONMANAGERDIALOG_H
