@@ -196,6 +196,7 @@ void MainWindow::on_editConnectionButton_clicked()
     QString connectionId = ui->connectionComboBox->itemData(index).toString();
     Connection connection = m_connectionManager.getConnections()[connectionId];
     ConnectionDialog dialog(connection);
+    dialog.setWindowTitle(tr("Edit Connection"));
     if(dialog.exec() == QDialog::Accepted)
     {
         connection = dialog.getConnection();
