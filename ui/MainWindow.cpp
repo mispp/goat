@@ -3,6 +3,7 @@
 #include "ui/ConnectionDialog.h"
 #include "ui/ConnectionTab.h"
 #include "ui/AboutDialog.h"
+#include "ui/ConnectionManagerDialog.h"
 
 #include <QCloseEvent>
 #include <QDebug>
@@ -108,7 +109,7 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 
     if(!tab->modified() || closeConfirmationDialog.exec() == QMessageBox::Yes)
     {
-        ui->tabBarConnections->removeTab(index);
+        //ui->tabBarConnections->removeTab(index);
         tab->close();
         tab->deleteLater();
 
@@ -313,4 +314,10 @@ void MainWindow::on_currentTabTextChanged()
         if (!currentTabText.startsWith("*"))
             ui->tabBarConnections->setTabText(index, "*" + currentTabText);
     }
+}
+
+void MainWindow::on_actionConnection_Manager_triggered()
+{
+    ConnectionManagerDialog dialog;
+    dialog.exec();
 }
