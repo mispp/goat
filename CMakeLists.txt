@@ -1,4 +1,4 @@
-find_package(Qt5 5.9.5 REQUIRED COMPONENTS Core Gui Sql)
+find_package(Qt5 5.11.0 REQUIRED COMPONENTS Core Gui Sql)
 find_package(Qt5Sql REQUIRED)
 
 set(goat_src

@@ -38,19 +38,6 @@ To be considered:
     - postgres is a priority here, mariadb/mysql should maybe stay with qt classes for now
 - evaluate scintilla/qscintilla or ktextedit/ktexteditor
 
-# Installing
-
-## Ubuntu 18.04
-
-```
-sudo apt install build-essential g++ qt5-default
-mkdir build
-cd build
-qmake ..
-make
-./Goat
-```
-
 # Recognitions
 
 Icons used are called Silk. From [here](http://www.famfamfam.com/lab/icons/silk/).
