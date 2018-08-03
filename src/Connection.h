@@ -1,10 +1,11 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include<QMap>
-#include<QString>
+#include <QMap>
+#include <QString>
+#include <QStandardItem>
 
-class Connection
+class Connection : public QStandardItem
 {
 public:
     static Connection defaultConnection(const QString &driver = "QPSQL");

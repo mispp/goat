@@ -63,7 +63,7 @@ QString Connection::defaultName(const Connection &connection)
     return name;
 }
 
-Connection::Connection()
+Connection::Connection() : QStandardItem()
 {
     m_connectionId = QUuid::createUuid().toString().mid(1, 36);
     m_name = "New connection";
@@ -76,7 +76,7 @@ Connection::Connection()
     m_details["pass"] = "";
 }
 
-Connection::Connection(const QString &connectionId, const QString &driver, const QString &name, const QMap<QString, QString> &details)
+Connection::Connection(const QString &connectionId, const QString &driver, const QString &name, const QMap<QString, QString> &details) : QStandardItem()
 {
     assert(!connectionId.isEmpty());
     assert(!driver.isEmpty());
