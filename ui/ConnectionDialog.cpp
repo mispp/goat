@@ -39,13 +39,18 @@ void ConnectionDialog::setUiValues(const Connection &connection)
 {
     int idx = ui->listDropdownDBDriver->findData(connection.driver(), Qt::UserRole + 1);
     ui->listDropdownDBDriver->setCurrentIndex(idx);
-    ui->chooseDatabaseFileButton->setDisabled(connection.driver() != "QSQLITE");
     ui->txtName->setText(connection.name());
     ui->txtServer->setText(connection.details()["server"]);
     ui->txtPort->setText(connection.details()["port"]);
     ui->txtDatabase->setText(connection.details()["database"]);
     ui->txtUser->setText(connection.details()["username"]);
     ui->txtPass->setText(connection.details()["pass"]);
+
+    ui->chooseDatabaseFileButton->setDisabled(connection.driver() != "QSQLITE");
+    ui->txtServer->setDisabled(connection.driver() == "QSQLITE");
+    ui->txtPort->setDisabled(connection.driver() == "QSQLITE");
+    ui->txtUser->setDisabled(connection.driver() == "QSQLITE");
+    ui->txtPass->setDisabled(connection.driver() == "QSQLITE");
 }
 
 Connection ConnectionDialog::buildConnection()
@@ -101,6 +106,14 @@ void ConnectionDialog::on_listDropdownDBDriver_currentIndexChanged(int index)
             details[key] = defaultConnection.details()[key];
         else
             details[key] = value;
+
+        if (connection.driver() == "QSQLITE")
+        {
+            details.remove("server");
+            details.remove("port");
+            details.remove("username");
+            details.remove("pass");
+        }
     }
 
     connection.setDetails(details);
