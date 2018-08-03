@@ -74,6 +74,8 @@ Connection::Connection() : QStandardItem()
     m_details["database"] = "";
     m_details["username"] = "";
     m_details["pass"] = "";
+
+    setText(m_name);
 }
 
 Connection::Connection(const QString &connectionId, const QString &driver, const QString &name, const QMap<QString, QString> &details) : QStandardItem()
@@ -85,6 +87,8 @@ Connection::Connection(const QString &connectionId, const QString &driver, const
     m_name = name;
     m_driver = driver;
     m_details = details;
+
+    setText(m_name);
 }
 
 QMap<QString, QString> Connection::details() const
