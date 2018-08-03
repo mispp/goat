@@ -31,7 +31,7 @@ ConnectionManagerDialog::ConnectionManagerDialog(QWidget *parent) :	QDialog(pare
     item_mysql->setData("QMYSQL");
     m_driversModel->appendRow(item_mysql);
 
-    //updateConnectionListModel();
+    updateConnectionListModel();
 
     //connect(ui->listViewConnections->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(on_listViewSelectionChanged(QItemSelection, QItemSelection)));
     //connect(m_connectionListModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(on_renameListViewItem(QStandardItem*)));
@@ -127,13 +127,12 @@ void ConnectionManagerDialog::on_listViewSelectionChanged(QItemSelection current
 }
 
 void ConnectionManagerDialog::updateConnectionListModel() {
-    /*QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
-
-    foreach(QString key, settings.childGroups())
+    foreach (Connection connection, m_connectionManager.getConnections().values())
     {
-        ConnectionStandardItem* item = new ConnectionStandardItem(key);
-        m_connectionListModel->appendRow(item);
-    }*/
+        // there is a problem either here or in Connection class
+        // setText on the QStandardItem doesnt work while instantiating Connection
+        m_connectionListModel->appendRow(&connection);
+    }
 }
 
 void ConnectionManagerDialog::updateCurrentlySelectedConnection()
