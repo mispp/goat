@@ -93,7 +93,7 @@ void MainWindow::writeSettings()
 
 void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 {
-    ConnectionTab *tab = (ConnectionTab*) ui->tabBarConnections->currentWidget();
+    ConnectionTab *tab = (ConnectionTab*) ui->tabBarConnections->widget(index);
 
     QMessageBox closeConfirmationDialog;
     closeConfirmationDialog.setWindowTitle(tr("Close?"));
@@ -109,7 +109,7 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 
     if(!tab->modified() || closeConfirmationDialog.exec() == QMessageBox::Yes)
     {
-        //ui->tabBarConnections->removeTab(index);
+        ui->tabBarConnections->removeTab(index);
         tab->close();
         tab->deleteLater();
 
