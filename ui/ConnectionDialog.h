@@ -30,6 +30,7 @@ private slots:
     void on_txtDatabase_textChanged(const QString &arg1);
     void on_txtUser_textChanged(const QString &arg1);
     void on_txtPass_textChanged(const QString &arg1);
+    void on_chooseDatabaseFileButton_clicked();
 
 private:
     Ui::ConnectionDialog *ui;

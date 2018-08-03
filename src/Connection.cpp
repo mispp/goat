@@ -1,5 +1,6 @@
 #include "Connection.h"
 
+#include <QFileInfo>
 #include <QUuid>
 #include <assert.h>
 
@@ -26,6 +27,14 @@ Connection Connection::defaultConnection(const QString &driver)
         details["username"] = "root";
         details["pass"] = "";
     }
+    else if (connection.driver() == "QSQLITE")
+    {
+        details["server"] = "";
+        details["port"] = "";
+        details["database"] = ":memory:";
+        details["username"] = "";
+        details["pass"] = "";
+    }
 
     connection.setDetails(details);
     connection.setName(defaultName(connection));
@@ -44,6 +53,10 @@ QString Connection::defaultName(const Connection &connection)
     {
         type = "mysql";
     }
+    else if (connection.driver() == "QSQLITE")
+    {
+        type = "sqlite";
+    }
 
     if (type == "?")
         return "New Connection";
@@ -54,10 +67,21 @@ QString Connection::defaultName(const Connection &connection)
     QString database = connection.details().contains("database") ? connection.details()[("database")] : "";
 
     QString name = "";
-    name += user + (user.isEmpty() ? "" : "@");
-    name += server;
-    name += (port.isEmpty() ? "" : ":") + port;
-    name += (database.isEmpty() ? "" : "/") + database;
+
+    if (connection.driver() == "QSQLITE")
+    {
+        if (database.contains(":"))
+            name += database;
+        else
+            name += QFileInfo(database).fileName();
+    }
+    else
+    {
+        name += user + (user.isEmpty() ? "" : "@");
+        name += server;
+        name += (port.isEmpty() ? "" : ":") + port;
+        name += (database.isEmpty() || name.isEmpty() ? "" : "/") + database;
+    }
     name += " [" + type + "]";
 
     return name;
