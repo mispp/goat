@@ -7,11 +7,10 @@
 #include "ui_ConnectionManagerDialog.h"
 #include "src/ConnectionManager.h"
 
-ConnectionManagerDialog::ConnectionManagerDialog(QWidget *parent) :	QDialog(parent), ui(new Ui::ConnectionManagerDialog)
+ConnectionManagerDialog::ConnectionManagerDialog(ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QDialog(parent), ui(new Ui::ConnectionManagerDialog)
 {
 	ui->setupUi(this);
 
-    //m_model = new QStandardItemModel(this);
     m_driversModel = new QStandardItemModel(this);
     m_connectionListModel = new QStandardItemModel(this);
     //m_dataWidgetMapper = new QDataWidgetMapper(this);
@@ -127,7 +126,7 @@ void ConnectionManagerDialog::on_listViewSelectionChanged(QItemSelection current
 }
 
 void ConnectionManagerDialog::updateConnectionListModel() {
-    foreach (Connection connection, m_connectionManager.getConnections().values())
+    foreach (Connection connection, m_connectionManager->getConnections().values())
     {
         // there is a problem either here or in Connection class
         // setText on the QStandardItem doesnt work while instantiating Connection

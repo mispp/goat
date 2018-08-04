@@ -319,6 +319,6 @@ void MainWindow::on_currentTabTextChanged()
 
 void MainWindow::on_actionConnection_Manager_triggered()
 {
-    ConnectionManagerDialog dialog;
+    ConnectionManagerDialog dialog(&m_connectionManager);
     dialog.exec();
 }

@@ -20,7 +20,7 @@ class ConnectionManagerDialog : public QDialog
 	Q_OBJECT
 
 public:
-    explicit ConnectionManagerDialog(QWidget *parent = 0);
+    explicit ConnectionManagerDialog(ConnectionManager *connectionManager, QWidget *parent = 0);
     ~ConnectionManagerDialog();
 
 private slots:
@@ -35,15 +35,13 @@ private slots:
 private:
     Ui::ConnectionManagerDialog *ui;
 
-    //QStandardItemModel* m_model;
     QStandardItemModel* m_driversModel;
     QStandardItemModel* m_connectionListModel;
     QDataWidgetMapper* m_dataWidgetMapper;
     void updateConnectionListModel();
     void updateCurrentlySelectedConnection();
     QMap<QString, QVariant> getSelectedConnectionDefinition();
-    //ConnectionStandardItem* getCurrentlySelectedConnection();
-    ConnectionManager m_connectionManager;
+    ConnectionManager* m_connectionManager;
 };
 
 #endif // CONNECTIONMANAGERDIALOG_H
