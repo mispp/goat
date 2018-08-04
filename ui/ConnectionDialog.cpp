@@ -1,6 +1,7 @@
 #include <QDebug>
-#include <QSettings>
+#include <QFileDialog>
 #include <QMessageBox>
+#include <QSettings>
 #include <QUuid>
 
 #include "ui/ConnectionDialog.h"
@@ -14,16 +15,17 @@ ConnectionDialog::ConnectionDialog(const Connection &connection, QWidget *parent
     ui->listDropdownDBDriver->setModel(&m_driversModel);
     this->m_connection = connection;
 
-    /* set combobox */
-    QStandardItem* item_psql = new QStandardItem();
-    item_psql->setText("PostgreSQL");
-    item_psql->setData("QPSQL");
-    m_driversModel.appendRow(item_psql);
+    QMap<QString, QString> drivers;
+    drivers["PostgreSQL"] = "QPSQL";
+    drivers["MySQL/MariaDB"] = "QMYSQL";
+    drivers["Sqlite"] = "QSQLITE";
 
-    QStandardItem* item_mysql = new QStandardItem();
-    item_mysql->setText("MySQL/MariaDB");
-    item_mysql->setData("QMYSQL");
-    m_driversModel.appendRow(item_mysql);
+    foreach(QString key, drivers.keys())
+    {
+        QStandardItem* item = new QStandardItem(key);
+        item->setData(drivers[key]);
+        m_driversModel.appendRow(item);
+    }
 
     setUiValues(m_connection);
     this->ignoreChanges = false;
@@ -35,18 +37,25 @@ ConnectionDialog::~ConnectionDialog() {
 
 void ConnectionDialog::setUiValues(const Connection &connection)
 {
-    ui->listDropdownDBDriver->setCurrentIndex(connection.driver() == "QPSQL" ? 0 : 1);
+    int idx = ui->listDropdownDBDriver->findData(connection.driver(), Qt::UserRole + 1);
+    ui->listDropdownDBDriver->setCurrentIndex(idx);
     ui->txtName->setText(connection.name());
     ui->txtServer->setText(connection.details()["server"]);
     ui->txtPort->setText(connection.details()["port"]);
     ui->txtDatabase->setText(connection.details()["database"]);
     ui->txtUser->setText(connection.details()["username"]);
     ui->txtPass->setText(connection.details()["pass"]);
+
+    ui->chooseDatabaseFileButton->setDisabled(connection.driver() != "QSQLITE");
+    ui->txtServer->setDisabled(connection.driver() == "QSQLITE");
+    ui->txtPort->setDisabled(connection.driver() == "QSQLITE");
+    ui->txtUser->setDisabled(connection.driver() == "QSQLITE");
+    ui->txtPass->setDisabled(connection.driver() == "QSQLITE");
 }
 
 Connection ConnectionDialog::buildConnection()
 {
-    QString driver = ui->listDropdownDBDriver->currentData(Qt::UserRole+1).toString();
+    QString driver = ui->listDropdownDBDriver->currentData(Qt::UserRole + 1).toString();
 
     QMap<QString, QString> details;
     details["server"] = ui->txtServer->text();
@@ -54,7 +63,6 @@ Connection ConnectionDialog::buildConnection()
     details["database"] = ui->txtDatabase->text();
     details["username"] = ui->txtUser->text();
     details["pass"] = ui->txtPass->text();
-
 
     Connection connection(m_connection.connectionId(), driver, ui->txtName->text(), details);
     return connection;
@@ -98,6 +106,14 @@ void ConnectionDialog::on_listDropdownDBDriver_currentIndexChanged(int index)
             details[key] = defaultConnection.details()[key];
         else
             details[key] = value;
+
+        if (connection.driver() == "QSQLITE")
+        {
+            details.remove("server");
+            details.remove("port");
+            details.remove("username");
+            details.remove("pass");
+        }
     }
 
     connection.setDetails(details);
@@ -149,4 +165,22 @@ void ConnectionDialog::on_txtUser_textChanged(const QString &arg1)
 void ConnectionDialog::on_txtPass_textChanged(const QString &arg1)
 {
     updateConnection();
+}
+
+void ConnectionDialog::on_chooseDatabaseFileButton_clicked()
+{
+    QFileDialog dialog(this);
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setDirectory(QDir::homePath());
+    dialog.setNameFilter(tr("Sqlite files (*.sqlite3 *.sqlite *.db) ;; All files (*.*)"));
+    dialog.setFileMode(QFileDialog::AnyFile); //allow creating a new database
+    dialog.setOptions(QFileDialog::DontConfirmOverwrite);
+    if (dialog.exec() == QDialog::Accepted && dialog.selectedFiles().count() > 0)
+    {
+        QString filename = dialog.selectedFiles().at(0);
+        if (!filename.isEmpty())
+        {
+            ui->txtDatabase->setText(filename);
+        }
+    }
 }
