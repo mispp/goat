@@ -13,8 +13,6 @@ ConnectionManagerDialog::ConnectionManagerDialog(ConnectionManager *connectionMa
 
     m_driversModel = new QStandardItemModel(this);
     m_connectionListModel = new QStandardItemModel(this);
-    //m_dataWidgetMapper = new QDataWidgetMapper(this);
-    //m_dataWidgetMapper->setModel(m_connectionListModel);
 
     ui->listDropdownDBDriver->setModel(m_driversModel);
     ui->listViewConnections->setModel(m_connectionListModel);
@@ -30,21 +28,21 @@ ConnectionManagerDialog::ConnectionManagerDialog(ConnectionManager *connectionMa
     item_mysql->setData("QMYSQL");
     m_driversModel->appendRow(item_mysql);
 
-    updateConnectionListModel();
+    populateConnectionListModel();
 
-    //connect(ui->listViewConnections->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(on_listViewSelectionChanged(QItemSelection, QItemSelection)));
-    //connect(m_connectionListModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(on_renameListViewItem(QStandardItem*)));
+    connect(ui->listViewConnections->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(on_listViewSelectionChanged(QItemSelection, QItemSelection)));
+    connect(m_connectionListModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(on_renameListViewItem(QStandardItem*)));
     //connect(m_connectionListModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(on_rowsInserted(QModelIndex,int,int)));
 
     /* disable ui to be edited until we have connection selected/created */
-    /*ui->txtDatabase->setDisabled(true);
+    ui->txtDatabase->setDisabled(true);
     ui->txtPass->setDisabled(true);
     ui->txtPort->setDisabled(true);
     ui->txtServer->setDisabled(true);
     ui->txtUser->setDisabled(true);
     ui->listDropdownDBDriver->setDisabled(true);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
-    ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);*/
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
 }
 
 ConnectionManagerDialog::~ConnectionManagerDialog() {
@@ -61,20 +59,20 @@ void ConnectionManagerDialog::on_buttonBox_rejected() {
 
 void ConnectionManagerDialog::on_buttonBox_clicked(QAbstractButton *button) {
 
-    /*if (button == ui->buttonBox->button(QDialogButtonBox::Apply))
+    if (button == ui->buttonBox->button(QDialogButtonBox::Apply))
 	{
         updateCurrentlySelectedConnection();
 	}
 	else if (button == ui->buttonBox->button(QDialogButtonBox::Ok))
 	{
         updateCurrentlySelectedConnection();
-        ConnectionManager::getInstance()->establishConnection(getCurrentlySelectedConnection());
+        m_connectionManager->openConnection(*getSelectedConnection());
 		accept();
 	}
 	else
 	{
 		reject();
-    }*/
+    }
 }
 
 void ConnectionManagerDialog::on_rowsInserted(const QModelIndex &source_parent, int start, int end)
@@ -89,30 +87,30 @@ void ConnectionManagerDialog::on_rowsInserted(const QModelIndex &source_parent, 
 
 void ConnectionManagerDialog::on_buttonNewConnection_released()
 {
-    /*QUuid newId = QUuid::createUuid();
-    ConnectionStandardItem* item = new ConnectionStandardItem(QString::number(newId));
-
-    m_connectionListModel->appendRow(item);*/
+    Connection* newConnection = new Connection();
+    m_connectionListModel->appendRow(newConnection);
+    m_connectionManager->saveConnection(*newConnection);
 }
 
 void ConnectionManagerDialog::on_renameListViewItem(QStandardItem* changedItem)
 {
-    /*QMap<QString, QVariant> connectionDefinition = changedItem->data(Qt::UserRole+1).value<QMap<QString, QVariant>>();
-    QString newName = changedItem->text();
-    connectionDefinition["name"] = QVariant(newName);
-
-    getCurrentlySelectedConnection()->updateConnectionDefinition(connectionDefinition);*/
+    Connection *changedConnection = (Connection*) changedItem;
+    changedConnection->setName(changedItem->text());
+    m_connectionManager->saveConnection(*changedConnection);
 }
 
 void ConnectionManagerDialog::on_listViewSelectionChanged(QItemSelection current, QItemSelection previous) {
-    /*//QMap<QString, QVariant> connectionDefinition = getSelectedConnectionDefinition();
+    Q_UNUSED(current);
+    Q_UNUSED(previous);
+
+    //QMap<QString, QVariant> connectionDefinition = getSelectedConnectionDefinition();
 
     //ui->listDropdownDBDriver->setCurrentIndex(index);
-    ui->txtUser->setText(connectionDefinition["username"].toString());
-    ui->txtPass->setText(connectionDefinition["pass"].toString());
-    ui->txtServer->setText(connectionDefinition["server"].toString());
-    ui->txtPort->setText(connectionDefinition["port"].toString());
-    ui->txtDatabase->setText(connectionDefinition["database"].toString());
+    ui->txtUser->setText(getSelectedConnection()->details()["username"]);
+    ui->txtPass->setText(getSelectedConnection()->details()["pass"]);
+    ui->txtServer->setText(getSelectedConnection()->details()["server"]);
+    ui->txtPort->setText(getSelectedConnection()->details()["port"]);
+    ui->txtDatabase->setText(getSelectedConnection()->details()["database"]);
 
     //enable UI to be edited
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
@@ -122,41 +120,49 @@ void ConnectionManagerDialog::on_listViewSelectionChanged(QItemSelection current
     ui->txtPort->setEnabled(true);
     ui->txtServer->setEnabled(true);
     ui->txtUser->setEnabled(true);
-    ui->listDropdownDBDriver->setEnabled(true);*/
+    ui->listDropdownDBDriver->setEnabled(true);
 }
 
-void ConnectionManagerDialog::updateConnectionListModel() {
+void ConnectionManagerDialog::populateConnectionListModel() {
+    m_connectionListModel->clear();
     foreach (Connection connection, m_connectionManager->getConnections().values())
     {
-        // there is a problem either here or in Connection class
-        // setText on the QStandardItem doesnt work while instantiating Connection
-        m_connectionListModel->appendRow(&connection);
+        Connection *connetionPointer = new Connection(connection.connectionId(), connection.driver(), connection.name(), connection.details());
+        m_connectionListModel->appendRow(connetionPointer);
     }
 }
 
 void ConnectionManagerDialog::updateCurrentlySelectedConnection()
 {
-    /*QMap<QString, QVariant> connectionDefinition = getSelectedConnectionDefinition();
+    QMap<QString, QString> details;
 
-    connectionDefinition["database"] = QVariant(ui->txtDatabase->text());
-    connectionDefinition["driver"] = ui->listDropdownDBDriver->currentData(Qt::UserRole+1);
-    connectionDefinition["pass"] = QVariant(ui->txtPass->text());
-    connectionDefinition["port"] = QVariant(ui->txtPort->text().toInt());
-    connectionDefinition["server"] = QVariant(ui->txtServer->text());
-    connectionDefinition["username"] = QVariant(ui->txtUser->text());
+    details["database"] = ui->txtDatabase->text();
+    details["pass"] = ui->txtPass->text();
+    details["port"] = ui->txtPort->text();
+    details["server"] = ui->txtServer->text();
+    details["username"] = ui->txtUser->text();
 
-    getCurrentlySelectedConnection()->updateConnectionDefinition(connectionDefinition);*/
+    Connection *selectedConnection = getSelectedConnection();
+
+    selectedConnection->setDetails(details);
+    selectedConnection->setDriver(ui->listDropdownDBDriver->currentData(Qt::UserRole+1).toString());
+    selectedConnection->setName(selectedConnection->text());
+    m_connectionManager->saveConnection(*selectedConnection);
 }
 
-/*ConnectionStandardItem* ConnectionManagerDialog::getCurrentlySelectedConnection()
+Connection* ConnectionManagerDialog::getSelectedConnection()
 {
-    QStandardItem* currentlySelectedConnection = m_connectionListModel->itemFromIndex(ui->listViewConnections->currentIndex());
+    QStandardItem* selectedConnection = m_connectionListModel->itemFromIndex(ui->listViewConnections->currentIndex());
 
-    return (ConnectionStandardItem*) currentlySelectedConnection;
-}*/
-
-/*QMap<QString, QVariant> ConnectionManagerDialog::getSelectedConnectionDefinition()
-{
-    return getCurrentlySelectedConnection()->data().value<QMap<QString, QVariant>>();
+    return (Connection*) selectedConnection;
 }
-*/
+
+void ConnectionManagerDialog::on_pushButton_released()
+{
+    Connection *connection = getSelectedConnection();
+
+    m_connectionManager->closeConnection(connection->connectionId());
+    m_connectionManager->deleteConnection(connection->connectionId());
+
+    populateConnectionListModel();
+}
