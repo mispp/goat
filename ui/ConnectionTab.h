@@ -1,6 +1,8 @@
 #ifndef CONNECTIONTAB_H
 #define CONNECTIONTAB_H
 
+#include "../src/ConnectionManager.h"
+
 #include <QPlainTextEdit>
 #include <QString>
 #include <QWidget>
@@ -23,7 +25,7 @@ signals:
    void textChanged();
 
 public:
-    explicit ConnectionTab(QString filename, QWidget *parent = 0);
+    explicit ConnectionTab(QString filename, ConnectionManager *connectionManager, QWidget *parent = 0);
 	~ConnectionTab();
     void executeQueryAtCursor(QSqlDatabase sqlDatabase);
     void executeQuery(QSqlDatabase sqlDatabase, QString query);
@@ -37,7 +39,14 @@ public:
 private:
     Ui::ConnectionTab *ui;
     QSqlQueryModel* m_queryResultsModel;
+    QStandardItemModel* m_openConnectionsModel;
     QString m_filename;
+    ConnectionManager* m_connectionManager;
+
+public slots:
+    void refreshOpenConnections();
+private slots:
+    void on_button_selectionQuery_released();
 };
 
 #endif // CONNECTIONTAB_H

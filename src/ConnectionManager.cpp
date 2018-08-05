@@ -10,7 +10,7 @@
 #include <QString>
 #include <QUuid>
 
-ConnectionManager::ConnectionManager()
+ConnectionManager::ConnectionManager() : QObject()
 {
     foreach(Connection connection, loadConnections())
     {
@@ -65,6 +65,8 @@ void ConnectionManager::openConnection(const Connection &connection)
 
 		errorCreatingDBConnectionDialog.exec();
 	}
+
+    emit connectionStateChanged();
 }
 
 void ConnectionManager::closeConnection(const QString &connectionId)
@@ -74,6 +76,8 @@ void ConnectionManager::closeConnection(const QString &connectionId)
 
     QSqlDatabase::database(connectionId).close();
     QSqlDatabase::removeDatabase(connectionId);
+
+    emit connectionStateChanged();
 }
 
 void ConnectionManager::saveConnection(const Connection &connection)
@@ -121,6 +125,19 @@ QSqlDatabase ConnectionManager::getOpenConnection(const QString &connectionId)
         qDebug() << "Call to ConnectionManager::getOpenConnection() was make with non-open connectionId " << connectionId;
 
     return QSqlDatabase::database(connectionId);
+}
+
+QMap<QString, QString> ConnectionManager::getOpenConnections()
+{
+    QMap<QString, QString> openConnections;
+
+    foreach (QString key, QSqlDatabase::connectionNames())
+    {
+        Connection connection = m_connections[key];
+        openConnections[key] = connection.name();
+    }
+
+    return openConnections;
 }
 
 QMap<QString, Connection> ConnectionManager::getConnections() const

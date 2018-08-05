@@ -21,21 +21,25 @@
 #include <QTextCursor>
 #include <QVBoxLayout>
 
-ConnectionTab::ConnectionTab(QString filename, QWidget *parent) : QWidget(parent), ui(new Ui::ConnectionTab)
+ConnectionTab::ConnectionTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QWidget(parent), ui(new Ui::ConnectionTab)
 {
 	ui->setupUi(this);
 
     m_queryResultsModel = new QSqlQueryModel(this);
+    m_openConnectionsModel = new QStandardItemModel(this);
     m_filename = filename;
 
     ui->resultsGrid->setModel(m_queryResultsModel);
+    ui->comboBoxConnections->setModel(m_openConnectionsModel);
 
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
     readFile();
     setModified(false);
+    refreshOpenConnections();
 
     connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
+    connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
 }
 
 ConnectionTab::~ConnectionTab()
@@ -163,4 +167,32 @@ void ConnectionTab::writeFile()
 void ConnectionTab::setFilename(const QString &filename)
 {
     m_filename = filename;
+}
+
+void ConnectionTab::refreshOpenConnections()
+{
+    QMap<QString, QString> openConnections = m_connectionManager->getOpenConnections();
+
+    m_openConnectionsModel->clear();
+
+    foreach (QString key, openConnections.keys())
+    {
+        QStandardItem* openConnectionItem = new QStandardItem();
+
+        openConnectionItem->setText(openConnections[key]);
+        openConnectionItem->setData(key, Qt::UserRole+1);
+
+        m_openConnectionsModel->appendRow(openConnectionItem);
+    }
+}
+
+void ConnectionTab::on_button_selectionQuery_released()
+{
+    int index = ui->comboBoxConnections->currentIndex();
+    QString connectionId = ui->comboBoxConnections->itemData(index, Qt::UserRole+1).toString();
+
+    if (!m_connectionManager->isOpen(connectionId))
+        return;
+
+    executeQuery(m_connectionManager->getOpenConnection(connectionId), ui->codeEditor->getSelection());
 }

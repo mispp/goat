@@ -126,7 +126,7 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_newFileButton_clicked()
 {
-    ConnectionTab *connectionTab = new ConnectionTab("", ui->tabBarConnections);
+    ConnectionTab *connectionTab = new ConnectionTab("", &m_connectionManager, ui->tabBarConnections);
     ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, tr("Untitled"));
     ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
 
@@ -259,7 +259,7 @@ void MainWindow::on_openFileButton_clicked()
     if (!filename.isEmpty())
     {
         QFileInfo fileInfo(filename);
-        ConnectionTab *connectionTab = new ConnectionTab(filename, ui->tabBarConnections);
+        ConnectionTab *connectionTab = new ConnectionTab(filename, &m_connectionManager, ui->tabBarConnections);
         ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, fileInfo.fileName());
         ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
 

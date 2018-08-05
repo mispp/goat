@@ -8,8 +8,10 @@
 
 #include "src/Connection.h"
 
-class ConnectionManager
+class ConnectionManager : public QObject
 {
+    Q_OBJECT
+
 public:
     ConnectionManager();
     ~ConnectionManager();
@@ -20,11 +22,15 @@ public:
     QMap<QString, Connection> getConnections() const;
     bool isOpen(const QString &connectionId) const;
     QSqlDatabase getOpenConnection(const QString &connectionId);
+    QMap<QString, QString> getOpenConnections();
 
 private:
     QList<Connection> loadConnections();
-
     QMap<QString, Connection> m_connections;
+
+signals:
+    void connectionStateChanged();
+
 };
 
 #endif // CONNECTIONMANAGER_H
