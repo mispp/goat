@@ -173,16 +173,40 @@ void ConnectionTab::refreshOpenConnections()
 {
     QMap<QString, QString> openConnections = m_connectionManager->getOpenConnections();
 
+    QString usedConnectionId = ui->comboBoxConnections->currentData(Qt::UserRole+1).toString();
+
     m_openConnectionsModel->clear();
 
-    foreach (QString key, openConnections.keys())
+    if (openConnections.count() == 0)
     {
         QStandardItem* openConnectionItem = new QStandardItem();
 
-        openConnectionItem->setText(openConnections[key]);
-        openConnectionItem->setData(key, Qt::UserRole+1);
+        openConnectionItem->setText("<no open connections>");
 
         m_openConnectionsModel->appendRow(openConnectionItem);
+
+        ui->comboBoxConnections->setCurrentIndex(0);
+    }
+    else
+    {
+        foreach (QString key, openConnections.keys())
+        {
+            QStandardItem* openConnectionItem = new QStandardItem();
+
+            openConnectionItem->setText(openConnections[key]);
+            openConnectionItem->setData(key, Qt::UserRole+1);
+
+            m_openConnectionsModel->appendRow(openConnectionItem);
+        }
+
+        if (!usedConnectionId.isEmpty())
+        {
+            int index = ui->comboBoxConnections->findData(usedConnectionId, Qt::UserRole+1);
+            if (index)
+            {
+                ui->comboBoxConnections->setCurrentIndex(index);
+            }
+        }
     }
 }
 
