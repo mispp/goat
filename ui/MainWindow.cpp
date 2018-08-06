@@ -1,7 +1,7 @@
 #include "ui/MainWindow.h"
 #include "ui_MainWindow.h"
 #include "ui/ConnectionDialog.h"
-#include "ui/ConnectionTab.h"
+#include "ui/QueryTab.h"
 #include "ui/AboutDialog.h"
 #include "ui/ConnectionManagerDialog.h"
 
@@ -41,7 +41,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     bool unsavedChanges = false;
     for (int i = 0; i < ui->tabBarConnections->count(); ++i)
     {
-        ConnectionTab *connectionTab = ((ConnectionTab*) ui->tabBarConnections->widget(i));
+        QueryTab *connectionTab = ((QueryTab*) ui->tabBarConnections->widget(i));
         unsavedChanges |= connectionTab->modified();
     }
 
@@ -93,7 +93,7 @@ void MainWindow::writeSettings()
 
 void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 {
-    ConnectionTab *tab = (ConnectionTab*) ui->tabBarConnections->widget(index);
+    QueryTab *tab = (QueryTab*) ui->tabBarConnections->widget(index);
 
     QMessageBox closeConfirmationDialog;
     closeConfirmationDialog.setWindowTitle(tr("Close?"));
@@ -126,7 +126,7 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_newFileButton_clicked()
 {
-    ConnectionTab *connectionTab = new ConnectionTab("", &m_connectionManager, ui->tabBarConnections);
+    QueryTab *connectionTab = new QueryTab("", &m_connectionManager, ui->tabBarConnections);
     ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, tr("Untitled"));
     ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
 
@@ -155,7 +155,7 @@ void MainWindow::on_connectionComboBox_currentIndexChanged(int index)
 
 void MainWindow::invalidateEnabledStates()
 {
-    ConnectionTab *currentTab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+    QueryTab *currentTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
 
     ui->actionCloseFile->setDisabled(currentTab == nullptr);
     ui->saveFileButton->setDisabled(currentTab == nullptr);
@@ -242,7 +242,7 @@ void MainWindow::on_queryBlockButton_clicked()
     if (!m_connectionManager.isOpen(connectionId))
         return;
 
-    ConnectionTab *tab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+    QueryTab *tab = ((QueryTab*) ui->tabBarConnections->currentWidget());
     QSqlDatabase db = m_connectionManager.getOpenConnection(connectionId);
     tab->executeQueryAtCursor(db);
 }
@@ -259,7 +259,7 @@ void MainWindow::on_openFileButton_clicked()
     if (!filename.isEmpty())
     {
         QFileInfo fileInfo(filename);
-        ConnectionTab *connectionTab = new ConnectionTab(filename, &m_connectionManager, ui->tabBarConnections);
+        QueryTab *connectionTab = new QueryTab(filename, &m_connectionManager, ui->tabBarConnections);
         ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, fileInfo.fileName());
         ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
 
@@ -268,13 +268,13 @@ void MainWindow::on_openFileButton_clicked()
     }
 }
 
-void MainWindow::changeTabFilename(ConnectionTab *connectionTab)
+void MainWindow::changeTabFilename(QueryTab *connectionTab)
 {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save As"), QDir::homePath(), tr("Sql files (*.sql) ;; All files (*.*)"));
     connectionTab->setFilename(filename);
 }
 
-void MainWindow::saveTab(ConnectionTab *connectionTab)
+void MainWindow::saveTab(QueryTab *connectionTab)
 {
     connectionTab->writeFile();
     QString text = connectionTab->filename();
@@ -287,7 +287,7 @@ void MainWindow::saveTab(ConnectionTab *connectionTab)
 
 void MainWindow::on_saveFileButton_clicked()
 {
-    ConnectionTab *connectionTab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+    QueryTab *connectionTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
     if (connectionTab->filename().isEmpty())
     {
         changeTabFilename(connectionTab);
@@ -297,7 +297,7 @@ void MainWindow::on_saveFileButton_clicked()
 
 void MainWindow::on_actionSaveFileAs_triggered()
 {
-    ConnectionTab *connectionTab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+    QueryTab *connectionTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
     changeTabFilename(connectionTab);
     saveTab(connectionTab);
 }
@@ -306,7 +306,7 @@ void MainWindow::on_currentTabTextChanged()
 {
     invalidateEnabledStates(); //save button
 
-    ConnectionTab *connectionTab = ((ConnectionTab*) ui->tabBarConnections->currentWidget());
+    QueryTab *connectionTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
     if (connectionTab->modified())
     {
         //have tab text show file has been changed

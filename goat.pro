@@ -17,24 +17,24 @@ SOURCES += \
     src/ConnectionManager.cpp \
     src/Connection.cpp \
     ui/MainWindow.cpp \
-    ui/ConnectionTab.cpp \
     ui/CodeEditor.cpp \
     ui/Highlighter.cpp \
     ui/AboutDialog.cpp \
     ui/ConnectionDialog.cpp \
-    ui/ConnectionManagerDialog.cpp
+    ui/ConnectionManagerDialog.cpp \
+    ui/QueryTab.cpp
 
 
 HEADERS  += \
     src/ConnectionManager.h \
     src/Connection.h \
     ui/MainWindow.h \
-    ui/ConnectionTab.h \
     ui/CodeEditor.h \
     ui/Highlighter.h \
     ui/AboutDialog.h \
     ui/ConnectionDialog.h \
-    ui/ConnectionManagerDialog.h
+    ui/ConnectionManagerDialog.h \
+    ui/QueryTab.h
 
 FORMS    += \
     ui/MainWindow.ui \

@@ -17,7 +17,7 @@ namespace Ui {
 class ConnectionTab;
 }
 
-class ConnectionTab : public QWidget
+class QueryTab : public QWidget
 {
 	Q_OBJECT
 
@@ -25,8 +25,8 @@ signals:
    void textChanged();
 
 public:
-    explicit ConnectionTab(QString filename, ConnectionManager *connectionManager, QWidget *parent = 0);
-	~ConnectionTab();
+    explicit QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent = 0);
+    ~QueryTab();
     void executeQueryAtCursor(QSqlDatabase sqlDatabase);
     void executeQuery(QSqlDatabase sqlDatabase, QString query);
     QString filename() const;

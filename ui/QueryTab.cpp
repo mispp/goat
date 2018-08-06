@@ -1,4 +1,4 @@
-#include "ConnectionTab.h"
+#include "QueryTab.h"
 #include "ui_ConnectionTab.h"
 #include "src/ConnectionManager.h"
 
@@ -21,7 +21,7 @@
 #include <QTextCursor>
 #include <QVBoxLayout>
 
-ConnectionTab::ConnectionTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QWidget(parent), ui(new Ui::ConnectionTab)
+QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QWidget(parent), ui(new Ui::ConnectionTab)
 {
 	ui->setupUi(this);
 
@@ -42,17 +42,17 @@ ConnectionTab::ConnectionTab(QString filename, ConnectionManager *connectionMana
     connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
 }
 
-ConnectionTab::~ConnectionTab()
+QueryTab::~QueryTab()
 {
 	delete ui;
 }
 
-void ConnectionTab::executeQueryAtCursor(QSqlDatabase sqlDatabase)
+void QueryTab::executeQueryAtCursor(QSqlDatabase sqlDatabase)
 {
     executeQuery(sqlDatabase, ui->codeEditor->getQueryAtCursor());
 }
 
-void ConnectionTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
+void QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
 {
     if (query.trimmed().isEmpty())
         return;
@@ -89,22 +89,22 @@ void ConnectionTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
     ui->resultsText->appendPlainText(q.lastQuery());
 }
 
-bool ConnectionTab::modified() const
+bool QueryTab::modified() const
 {
     return ui->codeEditor->document()->isModified();
 }
 
-void ConnectionTab::setModified(const bool &modified)
+void QueryTab::setModified(const bool &modified)
 {
     ui->codeEditor->document()->setModified(modified);
 }
 
-QString ConnectionTab::filename() const
+QString QueryTab::filename() const
 {
     return m_filename;
 }
 
-void ConnectionTab::readFile()
+void QueryTab::readFile()
 {
     if (m_filename.isEmpty())
         return;
@@ -130,7 +130,7 @@ void ConnectionTab::readFile()
     file.close();
 }
 
-void ConnectionTab::writeFile()
+void QueryTab::writeFile()
 {
     if (m_filename.isEmpty())
     {
@@ -164,12 +164,12 @@ void ConnectionTab::writeFile()
     }
 }
 
-void ConnectionTab::setFilename(const QString &filename)
+void QueryTab::setFilename(const QString &filename)
 {
     m_filename = filename;
 }
 
-void ConnectionTab::refreshOpenConnections()
+void QueryTab::refreshOpenConnections()
 {
     QMap<QString, QString> openConnections = m_connectionManager->getOpenConnections();
 
@@ -210,7 +210,7 @@ void ConnectionTab::refreshOpenConnections()
     }
 }
 
-void ConnectionTab::on_button_selectionQuery_released()
+void QueryTab::on_button_selectionQuery_released()
 {
     int index = ui->comboBoxConnections->currentIndex();
     QString connectionId = ui->comboBoxConnections->itemData(index, Qt::UserRole+1).toString();

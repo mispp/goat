@@ -6,7 +6,7 @@
 
 #include "src/Connection.h"
 #include "src/ConnectionManager.h"
-#include "ui/ConnectionTab.h"
+#include "ui/QueryTab.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,8 +20,8 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
-    void changeTabFilename(ConnectionTab *connectionTab);
-    void saveTab(ConnectionTab *connectionTab);
+    void changeTabFilename(QueryTab *connectionTab);
+    void saveTab(QueryTab *connectionTab);
 
 private slots:
 	void on_actionExit_triggered();
