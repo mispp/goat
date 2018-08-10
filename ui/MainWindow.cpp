@@ -258,6 +258,15 @@ void MainWindow::on_openFileButton_clicked()
 
     if (!filename.isEmpty())
     {
+        int index = ui->tabBarConnections->currentIndex();
+        if (index >= 0)
+        {
+            //can we "replace" the current tab with the file being opened?
+            QueryTab *queryTab = (QueryTab*) ui->tabBarConnections->widget(index);
+            if (!queryTab->modified() && queryTab->filename().isEmpty())
+                on_tabBarConnections_tabCloseRequested(index);
+        }
+
         QFileInfo fileInfo(filename);
         QueryTab *connectionTab = new QueryTab(filename, &m_connectionManager, ui->tabBarConnections);
         ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, fileInfo.fileName());
