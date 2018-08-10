@@ -341,7 +341,7 @@
   </action>
   <action name="actionOpenFile">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>&amp;Open File</string>
@@ -590,6 +590,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>97</x>
+     <y>53</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpenFile</sender>
+   <signal>triggered()</signal>
+   <receiver>openFileButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>60</x>
      <y>53</y>
     </hint>
    </hints>
