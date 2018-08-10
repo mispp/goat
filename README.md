@@ -15,28 +15,34 @@ What works:
     - warning! connection manager saves passwords. always!
 - queries can be executed with ctrl-enter for current query (query where cursor is currently located), as well as for selection with a button (but not as as script yet)
 - basic syntax highlighter
+- opening and saving files
+- connection manager functionality
+  - delete connections
+
 
 Todos:
 - change how results are fetched from database, now it doesn't work with big amounts of data
 - execute query as a script
 - further improve connection manager
-    - delete connections
     - option to save or not to save password (per connection)
     - driver auto-selection currently doesnt work
     - based on the driver, set default port to what makes sense
-- opening and saving files
 - autosave settings
     - e.g. height of the bottom part of tab
 - settings dialog
 - export data
 - import data
 - general code quality improvement
-    - connection handling moved to model (i have no idea how to do that now, so this is far, far away)
+
 
 To be considered:
+- evaluate scintilla/qscintilla or ktextedit/ktexteditor
+
+
+Far, far future, if not already outdated:
 - move from qt classes to libpq for better error reporting (should check if it would work better)
     - postgres is a priority here, mariadb/mysql should maybe stay with qt classes for now
-- evaluate scintilla/qscintilla or ktextedit/ktexteditor
+
 
 # Installing
 
