@@ -15,6 +15,7 @@
 #include <QSqlQuery>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QDateTime>
 
 namespace Ui {
 class ConnectionTab;
@@ -32,7 +33,7 @@ public:
     ~QueryTab();
     void executeQueryAtCursor(QSqlDatabase sqlDatabase);
     void executeSelectedQuery(QSqlDatabase sqlDatabase);
-    void executeQuery(QSqlDatabase sqlDatabase, QString query);
+    bool executeQuery(QSqlDatabase sqlDatabase, QString query);
     void displayQueryResults(bool success, QDateTime start, QDateTime end);
     QString filename() const;
     void setFilename(const QString &filename);
@@ -49,13 +50,19 @@ private:
     ConnectionManager* m_connectionManager;
 
     QSqlQuery m_sqlQuery;
+    QDateTime m_sqlQueryStart;
+    QDateTime m_sqlQueryEnd;
 
-    QFuture<void> m_futureQueryExecutionStatus;
+    QFuture<bool> m_queryFuture;
+    QFutureWatcher<void> m_queryFutureWatcher;
 
 public slots:
     void refreshOpenConnections();
+    void queryFinished();
 private slots:
     void on_button_selectionQuery_released();
+
+    void on_button_stopQuery_released();
 };
 
 #endif // CONNECTIONTAB_H

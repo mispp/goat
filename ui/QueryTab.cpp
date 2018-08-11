@@ -30,8 +30,11 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
 
     ui->resultsGrid->setModel(&m_queryResultsModel);
     ui->comboBoxConnections->setModel(&m_openConnectionsModel);
-
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+
+    ui->button_stopQuery->setEnabled(false);
+
+    //m_queryFutureWatcher.setFuture(m_queryFuture);
 
     readFile();
     setModified(false);
@@ -39,6 +42,7 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
 
     connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
     connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
+    connect(&m_queryFutureWatcher, SIGNAL(finished()), this, SLOT(queryFinished()));
 }
 
 QueryTab::~QueryTab()
@@ -48,34 +52,47 @@ QueryTab::~QueryTab()
 
 void QueryTab::executeQueryAtCursor(QSqlDatabase sqlDatabase)
 {
+    ui->button_selectionQuery->setEnabled(false);
+    ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
     ui->resultsText->clear();
     m_queryResultsModel.clear();
-    m_futureQueryExecutionStatus = QtConcurrent::run(this, &QueryTab::executeQuery, sqlDatabase, ui->codeEditor->getQueryAtCursor());
+    m_queryFuture = QtConcurrent::run(this, &QueryTab::executeQuery, sqlDatabase, ui->codeEditor->getQueryAtCursor());
+    m_queryFutureWatcher.setFuture(m_queryFuture);
 }
 
 void QueryTab::executeSelectedQuery(QSqlDatabase sqlDatabase)
 {
+    ui->button_selectionQuery->setEnabled(false);
+    ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
     ui->resultsText->clear();
     m_queryResultsModel.clear();
-    m_futureQueryExecutionStatus = QtConcurrent::run(this, &QueryTab::executeQuery, sqlDatabase, ui->codeEditor->getSelection());
+    m_queryFuture = QtConcurrent::run(this, &QueryTab::executeQuery, sqlDatabase, ui->codeEditor->getSelection());
+    m_queryFutureWatcher.setFuture(m_queryFuture);
 }
 
-void QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
+bool QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
 {
     qDebug() << "execution in new thread started";
 
     if (query.trimmed().isEmpty())
-        return;
+        return false;
 
     m_sqlQuery = QSqlQuery (sqlDatabase);
     //m_sqlQuery.setForwardOnly(true);
 
-    QDateTime start = QDateTime::currentDateTime();
+    m_sqlQueryStart = QDateTime::currentDateTime();
     bool success = m_sqlQuery.exec(query);
-    QDateTime end = QDateTime::currentDateTime();
+    m_sqlQueryEnd = QDateTime::currentDateTime();
 
-    //if query is not cancelled
-    displayQueryResults(success, start, end);
+    return success;
+}
+
+void QueryTab::queryFinished()
+{
+    displayQueryResults(m_queryFuture.result(), m_sqlQueryStart, m_sqlQueryEnd);
+
+    ui->button_selectionQuery->setEnabled(true);
+    ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
 }
 
 void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
@@ -236,4 +253,10 @@ void QueryTab::on_button_selectionQuery_released()
         return;
 
     executeSelectedQuery(m_connectionManager->getOpenConnection(connectionId));
+}
+
+void QueryTab::on_button_stopQuery_released()
+{
+    m_sqlQuery.finish();
+    m_queryFuture.cancel();
 }
