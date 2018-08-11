@@ -50,7 +50,7 @@ void QueryTab::executeQueryAtCursor(QSqlDatabase sqlDatabase)
 {
     ui->resultsText->clear();
     m_queryResultsModel.clear();
-    executeQuery(sqlDatabase, ui->codeEditor->getQueryAtCursor());
+    m_futureQueryExecutionStatus = QtConcurrent::run(this, &QueryTab::executeQuery, sqlDatabase, ui->codeEditor->getQueryAtCursor());
 }
 
 void QueryTab::executeSelectedQuery(QSqlDatabase sqlDatabase)
