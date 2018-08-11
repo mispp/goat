@@ -77,7 +77,10 @@ bool QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
     if (query.trimmed().isEmpty())
         return false;
 
-    m_sqlQuery = QSqlQuery (sqlDatabase);
+    m_database.close();
+    m_database = QSqlDatabase::cloneDatabase(sqlDatabase, QUuid::createUuid().toString());
+    m_database.open();
+    m_sqlQuery = QSqlQuery (m_database);
     //m_sqlQuery.setForwardOnly(true);
 
     m_sqlQueryStart = QDateTime::currentDateTime();

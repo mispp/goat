@@ -52,6 +52,7 @@ private:
     QSqlQuery m_sqlQuery;
     QDateTime m_sqlQueryStart;
     QDateTime m_sqlQueryEnd;
+    QSqlDatabase m_database;
 
     QFuture<bool> m_queryFuture;
     QFutureWatcher<void> m_queryFutureWatcher;
