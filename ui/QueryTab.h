@@ -13,6 +13,8 @@
 #include <QSplitter>
 #include <QComboBox>
 #include <QSqlQuery>
+#include <QFuture>
+#include <QFutureWatcher>
 
 namespace Ui {
 class ConnectionTab;
@@ -29,7 +31,9 @@ public:
     explicit QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent = 0);
     ~QueryTab();
     void executeQueryAtCursor(QSqlDatabase sqlDatabase);
+    void executeSelectedQuery(QSqlDatabase sqlDatabase);
     void executeQuery(QSqlDatabase sqlDatabase, QString query);
+    void displayQueryResults(bool success, QDateTime start, QDateTime end);
     QString filename() const;
     void setFilename(const QString &filename);
     bool modified() const;
@@ -45,6 +49,8 @@ private:
     ConnectionManager* m_connectionManager;
 
     QSqlQuery m_sqlQuery;
+
+    QFuture<void> m_futureQueryExecutionStatus;
 
 public slots:
     void refreshOpenConnections();

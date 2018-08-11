@@ -38,10 +38,10 @@ HEADERS  += \
 
 FORMS    += \
     ui/MainWindow.ui \
-    ui/ConnectionTab.ui \
     ui/AboutDialog.ui \
     ui/ConnectionDialog.ui \
-    ui/ConnectionManagerDialog.ui
+    ui/ConnectionManagerDialog.ui \
+    ui/QueryTab.ui
 
 DISTFILES += \
     LICENSE \

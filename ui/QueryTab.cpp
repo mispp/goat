@@ -1,5 +1,5 @@
 #include "QueryTab.h"
-#include "ui_ConnectionTab.h"
+#include "ui_QueryTab.h"
 #include "src/ConnectionManager.h"
 
 #include <QAction>
@@ -20,13 +20,12 @@
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QVBoxLayout>
+#include <QtConcurrent/QtConcurrent>
 
 QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QWidget(parent), ui(new Ui::ConnectionTab)
 {
 	ui->setupUi(this);
 
-    //m_queryResultsModel = new QSqlQueryModel(this);
-    //m_openConnectionsModel = new QStandardItemModel(this);
     m_filename = filename;
 
     ui->resultsGrid->setModel(&m_queryResultsModel);
@@ -49,21 +48,38 @@ QueryTab::~QueryTab()
 
 void QueryTab::executeQueryAtCursor(QSqlDatabase sqlDatabase)
 {
+    ui->resultsText->clear();
+    m_queryResultsModel.clear();
     executeQuery(sqlDatabase, ui->codeEditor->getQueryAtCursor());
+}
+
+void QueryTab::executeSelectedQuery(QSqlDatabase sqlDatabase)
+{
+    ui->resultsText->clear();
+    m_queryResultsModel.clear();
+    m_futureQueryExecutionStatus = QtConcurrent::run(this, &QueryTab::executeQuery, sqlDatabase, ui->codeEditor->getSelection());
 }
 
 void QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
 {
+    qDebug() << "execution in new thread started";
+
     if (query.trimmed().isEmpty())
         return;
 
-    ui->resultsText->clear();
     m_sqlQuery = QSqlQuery (sqlDatabase);
-    m_sqlQuery.setForwardOnly(true);
+    //m_sqlQuery.setForwardOnly(true);
 
     QDateTime start = QDateTime::currentDateTime();
     bool success = m_sqlQuery.exec(query);
     QDateTime end = QDateTime::currentDateTime();
+
+    //if query is not cancelled
+    displayQueryResults(success, start, end);
+}
+
+void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
+{
     bool displayGrid = success && m_sqlQuery.isSelect();
 
     if (displayGrid)
@@ -219,5 +235,5 @@ void QueryTab::on_button_selectionQuery_released()
     if (!m_connectionManager->isOpen(connectionId))
         return;
 
-    executeQuery(m_connectionManager->getOpenConnection(connectionId), ui->codeEditor->getSelection());
+    executeSelectedQuery(m_connectionManager->getOpenConnection(connectionId));
 }

@@ -62,6 +62,17 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="button_stopQuery">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/icons.qrc">
+             <normaloff>:/icons/silk/icons/silk/stop.png</normaloff>:/icons/silk/icons/silk/stop.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QComboBox" name="comboBoxConnections">
            <property name="minimumSize">
             <size>
