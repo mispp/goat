@@ -133,8 +133,11 @@ QMap<QString, QString> ConnectionManager::getOpenConnections()
 
     foreach (QString key, QSqlDatabase::connectionNames())
     {
-        Connection connection = m_connections[key];
-        openConnections[key] = connection.name();
+        if (!key.startsWith("CLONED_"))
+        {
+            Connection connection = m_connections[key];
+            openConnections[key] = connection.name();
+        }
     }
 
     return openConnections;

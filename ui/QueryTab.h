@@ -64,6 +64,7 @@ private slots:
     void on_button_selectionQuery_released();
 
     void on_button_stopQuery_released();
+    void on_comboBoxConnections_currentIndexChanged(int index);
 };
 
 #endif // CONNECTIONTAB_H
