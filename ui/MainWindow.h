@@ -34,7 +34,6 @@ private slots:
     void on_deleteConnectionButton_clicked();
     void on_openConnectionButton_clicked();
     void on_closeConnectionButton_clicked();
-    void on_queryBlockButton_clicked();
     void on_actionCloseFile_triggered();
     void on_openFileButton_clicked();
     void on_saveFileButton_clicked();
@@ -42,6 +41,7 @@ private slots:
     void on_actionSaveFileAs_triggered();
 
     void on_actionConnection_Manager_triggered();
+    void on_actionQueryBlockAtCursor_triggered();
 
 private:
     void closeEvent(QCloseEvent *event);

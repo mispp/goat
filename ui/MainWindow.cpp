@@ -184,7 +184,7 @@ void MainWindow::invalidateEnabledStates()
     ui->actionOpenConnection->setDisabled(isOpen);
     ui->closeConnectionButton->setDisabled(!isOpen);
     ui->actionCloseConnection->setDisabled(!isOpen);
-    ui->queryBlockButton->setDisabled(!connectionAtIndex || !queryExists);
+    //ui->queryBlockButton->setDisabled(!connectionAtIndex || !queryExists);
     ui->actionQueryBlockAtCursor->setDisabled(!connectionAtIndex || !queryExists);
 //    ui->queryFileButton->setDisabled(!connectionAtIndex || !queryExists);
 //    ui->actionQuery_File->setDisabled(!connectionAtIndex || !queryExists);
@@ -229,22 +229,6 @@ void MainWindow::on_closeConnectionButton_clicked()
     QString connectionId = ui->connectionComboBox->itemData(index).toString();
     m_connectionManager.closeConnection(connectionId);
     invalidateEnabledStates();
-}
-
-void MainWindow::on_queryBlockButton_clicked()
-{
-    int index = ui->connectionComboBox->currentIndex();
-    QString connectionId = ui->connectionComboBox->itemData(index).toString();
-
-    if (!m_connectionManager.isOpen(connectionId))
-        on_openConnectionButton_clicked();
-
-    if (!m_connectionManager.isOpen(connectionId))
-        return;
-
-    QueryTab *tab = ((QueryTab*) ui->tabBarConnections->currentWidget());
-    QSqlDatabase db = m_connectionManager.getOpenConnection(connectionId);
-    tab->executeQueryAtCursor(db);
 }
 
 void MainWindow::on_actionCloseFile_triggered()
@@ -330,4 +314,20 @@ void MainWindow::on_actionConnection_Manager_triggered()
 {
     ConnectionManagerDialog dialog(&m_connectionManager);
     dialog.exec();
+}
+
+void MainWindow::on_actionQueryBlockAtCursor_triggered()
+{
+    int index = ui->connectionComboBox->currentIndex();
+    QString connectionId = ui->connectionComboBox->itemData(index).toString();
+
+    if (!m_connectionManager.isOpen(connectionId))
+        on_openConnectionButton_clicked();
+
+    if (!m_connectionManager.isOpen(connectionId))
+        return;
+
+    QueryTab *tab = ((QueryTab*) ui->tabBarConnections->currentWidget());
+    QSqlDatabase db = m_connectionManager.getOpenConnection(connectionId);
+    tab->executeQueryAtCursor(db);
 }

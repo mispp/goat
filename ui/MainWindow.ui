@@ -174,47 +174,6 @@
          </widget>
         </item>
         <item>
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="queryBlockButton">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="toolTip">
-           <string>Query Block At Cursor</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../resources/icons.qrc">
-            <normaloff>:/icons/silk/icons/silk/resultset_next.png</normaloff>:/icons/silk/icons/silk/resultset_next.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="queryFileButton">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="toolTip">
-           <string>Query File</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../resources/icons.qrc">
-            <normaloff>:/icons/silk/icons/silk/page_white_go.png</normaloff>:/icons/silk/icons/silk/page_white_go.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="horizontalSpacer_4">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -264,7 +223,7 @@
      <x>0</x>
      <y>0</y>
      <width>1450</width>
-     <height>39</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -441,7 +400,7 @@
   </action>
   <action name="actionConnection_Manager">
    <property name="text">
-    <string>Connection Manager</string>
+    <string>Connection &amp;Manager</string>
    </property>
   </action>
  </widget>
@@ -526,38 +485,6 @@
     </hint>
     <hint type="destinationlabel">
      <x>702</x>
-     <y>53</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionQueryBlockAtCursor</sender>
-   <signal>triggered()</signal>
-   <receiver>queryBlockButton</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1101</x>
-     <y>53</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionQueryFile</sender>
-   <signal>triggered()</signal>
-   <receiver>queryFileButton</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1138</x>
      <y>53</y>
     </hint>
    </hints>
