@@ -12,6 +12,7 @@
 #include <QSqlQueryModel>
 #include <QSplitter>
 #include <QComboBox>
+#include <QSqlQuery>
 
 namespace Ui {
 class ConnectionTab;
@@ -38,10 +39,12 @@ public:
 
 private:
     Ui::ConnectionTab *ui;
-    QSqlQueryModel* m_queryResultsModel;
-    QStandardItemModel* m_openConnectionsModel;
+    QSqlQueryModel m_queryResultsModel;
+    QStandardItemModel m_openConnectionsModel;
     QString m_filename;
     ConnectionManager* m_connectionManager;
+
+    QSqlQuery m_sqlQuery;
 
 public slots:
     void refreshOpenConnections();

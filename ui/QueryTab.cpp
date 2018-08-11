@@ -25,12 +25,12 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
 {
 	ui->setupUi(this);
 
-    m_queryResultsModel = new QSqlQueryModel(this);
-    m_openConnectionsModel = new QStandardItemModel(this);
+    //m_queryResultsModel = new QSqlQueryModel(this);
+    //m_openConnectionsModel = new QStandardItemModel(this);
     m_filename = filename;
 
-    ui->resultsGrid->setModel(m_queryResultsModel);
-    ui->comboBoxConnections->setModel(m_openConnectionsModel);
+    ui->resultsGrid->setModel(&m_queryResultsModel);
+    ui->comboBoxConnections->setModel(&m_openConnectionsModel);
 
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
@@ -58,35 +58,36 @@ void QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
         return;
 
     ui->resultsText->clear();
-    QSqlQuery q(sqlDatabase);
+    m_sqlQuery = QSqlQuery (sqlDatabase);
+    m_sqlQuery.setForwardOnly(true);
 
     QDateTime start = QDateTime::currentDateTime();
-    bool success = q.exec(query);
+    bool success = m_sqlQuery.exec(query);
     QDateTime end = QDateTime::currentDateTime();
-    bool displayGrid = success && q.isSelect();
+    bool displayGrid = success && m_sqlQuery.isSelect();
 
     if (displayGrid)
     {
-        m_queryResultsModel->setQuery(q);
+        m_queryResultsModel.setQuery(m_sqlQuery);
         ui->resultsGrid->resizeColumnsToContents();
         ui->resultsTabBar->setCurrentIndex(0);
     }
     else
     {
-        m_queryResultsModel->clear();
+        m_queryResultsModel.clear();
         ui->resultsTabBar->setCurrentIndex(1);
     }
 
     ui->resultsText->appendPlainText("Timestamp: " + end.toString("yyyy-mm-dd hh:mm:ss"));
     ui->resultsText->appendPlainText("Elapsed: " + QString::number(start.msecsTo(end)) + " ms");
     if (success && !displayGrid)
-        ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(q.numRowsAffected()));
+        ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(m_sqlQuery.numRowsAffected()));
     else if (!success)
-        ui->resultsText->appendPlainText(q.lastError().text());
+        ui->resultsText->appendPlainText(m_sqlQuery.lastError().text());
     ui->resultsText->appendPlainText("");
     ui->resultsText->appendPlainText("Query:");
     ui->resultsText->appendPlainText("-------------------------------");
-    ui->resultsText->appendPlainText(q.lastQuery());
+    ui->resultsText->appendPlainText(m_sqlQuery.lastQuery());
 }
 
 bool QueryTab::modified() const
@@ -175,7 +176,7 @@ void QueryTab::refreshOpenConnections()
 
     QString usedConnectionId = ui->comboBoxConnections->currentData(Qt::UserRole+1).toString();
 
-    m_openConnectionsModel->clear();
+    m_openConnectionsModel.clear();
 
     if (openConnections.count() == 0)
     {
@@ -183,7 +184,7 @@ void QueryTab::refreshOpenConnections()
 
         openConnectionItem->setText("<no open connections>");
 
-        m_openConnectionsModel->appendRow(openConnectionItem);
+        m_openConnectionsModel.appendRow(openConnectionItem);
 
         ui->comboBoxConnections->setCurrentIndex(0);
     }
@@ -196,7 +197,7 @@ void QueryTab::refreshOpenConnections()
             openConnectionItem->setText(openConnections[key]);
             openConnectionItem->setData(key, Qt::UserRole+1);
 
-            m_openConnectionsModel->appendRow(openConnectionItem);
+            m_openConnectionsModel.appendRow(openConnectionItem);
         }
 
         if (!usedConnectionId.isEmpty())
