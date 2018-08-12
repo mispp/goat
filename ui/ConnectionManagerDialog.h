@@ -32,20 +32,22 @@ private slots:
     void on_rowsInserted(const QModelIndex &source_parent, int start, int end);
     void on_renameListViewItem(QStandardItem* changedItem);
 
-    void on_pushButton_released();
+    void on_button_deleteConnection_released();
 
 private:
     Ui::ConnectionManagerDialog *ui;
 
-    QStandardItemModel* m_driversModel;
-    QStandardItemModel* m_connectionListModel;
-    QDataWidgetMapper* m_dataWidgetMapper;
+    QStandardItemModel m_driversModel;
+    QStandardItemModel m_connectionListModel;
     void populateConnectionListModel();
     void updateCurrentlySelectedConnection();
     QMap<QString, QVariant> getSelectedConnectionDefinition();
     ConnectionManager* m_connectionManager;
     QMap<QString, Connection> m_connectionList;
     Connection* getSelectedConnection();
+
+    void disableEditing();
+    void enableEditing();
 };
 
 #endif // CONNECTIONMANAGERDIALOG_H
