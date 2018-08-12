@@ -85,19 +85,21 @@ void QueryTab::executeSelectedQuery(QSqlDatabase sqlDatabase)
 
 bool QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
 {
-    qDebug() << "execution in new thread started";
-
     if (query.trimmed().isEmpty())
         return false;
 
+    qDebug() << "reached 0";
 
-    m_sqlQuery = QSqlQuery (m_database);
-    //m_sqlQuery.setForwardOnly(true);
+    m_sqlQuery = QSqlQuery (m_database); //here it stops now (actually it takes a lot of time to finish)
+    m_sqlQuery.setForwardOnly(true);
 
+    qDebug() << "reached 1";
 
     m_sqlQueryStart = QDateTime::currentDateTime();
-    bool success = m_sqlQuery.exec(query);
+    bool success = m_sqlQuery.exec(query); //if previous assignment is moved to on_combobox_index_changed, then it stops here
     m_sqlQueryEnd = QDateTime::currentDateTime();
+
+    qDebug() << "reached 2";
 
     return success;
 }
@@ -116,14 +118,13 @@ void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
 
     if (displayGrid)
     {
-        m_queryResultsModel.setQuery(m_sqlQuery);
+        QSqlRecord record = m_sqlQuery.record();
 
-        /*int i=0;
-
-        while (m_sqlQuery.next() && i<100)
+        m_queryResultsModel.setColumnCount(record.count());
+        for (int col = 0; col < record.count(); ++col)
         {
-            m_queryResultsModel.insertRow(m_sqlQuery.record());
-        }*/
+            m_queryResultsModel.setHeaderData(col, Qt::Horizontal, record.fieldName(col).toUpper());
+        }
 
         ui->resultsGrid->resizeColumnsToContents();
         ui->resultsTabBar->setCurrentIndex(0);
@@ -146,6 +147,22 @@ void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
     ui->resultsText->appendPlainText("Query:");
     ui->resultsText->appendPlainText("-------------------------------");
     ui->resultsText->appendPlainText(m_sqlQuery.lastQuery());
+}
+
+void QueryTab::loadChunk()
+{
+    QSqlRecord record;
+    for (int row=0; row<1000; ++row)
+    {
+        m_sqlQuery.next();
+        record = m_sqlQuery.record();
+
+        m_queryResultsModel.setRowCount(m_queryResultsModel.rowCount() + 1);
+        for (int col = 0; col < record.count(); ++col)
+        {
+            m_queryResultsModel.setData(m_queryResultsModel.index(row, col), record.value(col));
+        }
+    }
 }
 
 bool QueryTab::modified() const
@@ -284,15 +301,12 @@ void QueryTab::on_button_selectionQuery_released()
 
 void QueryTab::on_button_stopQuery_released()
 {
-    //m_connectionManager->killQueryPostgres(m_database, m_postgresBackendPID);
     QtConcurrent::run(m_connectionManager, &ConnectionManager::killQueryPostgres, m_database, m_postgresBackendPID);
 
-    if (m_sqlQuery.isActive())
+    /*if (m_sqlQuery.isActive())
     {
         m_sqlQuery.finish();
-    }
-
-    //m_queryFuture.cancel();
+    }*/
 
     ui->codeEditor->setFocus();
 }
@@ -309,6 +323,7 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
 
         m_postgresBackendPID = -1;
 
+        // set up ability to cancel
         if (m_database.driverName() == "QPSQL")
         {
             QSqlQuery q(m_database);

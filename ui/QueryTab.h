@@ -44,7 +44,7 @@ public:
 
 private:
     Ui::ConnectionTab *ui;
-    QSqlQueryModel m_queryResultsModel;
+    QStandardItemModel m_queryResultsModel;
     QStandardItemModel m_openConnectionsModel;
     QString m_filename;
     ConnectionManager* m_connectionManager;
@@ -58,6 +58,8 @@ private:
     QFutureWatcher<void> m_queryFutureWatcher;
 
     int m_postgresBackendPID;
+
+    void loadChunk();
 
 public slots:
     void refreshOpenConnections();
