@@ -60,6 +60,7 @@ private:
     int m_postgresBackendPID;
 
     void loadChunk();
+    void reconnectDatabase();
 
 public slots:
     void refreshOpenConnections();

@@ -88,18 +88,14 @@ bool QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
     if (query.trimmed().isEmpty())
         return false;
 
-    qDebug() << "reached 0";
+    reconnectDatabase();
 
     m_sqlQuery = QSqlQuery (m_database); //here it stops now (actually it takes a lot of time to finish)
     m_sqlQuery.setForwardOnly(true);
 
-    qDebug() << "reached 1";
-
     m_sqlQueryStart = QDateTime::currentDateTime();
     bool success = m_sqlQuery.exec(query); //if previous assignment is moved to on_combobox_index_changed, then it stops here
     m_sqlQueryEnd = QDateTime::currentDateTime();
-
-    qDebug() << "reached 2";
 
     return success;
 }
@@ -322,19 +318,28 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
         m_database.open();
 
         m_postgresBackendPID = -1;
-
-        // set up ability to cancel
-        if (m_database.driverName() == "QPSQL")
-        {
-            QSqlQuery q(m_database);
-            q.prepare("SELECT pg_backend_pid();");
-            q.exec();
-            q.next();
-            int pid = q.value(0).toInt();
-
-            qDebug() << "pid: " + QString::number(pid);
-
-            if (pid > 0) m_postgresBackendPID = pid;
-        }
     }
+}
+
+
+void QueryTab::reconnectDatabase()
+{
+    //reconnection for running same query twice. seems to be faster.
+    if (m_database.isOpen())
+        m_database.close();
+    m_database.open();
+
+    // set up ability to cancel
+    if (m_database.driverName() == "QPSQL")
+    {
+        QSqlQuery q(m_database);
+        q.prepare("SELECT pg_backend_pid();");
+        q.exec();
+        q.next();
+        int pid = q.value(0).toInt();
+
+        qDebug() << "pid: " + QString::number(pid);
+
+        if (pid > 0) m_postgresBackendPID = pid;
+    } else m_postgresBackendPID = -1;
 }
