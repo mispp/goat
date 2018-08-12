@@ -21,6 +21,7 @@
 #include <QTextCursor>
 #include <QVBoxLayout>
 #include <QtConcurrent/QtConcurrent>
+#include <QSqlRecord>
 
 QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QWidget(parent), ui(new Ui::ConnectionTab)
 {
@@ -93,6 +94,7 @@ bool QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
     m_sqlQuery = QSqlQuery (m_database);
     //m_sqlQuery.setForwardOnly(true);
 
+
     m_sqlQueryStart = QDateTime::currentDateTime();
     bool success = m_sqlQuery.exec(query);
     m_sqlQueryEnd = QDateTime::currentDateTime();
@@ -115,6 +117,14 @@ void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
     if (displayGrid)
     {
         m_queryResultsModel.setQuery(m_sqlQuery);
+
+        /*int i=0;
+
+        while (m_sqlQuery.next() && i<100)
+        {
+            m_queryResultsModel.insertRow(m_sqlQuery.record());
+        }*/
+
         ui->resultsGrid->resizeColumnsToContents();
         ui->resultsTabBar->setCurrentIndex(0);
     }
@@ -128,6 +138,8 @@ void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
     ui->resultsText->appendPlainText("Elapsed: " + QString::number(start.msecsTo(end)) + " ms");
     if (success && !displayGrid)
         ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(m_sqlQuery.numRowsAffected()));
+    else if (success && displayGrid)
+        ui->resultsText->appendPlainText("Number of rows selected: " + QString::number(m_sqlQuery.size()));
     else if (!success)
         ui->resultsText->appendPlainText(m_sqlQuery.lastError().text());
     ui->resultsText->appendPlainText("");
@@ -272,8 +284,15 @@ void QueryTab::on_button_selectionQuery_released()
 
 void QueryTab::on_button_stopQuery_released()
 {
-    m_sqlQuery.finish();
-    m_queryFuture.cancel();
+    //m_connectionManager->killQueryPostgres(m_database, m_postgresBackendPID);
+    QtConcurrent::run(m_connectionManager, &ConnectionManager::killQueryPostgres, m_database, m_postgresBackendPID);
+
+    if (m_sqlQuery.isActive())
+    {
+        m_sqlQuery.finish();
+    }
+
+    //m_queryFuture.cancel();
 }
 
 void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
@@ -285,5 +304,20 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
     {
         m_database = QSqlDatabase::cloneDatabase(m_connectionManager->getOpenConnection(connectionId), "CLONED_" + QUuid::createUuid().toString());
         m_database.open();
+
+        m_postgresBackendPID = -1;
+
+        if (m_database.driverName() == "QPSQL")
+        {
+            QSqlQuery q(m_database);
+            q.prepare("SELECT pg_backend_pid();");
+            q.exec();
+            q.next();
+            int pid = q.value(0).toInt();
+
+            qDebug() << "pid: " + QString::number(pid);
+
+            if (pid > 0) m_postgresBackendPID = pid;
+        }
     }
 }

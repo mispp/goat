@@ -57,6 +57,8 @@ private:
     QFuture<bool> m_queryFuture;
     QFutureWatcher<void> m_queryFutureWatcher;
 
+    int m_postgresBackendPID;
+
 public slots:
     void refreshOpenConnections();
     void queryFinished();

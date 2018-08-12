@@ -23,6 +23,7 @@ public:
     bool isOpen(const QString &connectionId) const;
     QSqlDatabase getOpenConnection(const QString &connectionId);
     QMap<QString, QString> getOpenConnections();
+    void killQueryPostgres(QSqlDatabase db, int pid);
 
 private:
     QList<Connection> loadConnections();

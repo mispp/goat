@@ -9,6 +9,7 @@
 #include <QSqlError>
 #include <QString>
 #include <QUuid>
+#include <QSqlQuery>
 
 ConnectionManager::ConnectionManager() : QObject()
 {
@@ -177,4 +178,18 @@ QList<Connection> ConnectionManager::loadConnections()
         settings.endGroup();
     }
     return connections;
+}
+
+void ConnectionManager::killQueryPostgres(QSqlDatabase db, int pid)
+{
+    if (db.driverName() == "QPSQL" && pid > 0)
+    {
+        QSqlDatabase kill_db = QSqlDatabase::cloneDatabase(db, "CLONED_" + QUuid::createUuid().toString());
+        kill_db.open();
+        QSqlQuery q(kill_db);
+        q.prepare("SELECT pg_cancel_backend(:pid);");
+        q.bindValue(":pid", pid);
+        q.exec();
+        kill_db.close();
+    }
 }
