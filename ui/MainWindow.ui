@@ -79,6 +79,24 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="button_connectionManager">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/icons.qrc">
+            <normaloff>:/icons/silk/icons/silk/database_gear.png</normaloff>:/icons/silk/icons/silk/database_gear.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QComboBox" name="connectionComboBox">
           <property name="minimumSize">
            <size>
