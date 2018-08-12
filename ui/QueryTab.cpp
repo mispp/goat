@@ -293,6 +293,8 @@ void QueryTab::on_button_stopQuery_released()
     }
 
     //m_queryFuture.cancel();
+
+    ui->codeEditor->setFocus();
 }
 
 void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
