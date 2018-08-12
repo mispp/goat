@@ -291,6 +291,10 @@
    </property>
   </action>
   <action name="actionNewFile">
+   <property name="icon">
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/page_white.png</normaloff>:/icons/silk/icons/silk/page_white.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;New File</string>
    </property>
@@ -302,6 +306,10 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/folder.png</normaloff>:/icons/silk/icons/silk/folder.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Open File</string>
    </property>
@@ -312,6 +320,10 @@
   <action name="actionSaveFile">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/disk.png</normaloff>:/icons/silk/icons/silk/disk.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Save File</string>
@@ -361,6 +373,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/script_code.png</normaloff>:/icons/silk/icons/silk/script_code.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Query Block At Cursor</string>
    </property>
@@ -391,6 +407,10 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/drive_disk.png</normaloff>:/icons/silk/icons/silk/drive_disk.png</iconset>
+   </property>
    <property name="text">
     <string>Save &amp;File As...</string>
    </property>
@@ -399,6 +419,10 @@
    </property>
   </action>
   <action name="actionConnection_Manager">
+   <property name="icon">
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/icons/silk/icons/silk/database_gear.png</normaloff>:/icons/silk/icons/silk/database_gear.png</iconset>
+   </property>
    <property name="text">
     <string>Connection &amp;Manager</string>
    </property>
