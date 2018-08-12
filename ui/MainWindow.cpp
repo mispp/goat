@@ -331,3 +331,8 @@ void MainWindow::on_actionQueryBlockAtCursor_triggered()
     QSqlDatabase db = m_connectionManager.getOpenConnection(connectionId);
     tab->executeQueryAtCursor(db);
 }
+
+void MainWindow::on_button_connectionManager_released()
+{
+    on_actionConnection_Manager_triggered();
+}
