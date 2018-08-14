@@ -11,21 +11,22 @@ This app was made for 2 reasons:
 Contributions are welcome!
 
 What works:
-- connection manager saves information
-    - warning! connection manager saves passwords. always!
+- connection manager
+    - saves information (warning! connection manager saves unencrypted passwords. always!)
+    - delete connections
 - queries can be executed with ctrl-enter for current query (query where cursor is currently located), as well as for selection with a button (but not as as script yet)
 - basic syntax highlighter
 - opening and saving files
-- connection manager functionality
-  - delete connections
+- queries can be cancelled
+    - works currently only on postgres
 
 
 Todos:
-- change how results are fetched from database, now it doesn't work with big amounts of data
+- support more database options
+    - connection manager needs to be able to handle file to actual sqlite db
 - execute query as a script
 - further improve connection manager
     - option to save or not to save password (per connection)
-    - driver auto-selection currently doesnt work
     - based on the driver, set default port to what makes sense
 - autosave settings
     - e.g. height of the bottom part of tab
@@ -33,15 +34,13 @@ Todos:
 - export data
 - import data
 - general code quality improvement
+    - refactoring of querying (move to separate class?)
+- colloring of NULL values in results grid
 
 
 To be considered:
 - evaluate scintilla/qscintilla or ktextedit/ktexteditor
-
-
-Far, far future, if not already outdated:
-- move from qt classes to libpq for better error reporting (should check if it would work better)
-    - postgres is a priority here, mariadb/mysql should maybe stay with qt classes for now
+- move from qt classes to native libs (e.g. libpq)
 
 
 # Installing
