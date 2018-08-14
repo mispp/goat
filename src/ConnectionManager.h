@@ -17,13 +17,16 @@ public:
     ~ConnectionManager();
     void saveConnection(const Connection &connection);
     void deleteConnection(const QString &connectionId);
-    void openConnection(const Connection &connection);
     void closeConnection(const QString &connectionId);
     QMap<QString, Connection> getConnections() const;
     bool isOpen(const QString &connectionId) const;
     QSqlDatabase getOpenConnection(const QString &connectionId);
     QMap<QString, QString> getOpenConnections();
     void killQueryPostgres(QSqlDatabase db, int pid);
+
+public slots:
+    void openConnection(const Connection &connection);
+    void openConnectionSlot();
 
 private:
     QList<Connection> loadConnections();

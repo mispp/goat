@@ -43,7 +43,8 @@ private slots:
     void on_actionConnection_Manager_triggered();
     void on_actionQueryBlockAtCursor_triggered();
 
-    void on_button_connectionManager_released();
+public slots:
+    void refreshConnectionActions();
 
 private:
     void closeEvent(QCloseEvent *event);

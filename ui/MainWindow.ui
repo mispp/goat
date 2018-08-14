@@ -79,13 +79,25 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="button_connectionManager">
+         <widget class="QToolButton" name="toolButton_connectionManager">
+          <property name="mouseTracking">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string/>
           </property>
           <property name="icon">
            <iconset resource="../resources/icons.qrc">
             <normaloff>:/icons/silk/icons/silk/database_gear.png</normaloff>:/icons/silk/icons/silk/database_gear.png</iconset>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::MenuButtonPopup</enum>
+          </property>
+          <property name="autoRaise">
+           <bool>false</bool>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::NoArrow</enum>
           </property>
          </widget>
         </item>
@@ -576,6 +588,22 @@
     <hint type="destinationlabel">
      <x>60</x>
      <y>53</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_connectionManager</sender>
+   <signal>released()</signal>
+   <receiver>actionConnection_Manager</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>190</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>

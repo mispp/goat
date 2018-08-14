@@ -10,6 +10,7 @@
 #include <QString>
 #include <QUuid>
 #include <QSqlQuery>
+#include <QAction>
 
 ConnectionManager::ConnectionManager() : QObject()
 {
@@ -26,6 +27,18 @@ ConnectionManager::~ConnectionManager()
         closeConnection(connection.connectionId());
     }
     m_connections.clear();
+}
+
+void ConnectionManager::openConnectionSlot()
+{
+    QObject* s = sender();
+    QAction* a = (QAction*) s;
+    QString connectionId = a->data().toString();
+
+    if (!connectionId.isEmpty())
+    {
+        openConnection(m_connections[connectionId]);
+    }
 }
 
 void ConnectionManager::openConnection(const Connection &connection)
