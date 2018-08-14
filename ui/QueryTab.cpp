@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 #include <QtConcurrent/QtConcurrent>
 #include <QSqlRecord>
+#include <QScrollBar>
 
 QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QWidget(parent), ui(new Ui::ConnectionTab)
 {
@@ -44,6 +45,8 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
     connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
     connect(&m_queryFutureWatcher, SIGNAL(finished()), this, SLOT(queryFinished()));
+
+    connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(resultsGridSliderAtEnd(int)));
 }
 
 QueryTab::~QueryTab()
@@ -114,13 +117,19 @@ void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
 
     if (displayGrid)
     {
-        QSqlRecord record = m_sqlQuery.record();
+        m_queryResultsModel.clear();
 
-        m_queryResultsModel.setColumnCount(record.count());
+        QSqlRecord record = m_sqlQuery.record(); //this is only header, pointer is still at the invalid row
+
+        int columnCount = record.count();
+
+        m_queryResultsModel.setColumnCount(columnCount);
         for (int col = 0; col < record.count(); ++col)
         {
             m_queryResultsModel.setHeaderData(col, Qt::Horizontal, record.fieldName(col).toUpper());
         }
+
+        loadChunk(100);
 
         ui->resultsGrid->resizeColumnsToContents();
         ui->resultsTabBar->setCurrentIndex(0);
@@ -143,22 +152,6 @@ void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
     ui->resultsText->appendPlainText("Query:");
     ui->resultsText->appendPlainText("-------------------------------");
     ui->resultsText->appendPlainText(m_sqlQuery.lastQuery());
-}
-
-void QueryTab::loadChunk()
-{
-    QSqlRecord record;
-    for (int row=0; row<1000; ++row)
-    {
-        m_sqlQuery.next();
-        record = m_sqlQuery.record();
-
-        m_queryResultsModel.setRowCount(m_queryResultsModel.rowCount() + 1);
-        for (int col = 0; col < record.count(); ++col)
-        {
-            m_queryResultsModel.setData(m_queryResultsModel.index(row, col), record.value(col));
-        }
-    }
 }
 
 bool QueryTab::modified() const
@@ -338,8 +331,37 @@ void QueryTab::reconnectDatabase()
         q.next();
         int pid = q.value(0).toInt();
 
-        qDebug() << "pid: " + QString::number(pid);
-
         if (pid > 0) m_postgresBackendPID = pid;
     } else m_postgresBackendPID = -1;
+}
+
+void QueryTab::resultsGridSliderAtEnd(int value)
+{
+    if (ui->resultsGrid->verticalScrollBar()->maximum() == value)
+    {
+        loadChunk(100);
+    }
+}
+
+void QueryTab::loadChunk(int size)
+{
+    int counter = 0;
+
+    while (m_sqlQuery.next() && counter < size)
+    {
+        QSqlRecord record = m_sqlQuery.record();
+
+        QList<QStandardItem*> row;
+
+        for (int col = 0; col < record.count(); ++col)
+        {
+            QStandardItem* item = new QStandardItem();
+            item->setData(record.value(col), Qt::DisplayRole);
+            row.append(item);
+        }
+
+        m_queryResultsModel.appendRow(row);
+
+        ++counter;
+    }
 }

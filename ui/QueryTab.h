@@ -59,17 +59,20 @@ private:
 
     int m_postgresBackendPID;
 
-    void loadChunk();
+    void loadChunk(int size);
     void reconnectDatabase();
 
 public slots:
     void refreshOpenConnections();
     void queryFinished();
+    void resultsGridSliderAtEnd(int value);
+
 private slots:
     void on_button_selectionQuery_released();
 
     void on_button_stopQuery_released();
     void on_comboBoxConnections_currentIndexChanged(int index);
+
 };
 
 #endif // CONNECTIONTAB_H
