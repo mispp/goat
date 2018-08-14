@@ -144,8 +144,6 @@ void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
     ui->resultsText->appendPlainText("Elapsed: " + QString::number(start.msecsTo(end)) + " ms");
     if (success && !displayGrid)
         ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(m_sqlQuery.numRowsAffected()));
-    else if (success && displayGrid)
-        ui->resultsText->appendPlainText("Number of rows selected: " + QString::number(m_sqlQuery.size()));
     else if (!success)
         ui->resultsText->appendPlainText(m_sqlQuery.lastError().text());
     ui->resultsText->appendPlainText("");
