@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QStandardItemModel>
+#include <QMenu>
 
 #include "src/Connection.h"
 #include "src/ConnectionManager.h"
@@ -54,6 +55,7 @@ private:
 
 	Ui::MainWindow *ui;
     ConnectionManager m_connectionManager;
+    QMenu m_connectionListMenu;
 };
 
 #endif // MAINWINDOW_H

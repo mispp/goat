@@ -26,8 +26,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
         ui->connectionComboBox->addItem(connection.name(), connection.connectionId()); //TODO order this by name?
     }
 
-    refreshConnectionActions();
-    //connect(ui->toolButton_connectionManager->menu(), SIGNAL(aboutToShow()), this, SLOT(refreshConnectionActions()));
+    ui->toolButton_connectionManager->setMenu(&m_connectionListMenu);
+
+    connect(&m_connectionListMenu, SIGNAL(aboutToShow()), this, SLOT(refreshConnectionActions()));
 }
 
 MainWindow::~MainWindow() {
@@ -338,7 +339,7 @@ void MainWindow::on_actionQueryBlockAtCursor_triggered()
 
 void MainWindow::refreshConnectionActions()
 {
-    ui->toolButton_connectionManager->actions().clear();
+    m_connectionListMenu.clear();
 
     foreach (Connection connection, m_connectionManager.getConnections().values())
     {
@@ -347,6 +348,6 @@ void MainWindow::refreshConnectionActions()
         establishConnectionAction->setData(connection.connectionId());
         establishConnectionAction->setIcon(QIcon(":/icons/silk/icons/silk/database_link.png"));
         connect(establishConnectionAction, SIGNAL(triggered(bool)), &m_connectionManager, SLOT(openConnectionSlot()));
-        ui->toolButton_connectionManager->addAction(establishConnectionAction);
+        m_connectionListMenu.addAction(establishConnectionAction);
     }
 }
