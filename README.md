@@ -64,8 +64,8 @@ Icons used are called Silk. From [here](http://www.famfamfam.com/lab/icons/silk/
 
 Connection manager
 
-[![Connection manager](https://i.imgur.com/YCDsRwq.png)](https://i.imgur.com/YCDsRwq.png)
+[![Connection manager](https://i.imgur.com/yJTrOYM.png)](https://i.imgur.com/yJTrOYM.png)
 
 Main window
 
-[![Main window](https://i.imgur.com/NJjdtkH.png)](https://i.imgur.com/NJjdtkH.png)
+[![Main window](https://i.imgur.com/j0tDvzv.png)](https://i.imgur.com/j0tDvzv.png)
