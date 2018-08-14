@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 #include <QtConcurrent/QtConcurrent>
 #include <QSqlRecord>
+#include <QScrollBar>
 
 QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QWidget(parent), ui(new Ui::ConnectionTab)
 {
@@ -44,6 +45,8 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
     connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
     connect(&m_queryFutureWatcher, SIGNAL(finished()), this, SLOT(queryFinished()));
+
+    connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(resultsGridSliderAtEnd(int)));
 }
 
 QueryTab::~QueryTab()
@@ -85,18 +88,16 @@ void QueryTab::executeSelectedQuery(QSqlDatabase sqlDatabase)
 
 bool QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
 {
-    qDebug() << "execution in new thread started";
-
     if (query.trimmed().isEmpty())
         return false;
 
+    reconnectDatabase();
 
-    m_sqlQuery = QSqlQuery (m_database);
-    //m_sqlQuery.setForwardOnly(true);
-
+    m_sqlQuery = QSqlQuery (m_database); //here it stops now (actually it takes a lot of time to finish)
+    m_sqlQuery.setForwardOnly(true);
 
     m_sqlQueryStart = QDateTime::currentDateTime();
-    bool success = m_sqlQuery.exec(query);
+    bool success = m_sqlQuery.exec(query); //if previous assignment is moved to on_combobox_index_changed, then it stops here
     m_sqlQueryEnd = QDateTime::currentDateTime();
 
     return success;
@@ -116,14 +117,19 @@ void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
 
     if (displayGrid)
     {
-        m_queryResultsModel.setQuery(m_sqlQuery);
+        m_queryResultsModel.clear();
 
-        /*int i=0;
+        QSqlRecord record = m_sqlQuery.record(); //this is only header, pointer is still at the invalid row
 
-        while (m_sqlQuery.next() && i<100)
+        int columnCount = record.count();
+
+        m_queryResultsModel.setColumnCount(columnCount);
+        for (int col = 0; col < record.count(); ++col)
         {
-            m_queryResultsModel.insertRow(m_sqlQuery.record());
-        }*/
+            m_queryResultsModel.setHeaderData(col, Qt::Horizontal, record.fieldName(col).toUpper());
+        }
+
+        loadChunk(100);
 
         ui->resultsGrid->resizeColumnsToContents();
         ui->resultsTabBar->setCurrentIndex(0);
@@ -284,15 +290,12 @@ void QueryTab::on_button_selectionQuery_released()
 
 void QueryTab::on_button_stopQuery_released()
 {
-    //m_connectionManager->killQueryPostgres(m_database, m_postgresBackendPID);
     QtConcurrent::run(m_connectionManager, &ConnectionManager::killQueryPostgres, m_database, m_postgresBackendPID);
 
-    if (m_sqlQuery.isActive())
+    /*if (m_sqlQuery.isActive())
     {
         m_sqlQuery.finish();
-    }
-
-    //m_queryFuture.cancel();
+    }*/
 
     ui->codeEditor->setFocus();
 }
@@ -308,18 +311,57 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
         m_database.open();
 
         m_postgresBackendPID = -1;
+    }
+}
 
-        if (m_database.driverName() == "QPSQL")
+
+void QueryTab::reconnectDatabase()
+{
+    //reconnection for running same query twice. seems to be faster.
+    if (m_database.isOpen())
+        m_database.close();
+    m_database.open();
+
+    // set up ability to cancel
+    if (m_database.driverName() == "QPSQL")
+    {
+        QSqlQuery q(m_database);
+        q.prepare("SELECT pg_backend_pid();");
+        q.exec();
+        q.next();
+        int pid = q.value(0).toInt();
+
+        if (pid > 0) m_postgresBackendPID = pid;
+    } else m_postgresBackendPID = -1;
+}
+
+void QueryTab::resultsGridSliderAtEnd(int value)
+{
+    if (ui->resultsGrid->verticalScrollBar()->maximum() == value)
+    {
+        loadChunk(100);
+    }
+}
+
+void QueryTab::loadChunk(int size)
+{
+    int counter = 0;
+
+    while (m_sqlQuery.next() && counter < size)
+    {
+        QSqlRecord record = m_sqlQuery.record();
+
+        QList<QStandardItem*> row;
+
+        for (int col = 0; col < record.count(); ++col)
         {
-            QSqlQuery q(m_database);
-            q.prepare("SELECT pg_backend_pid();");
-            q.exec();
-            q.next();
-            int pid = q.value(0).toInt();
-
-            qDebug() << "pid: " + QString::number(pid);
-
-            if (pid > 0) m_postgresBackendPID = pid;
+            QStandardItem* item = new QStandardItem();
+            item->setData(record.value(col), Qt::DisplayRole);
+            row.append(item);
         }
+
+        m_queryResultsModel.appendRow(row);
+
+        ++counter;
     }
 }
