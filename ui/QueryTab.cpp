@@ -347,7 +347,7 @@ void QueryTab::loadChunk(int size)
 {
     int counter = 0;
 
-    while (m_sqlQuery.next() && counter < size)
+    while (counter < size && m_sqlQuery.next())
     {
         QSqlRecord record = m_sqlQuery.record();
 
