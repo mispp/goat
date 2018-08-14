@@ -118,6 +118,8 @@ void ConnectionManagerDialog::populateConnectionListModel() {
         Connection *connetionPointer = new Connection(connection.connectionId(), connection.driver(), connection.name(), connection.details());
         m_connectionListModel.appendRow(connetionPointer);
     }
+
+    m_connectionListModel.sort(0);
 }
 
 void ConnectionManagerDialog::updateCurrentlySelectedConnection()
