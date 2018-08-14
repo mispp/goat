@@ -83,6 +83,9 @@
           <property name="mouseTracking">
            <bool>false</bool>
           </property>
+          <property name="toolTip">
+           <string>Connection manager</string>
+          </property>
           <property name="text">
            <string/>
           </property>

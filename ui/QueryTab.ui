@@ -52,6 +52,9 @@
          </property>
          <item>
           <widget class="QPushButton" name="button_selectionQuery">
+           <property name="toolTip">
+            <string>Run selection</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -63,6 +66,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="button_stopQuery">
+           <property name="toolTip">
+            <string>Stop query</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -85,6 +91,9 @@
              <width>200</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>Open connections</string>
            </property>
            <property name="sizeAdjustPolicy">
             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
