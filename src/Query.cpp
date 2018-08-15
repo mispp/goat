@@ -30,6 +30,10 @@ const QList<TableRow> Query::getNextRowSet(int rowSetSize)
         {
             QStandardItem* item = new QStandardItem();
             item->setData(record.value(col), Qt::DisplayRole);
+            if (record.value(col).isNull())
+            {
+                item->setData(QColor("#f7ff87"), Qt::BackgroundRole);
+            }
             row.append(item);
         }
 
