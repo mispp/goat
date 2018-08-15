@@ -334,7 +334,7 @@ void MainWindow::on_actionQueryBlockAtCursor_triggered()
 
     QueryTab *tab = ((QueryTab*) ui->tabBarConnections->currentWidget());
     QSqlDatabase db = m_connectionManager.getOpenConnection(connectionId);
-    tab->executeQueryAtCursor(db);
+    tab->executeQueryAtCursor();
 }
 
 void MainWindow::refreshConnectionActions()

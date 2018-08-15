@@ -22,7 +22,8 @@ SOURCES += \
     ui/AboutDialog.cpp \
     ui/ConnectionDialog.cpp \
     ui/ConnectionManagerDialog.cpp \
-    ui/QueryTab.cpp
+    ui/QueryTab.cpp \
+    src/Query.cpp
 
 
 HEADERS  += \
@@ -34,7 +35,8 @@ HEADERS  += \
     ui/AboutDialog.h \
     ui/ConnectionDialog.h \
     ui/ConnectionManagerDialog.h \
-    ui/QueryTab.h
+    ui/QueryTab.h \
+    src/Query.h
 
 FORMS    += \
     ui/MainWindow.ui \

@@ -2,6 +2,7 @@
 #define CONNECTIONTAB_H
 
 #include "../src/ConnectionManager.h"
+#include "../src/Query.h"
 
 #include <QPlainTextEdit>
 #include <QString>
@@ -31,10 +32,10 @@ signals:
 public:
     explicit QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent = 0);
     ~QueryTab();
-    void executeQueryAtCursor(QSqlDatabase sqlDatabase);
-    void executeSelectedQuery(QSqlDatabase sqlDatabase);
-    bool executeQuery(QSqlDatabase sqlDatabase, QString query);
-    void displayQueryResults(bool success, QDateTime start, QDateTime end);
+    void executeQueryAtCursor();
+    void executeSelectedQuery();
+    bool executeQuery(QString query);
+    void displayQueryResults();
     QString filename() const;
     void setFilename(const QString &filename);
     bool modified() const;
@@ -49,18 +50,7 @@ private:
     QString m_filename;
     ConnectionManager* m_connectionManager;
 
-    QSqlQuery m_sqlQuery;
-    QDateTime m_sqlQueryStart;
-    QDateTime m_sqlQueryEnd;
-    QSqlDatabase m_database;
-
-    QFuture<bool> m_queryFuture;
-    QFutureWatcher<void> m_queryFutureWatcher;
-
-    int m_postgresBackendPID;
-
-    void loadChunk(int size);
-    void reconnectDatabase();
+    Query m_query;
 
 public slots:
     void refreshOpenConnections();
