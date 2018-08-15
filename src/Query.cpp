@@ -52,8 +52,11 @@ void Query::switchDatabase(QString connectionId)
 
     QSqlDatabase::removeDatabase(m_database.connectionName());
 
-    m_database = QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), "CLONED_" + QUuid::createUuid().toString());
-    m_database.open();
+    if (!connectionId.isEmpty())
+    {
+        m_database = QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), "CLONED_" + QUuid::createUuid().toString());
+        m_database.open();
+    }
 
     m_postgresBackendPID = -1;
 }
