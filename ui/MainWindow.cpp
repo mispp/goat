@@ -15,7 +15,8 @@
 #include <QSqlError>
 #include <QStandardItem>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWindow)
+{
 	ui->setupUi(this);
     this->setFocus(); //HACK otherwise the new file button is focused, which looks weird
 	readSettings();
@@ -31,12 +32,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
     connect(&m_connectionListMenu, SIGNAL(aboutToShow()), this, SLOT(refreshConnectionActions()));
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
 	delete ui;
 }
 
-void MainWindow::on_actionExit_triggered() {
-	//this->close();
+void MainWindow::on_actionExit_triggered()
+{
+    QList<QString> connectionNames = QSqlDatabase::connectionNames();
+
+    foreach (QString name, connectionNames)
+    {
+        QSqlDatabase::database(name).close();
+        QSqlDatabase::removeDatabase(name);
+    }
+
 	QApplication::exit();
 }
 
