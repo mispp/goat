@@ -20,8 +20,6 @@ public:
 
     void switchDatabase(QString connectionId);
     void cancelQuery();
-    bool submitQueryForExecution(const QString query);
-    bool displayGrid(); //this is a flag!
     QList<QString> getColumNames();
     int numRowsAffected();
     const QString lastError();
@@ -29,9 +27,8 @@ public:
     const QDateTime startTime();
     const QDateTime endTime();
     bool isSelect();
-    bool isSuccesful();
-
     const QList<TableRow> getNextRowSet(int rowSetSize);
+    bool executeQuery(const QString query);
 
 private:
     QSqlQuery m_query;
@@ -42,16 +39,12 @@ private:
     QDateTime m_startTime;
     QDateTime m_endTime;
 
-    QFuture<bool> m_queryFuture;
-    QFutureWatcher<void> m_queryFutureWatcher;
-
     int m_postgresBackendPID;
 
     QList<QString> m_columnNames;
 
     void reconnectDatabase();
     void killQueryPostgres();
-    bool executeQuery(const QString query);
 
 public slots:
     void queryfinished();

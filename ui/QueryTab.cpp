@@ -63,12 +63,14 @@ void QueryTab::executeQueryAtCursor()
         ui->resultsText->clear();
         m_queryResultsModel.clear();
 
-        m_query.submitQueryForExecution(query);
+        submitQueryForExecution(query);
     }
 }
 
 void QueryTab::executeSelectedQuery()
 {
+    qDebug() << "executeSelectedQuery reached";
+
     QString query = ui->codeEditor->getSelection();
 
     if (!query.isEmpty())
@@ -78,12 +80,22 @@ void QueryTab::executeSelectedQuery()
         ui->resultsText->clear();
         m_queryResultsModel.clear();
 
-        m_query.submitQueryForExecution(query);
+        submitQueryForExecution(query);
     }
+}
+
+void QueryTab::submitQueryForExecution(const QString query)
+{
+    qDebug() << "submitQueryForExecution reached";
+
+    m_queryFuture = QtConcurrent::run(&m_query, &Query::executeQuery, query);
+    m_queryFutureWatcher.setFuture(m_queryFuture);
 }
 
 void QueryTab::queryFinished()
 {
+    qDebug() << "queryFinished reached";
+
     displayQueryResults();
 
     ui->button_selectionQuery->setEnabled(true);
@@ -92,7 +104,9 @@ void QueryTab::queryFinished()
 
 void QueryTab::displayQueryResults()
 {
-    if (m_query.displayGrid())
+    qDebug() << "displayQueryResults reached";
+
+    if (m_queryFuture.result() && m_query.isSelect())
     {
         m_queryResultsModel.clear();
         m_queryResultsModel.setColumnCount(m_query.getColumNames().count());
@@ -120,9 +134,9 @@ void QueryTab::displayQueryResults()
 
     ui->resultsText->appendPlainText("Timestamp: " + m_query.startTime().toString("yyyy-MM-dd hh:mm:ss"));
     ui->resultsText->appendPlainText("Elapsed: " + QString::number(m_query.startTime().msecsTo(m_query.endTime())) + " ms");
-    if (m_query.isSuccesful() && !m_query.isSelect())
+    if (m_queryFuture.result() && !m_query.isSelect())
         ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(m_query.numRowsAffected()));
-    else if (!m_query.isSuccesful())
+    else if (!m_queryFuture.result())
         ui->resultsText->appendPlainText(m_query.lastError());
     ui->resultsText->appendPlainText("");
     ui->resultsText->appendPlainText("Query:");
@@ -253,7 +267,7 @@ void QueryTab::refreshOpenConnections()
 
 void QueryTab::on_button_selectionQuery_released()
 {
-    m_query.submitQueryForExecution(ui->codeEditor->getSelection());
+    executeSelectedQuery();
 
     ui->codeEditor->setFocus();
 }

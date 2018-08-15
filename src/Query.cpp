@@ -6,7 +6,7 @@
 
 Query::Query() : QObject()
 {
-    connect(&m_queryFutureWatcher, SIGNAL(finished()), this, SLOT(queryfinished()));
+
 }
 
 Query::~Query()
@@ -102,10 +102,14 @@ void Query::reconnectDatabase()
 
 bool Query::executeQuery(const QString query)
 {
+    qDebug() << "executeQuery reached -- " + query;
+
     if (query.trimmed().isEmpty())
         return false;
 
     reconnectDatabase();
+
+    m_columnNames.clear();
 
     m_query = QSqlQuery (m_database);
     m_query.setForwardOnly(true);
@@ -113,6 +117,8 @@ bool Query::executeQuery(const QString query)
     m_startTime = QDateTime::currentDateTime();
     bool success = m_query.exec(query);
     m_endTime = QDateTime::currentDateTime();
+
+    qDebug() << "executeQuery reached -- query finished at " + m_endTime.toString("yyyy-MM-dd hh:mm:ss");
 
     if (success)
     {
@@ -126,22 +132,9 @@ bool Query::executeQuery(const QString query)
         m_columnNames.clear();
     }
 
+    emit finished();
+
     return success;
-}
-
-bool Query::submitQueryForExecution(const QString query)
-{
-    m_columnNames.clear();
-
-    m_queryFuture = QtConcurrent::run(this, &Query::executeQuery, query);
-    m_queryFutureWatcher.setFuture(m_queryFuture);
-
-    return m_queryFuture.result();
-}
-
-bool Query::displayGrid()
-{
-    return m_queryFuture.result() && m_query.isSelect();
 }
 
 QList<QString> Query::getColumNames()
@@ -179,12 +172,8 @@ bool Query::isSelect()
     return m_query.isSelect();
 }
 
-bool Query::isSuccesful()
-{
-    return m_queryFuture.result();
-}
-
 void Query::queryfinished()
 {
+    qDebug() << "emitting signal queryFinished from class Query";
     emit finished();
 }

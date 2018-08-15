@@ -34,7 +34,6 @@ public:
     ~QueryTab();
     void executeQueryAtCursor();
     void executeSelectedQuery();
-    bool executeQuery(QString query);
     void displayQueryResults();
     QString filename() const;
     void setFilename(const QString &filename);
@@ -51,6 +50,11 @@ private:
     ConnectionManager* m_connectionManager;
 
     Query m_query;
+
+    QFuture<bool> m_queryFuture;
+    QFutureWatcher<void> m_queryFutureWatcher;
+
+    void submitQueryForExecution(const QString query);
 
 public slots:
     void refreshOpenConnections();
