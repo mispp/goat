@@ -69,8 +69,6 @@ void QueryTab::executeQueryAtCursor()
 
 void QueryTab::executeSelectedQuery()
 {
-    qDebug() << "executeSelectedQuery reached";
-
     QString query = ui->codeEditor->getSelection();
 
     if (!query.isEmpty())
@@ -86,16 +84,12 @@ void QueryTab::executeSelectedQuery()
 
 void QueryTab::submitQueryForExecution(const QString query)
 {
-    qDebug() << "submitQueryForExecution reached";
-
     m_queryFuture = QtConcurrent::run(&m_query, &Query::executeQuery, query);
     m_queryFutureWatcher.setFuture(m_queryFuture);
 }
 
 void QueryTab::queryFinished()
 {
-    qDebug() << "queryFinished reached";
-
     displayQueryResults();
 
     ui->button_selectionQuery->setEnabled(true);
@@ -104,8 +98,6 @@ void QueryTab::queryFinished()
 
 void QueryTab::displayQueryResults()
 {
-    qDebug() << "displayQueryResults reached";
-
     if (m_queryFuture.result() && m_query.isSelect())
     {
         m_queryResultsModel.clear();

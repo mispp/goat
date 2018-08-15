@@ -102,8 +102,6 @@ void Query::reconnectDatabase()
 
 bool Query::executeQuery(const QString query)
 {
-    qDebug() << "executeQuery reached -- " + query;
-
     if (query.trimmed().isEmpty())
         return false;
 
@@ -117,8 +115,6 @@ bool Query::executeQuery(const QString query)
     m_startTime = QDateTime::currentDateTime();
     bool success = m_query.exec(query);
     m_endTime = QDateTime::currentDateTime();
-
-    qDebug() << "executeQuery reached -- query finished at " + m_endTime.toString("yyyy-MM-dd hh:mm:ss");
 
     if (success)
     {
@@ -170,10 +166,4 @@ const QDateTime Query::startTime()
 bool Query::isSelect()
 {
     return m_query.isSelect();
-}
-
-void Query::queryfinished()
-{
-    qDebug() << "emitting signal queryFinished from class Query";
-    emit finished();
 }

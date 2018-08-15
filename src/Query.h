@@ -46,9 +46,6 @@ private:
     void reconnectDatabase();
     void killQueryPostgres();
 
-public slots:
-    void queryfinished();
-
 signals:
     void finished();
 
