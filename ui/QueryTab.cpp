@@ -314,5 +314,3 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
     /* QSqlDatabase needs to be pushed as a param */
     m_queryManager.switchDatabase(QSqlDatabase::database(m_connectionIdQuery));
 }
-
-
