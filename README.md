@@ -19,6 +19,7 @@ What works:
 - opening and saving files
 - queries can be cancelled
     - works currently only on postgres
+- coloring of NULL values in results grid
 
 
 Todos:
@@ -35,7 +36,6 @@ Todos:
 - import data
 - general code quality improvement
     - refactoring of querying (move to separate class?)
-- colloring of NULL values in results grid
 
 
 To be considered:
