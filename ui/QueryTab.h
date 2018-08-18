@@ -51,8 +51,8 @@ private:
     ConnectionManager* m_connectionManager;
     QString m_filename;
 
-    QStandardItemModel m_queryResultsModel;
-    QStandardItemModel m_openConnectionsModel;
+    QStandardItemModel* m_queryResultsModel;
+    QStandardItemModel* m_openConnectionsModel;
     QString m_connectionIdQuery;
     QString m_connectionIdKill;
     QueryManager m_queryManager;

@@ -30,8 +30,11 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
 
     m_filename = filename;
 
-    ui->resultsGrid->setModel(&m_queryResultsModel);
-    ui->comboBoxConnections->setModel(&m_openConnectionsModel);
+    m_queryResultsModel = new QStandardItemModel(this);
+    m_openConnectionsModel = new QStandardItemModel(this);
+
+    ui->resultsGrid->setModel(m_queryResultsModel);
+    ui->comboBoxConnections->setModel(m_openConnectionsModel);
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
     ui->button_stopQuery->setEnabled(false);
@@ -64,6 +67,7 @@ void QueryTab::setFilename(const QString &filename)
 
 bool QueryTab::modified() const
 {
+    //fails here
     return ui->codeEditor->document()->isModified();
 }
 
@@ -143,7 +147,7 @@ void QueryTab::executeQueryAtCursor()
             ui->button_selectionQuery->setEnabled(false);
             ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
             ui->resultsText->clear();
-            m_queryResultsModel.clear();
+            m_queryResultsModel->clear();
 
             submitQueryForExecution(query);
         }
@@ -161,7 +165,7 @@ void QueryTab::executeSelectedQuery()
             ui->button_selectionQuery->setEnabled(false);
             ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
             ui->resultsText->clear();
-            m_queryResultsModel.clear();
+            m_queryResultsModel->clear();
 
             submitQueryForExecution(query);
         }
@@ -175,19 +179,19 @@ void QueryTab::displayQueryResults()
 
     if (queryResult && queryIsSelect)
     {
-        m_queryResultsModel.clear();
-        m_queryResultsModel.setColumnCount(m_queryManager.getColumNames().count());
+        m_queryResultsModel->clear();
+        m_queryResultsModel->setColumnCount(m_queryManager.getColumNames().count());
 
         int columnIndex = 0;
         foreach (QString columnName, m_queryManager.getColumNames())
         {
-            m_queryResultsModel.setHeaderData(columnIndex, Qt::Horizontal, columnName);
+            m_queryResultsModel->setHeaderData(columnIndex, Qt::Horizontal, columnName);
             ++columnIndex;
         }
 
         foreach (TableRow row, m_queryManager.getNextRowSet(100))
         {
-            m_queryResultsModel.appendRow(row);
+            m_queryResultsModel->appendRow(row);
         }
 
         ui->resultsGrid->resizeColumnsToContents();
@@ -195,7 +199,7 @@ void QueryTab::displayQueryResults()
     }
     else
     {
-        m_queryResultsModel.clear();
+        m_queryResultsModel->clear();
         ui->resultsTabBar->setCurrentIndex(1);
     }
 
@@ -231,7 +235,7 @@ void QueryTab::refreshOpenConnections()
 
     QString usedConnectionId = ui->comboBoxConnections->currentData(Qt::UserRole+1).toString();
 
-    m_openConnectionsModel.clear();
+    m_openConnectionsModel->clear();
 
     if (openConnections.count() == 0)
     {
@@ -239,7 +243,7 @@ void QueryTab::refreshOpenConnections()
 
         openConnectionItem->setText("<no open connections>");
 
-        m_openConnectionsModel.appendRow(openConnectionItem);
+        m_openConnectionsModel->appendRow(openConnectionItem);
 
         ui->comboBoxConnections->setCurrentIndex(0);
     }
@@ -252,7 +256,7 @@ void QueryTab::refreshOpenConnections()
             openConnectionItem->setText(openConnections[key]);
             openConnectionItem->setData(key, Qt::UserRole+1);
 
-            m_openConnectionsModel.appendRow(openConnectionItem);
+            m_openConnectionsModel->appendRow(openConnectionItem);
         }
 
         if (!usedConnectionId.isEmpty())
@@ -272,7 +276,7 @@ void QueryTab::resultsGridSliderAtEnd(int value)
     {
         foreach (TableRow row, m_queryManager.getNextRowSet(100))
         {
-            m_queryResultsModel.appendRow(row);
+            m_queryResultsModel->appendRow(row);
         }
     }
 }

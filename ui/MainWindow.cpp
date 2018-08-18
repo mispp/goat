@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 	ui->setupUi(this);
     this->setFocus(); //HACK otherwise the new file button is focused, which looks weird
 	readSettings();
-    on_newFileButton_clicked();
+    on_actionNewFile_triggered();
 
     m_connectionListMenu.setTitle("Available connections");
     m_openConnectionListMenu.setTitle("Open connections");
@@ -59,10 +59,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
     connect(&m_openConnectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_disconnectListToolButtonItemTriggered(QAction*)));
     connect(&m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(on_connectionStateChanged()));
     connect(m_connectionManagerToolButton, SIGNAL(released()), this, SLOT(on_actionConnection_Manager_triggered()));
-
-    connect(ui->actionOpenFile, SIGNAL(triggered(bool)), this, SLOT(on_openFileButton_clicked()));
-    connect(ui->actionNewFile, SIGNAL(triggered(bool)), this, SLOT(on_newFileButton_clicked()));
-    connect(ui->actionSaveFile, SIGNAL(triggered(bool)), this, SLOT(on_saveFileButton_clicked()));
 
     connect(ui->toolBar, SIGNAL(orientationChanged(Qt::Orientation)), this, SLOT(on_toolbarOrientationChange(Qt::Orientation)));
 }
@@ -165,7 +161,7 @@ void MainWindow::on_actionAbout_triggered()
     dialog.exec();
 }
 
-void MainWindow::on_newFileButton_clicked()
+void MainWindow::on_actionNewFile_triggered()
 {
     QueryTab *connectionTab = new QueryTab("", &m_connectionManager, ui->tabBarConnections);
     ui->tabBarConnections->insertTab(ui->tabBarConnections->count(), connectionTab, tr("Untitled"));
@@ -194,7 +190,7 @@ void MainWindow::on_actionCloseFile_triggered()
     on_tabBarConnections_tabCloseRequested(ui->tabBarConnections->currentIndex());
 }
 
-void MainWindow::on_openFileButton_clicked()
+void MainWindow::on_actionOpenFile_triggered()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::homePath(), tr("Sql files (*.sql) ;; All files (*.*)"));
 
@@ -236,7 +232,7 @@ void MainWindow::saveTab(QueryTab *connectionTab)
     ui->tabBarConnections->setTabText(ui->tabBarConnections->currentIndex(), text);
 }
 
-void MainWindow::on_saveFileButton_clicked()
+void MainWindow::on_actionSaveFile_triggered()
 {
     QueryTab *connectionTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
     if (connectionTab->filename().isEmpty())
