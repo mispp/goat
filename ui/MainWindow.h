@@ -45,7 +45,8 @@ private slots:
     void on_actionQueryBlockAtCursor_triggered();
 
 public slots:
-    void refreshConnectionActions();
+    void on_connectionListToolButtonExpandTriggered();
+    void on_connectionListToolButtonItemTriggered(QAction* triggeredAction);
 
 private:
     void closeEvent(QCloseEvent *event);

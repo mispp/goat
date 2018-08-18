@@ -29,18 +29,6 @@ ConnectionManager::~ConnectionManager()
     m_connections.clear();
 }
 
-void ConnectionManager::openConnectionSlot()
-{
-    QObject* s = sender();
-    QAction* a = (QAction*) s;
-    QString connectionId = a->data().toString();
-
-    if (!connectionId.isEmpty())
-    {
-        openConnection(m_connections[connectionId]);
-    }
-}
-
 void ConnectionManager::openConnection(const Connection &connection)
 {
     if (QSqlDatabase::contains(connection.connectionId()))
@@ -126,6 +114,8 @@ void ConnectionManager::deleteConnection(const QString &connectionId)
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
     settings.remove(connectionId);
     settings.sync();
+
+    emit connectionDeleted(connectionId);
 }
 
 bool ConnectionManager::isOpen(const QString &connectionId) const

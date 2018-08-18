@@ -29,7 +29,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 
     ui->toolButton_connectionManager->setMenu(&m_connectionListMenu);
 
-    connect(&m_connectionListMenu, SIGNAL(aboutToShow()), this, SLOT(refreshConnectionActions()));
+    connect(&m_connectionListMenu, SIGNAL(aboutToShow()), this, SLOT(on_connectionListToolButtonExpandTriggered()));
+    connect(&m_connectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_connectionListToolButtonItemTriggered(QAction*)));
 }
 
 MainWindow::~MainWindow()
@@ -347,7 +348,7 @@ void MainWindow::on_actionQueryBlockAtCursor_triggered()
     tab->executeQueryAtCursor();
 }
 
-void MainWindow::refreshConnectionActions()
+void MainWindow::on_connectionListToolButtonExpandTriggered()
 {
     m_connectionListMenu.clear();
 
@@ -357,7 +358,12 @@ void MainWindow::refreshConnectionActions()
         establishConnectionAction->setText(connection.name());
         establishConnectionAction->setData(connection.connectionId());
         establishConnectionAction->setIcon(QIcon(":/icons/silk/icons/silk/database_link.png"));
-        connect(establishConnectionAction, SIGNAL(triggered(bool)), &m_connectionManager, SLOT(openConnectionSlot()));
+
         m_connectionListMenu.addAction(establishConnectionAction);
     }
+}
+
+void MainWindow::on_connectionListToolButtonItemTriggered(QAction* triggeredAction)
+{
+    m_connectionManager.openConnection(m_connectionManager.getConnections()[triggeredAction->data().toString()]);
 }

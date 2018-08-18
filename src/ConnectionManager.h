@@ -25,7 +25,6 @@ public:
 
 public slots:
     void openConnection(const Connection &connection);
-    void openConnectionSlot();
 
 private:
     QList<Connection> loadConnections();
@@ -33,6 +32,8 @@ private:
 
 signals:
     void connectionStateChanged();
+    void connectionAdded(Connection*);
+    void connectionDeleted(QString connectionId);
 
 };
 
