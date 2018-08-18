@@ -153,7 +153,8 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
     {
         invalidateEnabledStates();
 
-        ui->tabBarConnections->removeTab(index);
+        //ui->tabBarConnections->removeTab(index);
+
         tab->close();
         tab->deleteLater();
     }
@@ -334,9 +335,12 @@ void MainWindow::on_toolbarOrientationChange(Qt::Orientation orientation)
     if (orientation == Qt::Vertical)
     {
         qDebug() << "is vertical now";
+        //we could change button-with-menu width here, so in vertical toolbar it looks better.
+        //type of popup needs to be also changed, maybe immediate?
     }
     else if (orientation == Qt::Horizontal)
     {
         qDebug() << "is horizontal now";
+        //change it back here
     }
 }
