@@ -22,6 +22,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 	readSettings();
     on_newFileButton_clicked();
 
+    m_connectionListMenu.setTitle("Available connections");
+    m_openConnectionListMenu.setTitle("Open connections");
+    m_openConnectionListMenu.setEnabled(false);
+
     ui->toolBar->addAction(ui->actionNewFile);
     ui->toolBar->addAction(ui->actionOpenFile);
     ui->toolBar->addAction(ui->actionSaveFile);
@@ -43,6 +47,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
     m_disconnectToolButton->setToolTip("Disconnect");
     m_disconnectToolButton->setEnabled(false);
     ui->toolBar->addWidget(m_disconnectToolButton);
+
+    /* add open and available connections menus (i know it's redundant, but still) */
+
+    ui->menuConnection->addSeparator();
+    ui->menuConnection->addMenu(&m_connectionListMenu);
+    ui->menuConnection->addMenu(&m_openConnectionListMenu);
 
     connect(&m_connectionListMenu, SIGNAL(aboutToShow()), this, SLOT(on_connectionListToolButtonExpandTriggered()));
     connect(&m_connectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_connectionListToolButtonItemTriggered(QAction*)));
@@ -308,8 +318,16 @@ void MainWindow::on_connectionStateChanged()
         }
     }
 
-    if (m_openConnectionListMenu.actions().count() > 0) m_disconnectToolButton->setEnabled(true);
-    else m_disconnectToolButton->setEnabled(false);
+    if (m_openConnectionListMenu.actions().count() > 0)
+    {
+        m_disconnectToolButton->setEnabled(true);
+        m_openConnectionListMenu.setEnabled(m_disconnectToolButton->isEnabled());
+    }
+    else
+    {
+        m_disconnectToolButton->setEnabled(false);
+        m_openConnectionListMenu.setEnabled(m_disconnectToolButton->isEnabled());
+    }
 }
 
 void MainWindow::on_disconnectListToolButtonItemTriggered(QAction* triggeredAction)

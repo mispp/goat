@@ -87,13 +87,6 @@
      <string>&amp;Connection</string>
     </property>
     <addaction name="actionConnection_Manager"/>
-    <addaction name="separator"/>
-    <addaction name="actionNewConnection"/>
-    <addaction name="actionEditConnection"/>
-    <addaction name="actionDeleteConnection"/>
-    <addaction name="separator"/>
-    <addaction name="actionOpenConnection"/>
-    <addaction name="actionCloseConnection"/>
    </widget>
    <widget class="QMenu" name="menuQuery">
     <property name="title">
