@@ -40,7 +40,7 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     setModified(false);
     refreshOpenConnections();
 
-    //connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
+    connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
     connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
     connect(&m_queryManager, SIGNAL(finished()), this, SLOT(queryFinished()));
 
@@ -197,7 +197,7 @@ void QueryTab::displayQueryResults()
 
 void QueryTab::submitQueryForExecution(const QString query)
 {
-    if (!query.isEmpty())
+    if (!query.isEmpty() && !m_connectionIdQuery.isEmpty())
     {
         ui->button_selectionQuery->setEnabled(false);
         ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
@@ -298,10 +298,18 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
     QSqlDatabase::removeDatabase(m_connectionIdKill);
 
     /* create new connections */
-    m_connectionIdQuery = "CLONED_" + QUuid::createUuid().toString();
-    m_connectionIdKill = "CLONED_KILL_" + QUuid::createUuid().toString();
-    QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdQuery);
-    QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdKill);
+    if (connectionId.isEmpty())
+    {
+        m_connectionIdQuery.clear();
+        m_connectionIdKill.clear();
+    }
+    else
+    {
+        m_connectionIdQuery = "CLONED_" + QUuid::createUuid().toString();
+        m_connectionIdKill = "CLONED_KILL_" + QUuid::createUuid().toString();
+        QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdQuery);
+        QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdKill);
+    }
 
     /* QSqlDatabase needs to be pushed as a param */
     m_queryManager.switchDatabase(QSqlDatabase::database(m_connectionIdQuery));
