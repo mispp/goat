@@ -52,97 +52,14 @@ QueryTab::~QueryTab()
 	delete ui;
 }
 
-void QueryTab::executeQueryAtCursor()
+QString QueryTab::filename() const
 {
-    if (m_queryFuture.isFinished())
-    {
-        QString query = ui->codeEditor->getQueryAtCursor();
-
-        if (!query.isEmpty())
-        {
-            ui->button_selectionQuery->setEnabled(false);
-            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-            ui->resultsText->clear();
-            m_queryResultsModel.clear();
-
-            submitQueryForExecution(query);
-        }
-    }
+    return m_filename;
 }
 
-void QueryTab::executeSelectedQuery()
+void QueryTab::setFilename(const QString &filename)
 {
-    if (m_queryFuture.isFinished())
-    {
-        QString query = ui->codeEditor->getSelection();
-
-        if (!query.isEmpty())
-        {
-            ui->button_selectionQuery->setEnabled(false);
-            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-            ui->resultsText->clear();
-            m_queryResultsModel.clear();
-
-            submitQueryForExecution(query);
-        }
-    }
-}
-
-void QueryTab::submitQueryForExecution(const QString query)
-{
-    m_queryFuture = QtConcurrent::run(&m_queryManager, &QueryManager::executeQuery, QSqlDatabase::database(m_connectionIdQuery), query);
-    m_queryFutureWatcher.setFuture(m_queryFuture);
-}
-
-void QueryTab::queryFinished()
-{
-    displayQueryResults();
-
-    ui->button_selectionQuery->setEnabled(true);
-    ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-}
-
-void QueryTab::displayQueryResults()
-{
-    bool queryResult = m_queryManager.isSuccess();
-    bool queryIsSelect = m_queryManager.isSelect();
-
-    if (queryResult && queryIsSelect)
-    {
-        m_queryResultsModel.clear();
-        m_queryResultsModel.setColumnCount(m_queryManager.getColumNames().count());
-
-        int columnIndex = 0;
-        foreach (QString columnName, m_queryManager.getColumNames())
-        {
-            m_queryResultsModel.setHeaderData(columnIndex, Qt::Horizontal, columnName);
-            ++columnIndex;
-        }
-
-        foreach (TableRow row, m_queryManager.getNextRowSet(100))
-        {
-            m_queryResultsModel.appendRow(row);
-        }
-
-        ui->resultsGrid->resizeColumnsToContents();
-        ui->resultsTabBar->setCurrentIndex(0);
-    }
-    else
-    {
-        m_queryResultsModel.clear();
-        ui->resultsTabBar->setCurrentIndex(1);
-    }
-
-    ui->resultsText->appendPlainText("Timestamp: " + m_queryManager.startTime().toString("yyyy-MM-dd hh:mm:ss"));
-    ui->resultsText->appendPlainText("Elapsed: " + QString::number(m_queryManager.startTime().msecsTo(m_queryManager.endTime())) + " ms");
-    if (queryResult && !queryIsSelect)
-        ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(m_queryManager.numRowsAffected()));
-    else if (!queryResult)
-        ui->resultsText->appendPlainText(m_queryManager.lastError());
-    ui->resultsText->appendPlainText("");
-    ui->resultsText->appendPlainText("Query:");
-    ui->resultsText->appendPlainText("-------------------------------");
-    ui->resultsText->appendPlainText(m_queryManager.lastQuery());
+    m_filename = filename;
 }
 
 bool QueryTab::modified() const
@@ -153,11 +70,6 @@ bool QueryTab::modified() const
 void QueryTab::setModified(const bool &modified)
 {
     ui->codeEditor->document()->setModified(modified);
-}
-
-QString QueryTab::filename() const
-{
-    return m_filename;
 }
 
 void QueryTab::readFile()
@@ -220,9 +132,97 @@ void QueryTab::writeFile()
     }
 }
 
-void QueryTab::setFilename(const QString &filename)
+void QueryTab::executeQueryAtCursor()
 {
-    m_filename = filename;
+    if (m_queryFuture.isFinished())
+    {
+        QString query = ui->codeEditor->getQueryAtCursor();
+
+        if (!query.isEmpty())
+        {
+            ui->button_selectionQuery->setEnabled(false);
+            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
+            ui->resultsText->clear();
+            m_queryResultsModel.clear();
+
+            submitQueryForExecution(query);
+        }
+    }
+}
+
+void QueryTab::executeSelectedQuery()
+{
+    if (m_queryFuture.isFinished())
+    {
+        QString query = ui->codeEditor->getSelection();
+
+        if (!query.isEmpty())
+        {
+            ui->button_selectionQuery->setEnabled(false);
+            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
+            ui->resultsText->clear();
+            m_queryResultsModel.clear();
+
+            submitQueryForExecution(query);
+        }
+    }
+}
+
+void QueryTab::displayQueryResults()
+{
+    bool queryResult = m_queryManager.isSuccess();
+    bool queryIsSelect = m_queryManager.isSelect();
+
+    if (queryResult && queryIsSelect)
+    {
+        m_queryResultsModel.clear();
+        m_queryResultsModel.setColumnCount(m_queryManager.getColumNames().count());
+
+        int columnIndex = 0;
+        foreach (QString columnName, m_queryManager.getColumNames())
+        {
+            m_queryResultsModel.setHeaderData(columnIndex, Qt::Horizontal, columnName);
+            ++columnIndex;
+        }
+
+        foreach (TableRow row, m_queryManager.getNextRowSet(100))
+        {
+            m_queryResultsModel.appendRow(row);
+        }
+
+        ui->resultsGrid->resizeColumnsToContents();
+        ui->resultsTabBar->setCurrentIndex(0);
+    }
+    else
+    {
+        m_queryResultsModel.clear();
+        ui->resultsTabBar->setCurrentIndex(1);
+    }
+
+    ui->resultsText->appendPlainText("Timestamp: " + m_queryManager.startTime().toString("yyyy-MM-dd hh:mm:ss"));
+    ui->resultsText->appendPlainText("Elapsed: " + QString::number(m_queryManager.startTime().msecsTo(m_queryManager.endTime())) + " ms");
+    if (queryResult && !queryIsSelect)
+        ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(m_queryManager.numRowsAffected()));
+    else if (!queryResult)
+        ui->resultsText->appendPlainText(m_queryManager.lastError());
+    ui->resultsText->appendPlainText("");
+    ui->resultsText->appendPlainText("Query:");
+    ui->resultsText->appendPlainText("-------------------------------");
+    ui->resultsText->appendPlainText(m_queryManager.lastQuery());
+}
+
+void QueryTab::submitQueryForExecution(const QString query)
+{
+    m_queryFuture = QtConcurrent::run(&m_queryManager, &QueryManager::executeQuery, QSqlDatabase::database(m_connectionIdQuery), query);
+    m_queryFutureWatcher.setFuture(m_queryFuture);
+}
+
+void QueryTab::queryFinished()
+{
+    displayQueryResults();
+
+    ui->button_selectionQuery->setEnabled(true);
+    ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
 }
 
 void QueryTab::refreshOpenConnections()
@@ -266,6 +266,17 @@ void QueryTab::refreshOpenConnections()
     }
 }
 
+void QueryTab::resultsGridSliderAtEnd(int value)
+{
+    if (ui->resultsGrid->verticalScrollBar()->maximum() == value)
+    {
+        foreach (TableRow row, m_queryManager.getNextRowSet(100))
+        {
+            m_queryResultsModel.appendRow(row);
+        }
+    }
+}
+
 void QueryTab::on_button_selectionQuery_released()
 {
     executeSelectedQuery();
@@ -285,8 +296,8 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
     QString connectionId = ui->comboBoxConnections->itemData(index, Qt::UserRole+1).toString();
 
     /*
-     * cloning id done here because QSqlDatabase::database() won't extract connections which are created in another thread
-    */
+     *  cloning id done here because QSqlDatabase::database() won't return connections which are created in another thread
+     */
 
     /* close old connections */
     QSqlDatabase::database(m_connectionIdQuery).close();
@@ -304,13 +315,4 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
     m_queryManager.switchDatabase(QSqlDatabase::database(m_connectionIdQuery));
 }
 
-void QueryTab::resultsGridSliderAtEnd(int value)
-{
-    if (ui->resultsGrid->verticalScrollBar()->maximum() == value)
-    {
-        foreach (TableRow row, m_queryManager.getNextRowSet(100))
-        {
-            m_queryResultsModel.appendRow(row);
-        }
-    }
-}
+

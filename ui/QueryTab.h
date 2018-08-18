@@ -33,9 +33,7 @@ signals:
 public:
     explicit QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent = 0);
     ~QueryTab();
-    void executeQueryAtCursor();
-    void executeSelectedQuery();
-    void displayQueryResults();
+
     QString filename() const;
     void setFilename(const QString &filename);
     bool modified() const;
@@ -43,18 +41,21 @@ public:
     void readFile();
     void writeFile();
 
+    void executeQueryAtCursor();
+    void executeSelectedQuery();
+    void displayQueryResults();
+
 private:
     Ui::ConnectionTab *ui;
+
+    ConnectionManager* m_connectionManager;
+    QString m_filename;
+
     QStandardItemModel m_queryResultsModel;
     QStandardItemModel m_openConnectionsModel;
-    QString m_filename;
-    ConnectionManager* m_connectionManager;
-
     QString m_connectionIdQuery;
     QString m_connectionIdKill;
-
     QueryManager m_queryManager;
-
     QFuture<bool> m_queryFuture;
     QFutureWatcher<void> m_queryFutureWatcher;
 
@@ -67,7 +68,6 @@ public slots:
 
 private slots:
     void on_button_selectionQuery_released();
-
     void on_button_stopQuery_released();
     void on_comboBoxConnections_currentIndexChanged(int index);
 

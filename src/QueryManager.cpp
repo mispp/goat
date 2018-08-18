@@ -1,6 +1,5 @@
 #include "QueryManager.h"
 
-#include <QtConcurrent/QtConcurrent>
 #include <QSqlRecord>
 #include <QSqlError>
 
@@ -11,9 +10,7 @@ QueryManager::QueryManager() : QObject()
 
 QueryManager::~QueryManager()
 {
-    QSqlDatabase::database(m_clonedConnectionId).close();
 
-    QSqlDatabase::removeDatabase(m_clonedConnectionId);
 }
 
 void QueryManager::switchDatabase(QSqlDatabase database)
@@ -22,8 +19,6 @@ void QueryManager::switchDatabase(QSqlDatabase database)
 
     m_query = QSqlQuery (clonedDatabase);
     m_query.setForwardOnly(true);
-
-
 }
 
 bool QueryManager::executeQuery(QSqlDatabase database, const QString query)
@@ -56,8 +51,6 @@ bool QueryManager::executeQuery(QSqlDatabase database, const QString query)
             }
         }
 
-        qDebug() << "cancel pid is: " + QString::number(m_postgresBackendPID);
-
         m_startTime = QDateTime::currentDateTime();
         m_querySuccess = m_query.exec(query);
         m_endTime = QDateTime::currentDateTime();
@@ -89,62 +82,9 @@ void QueryManager::cancelQuery(QSqlDatabase database)
     killQueryPostgres(database, m_postgresBackendPID);
 }
 
-
-void QueryManager::killQueryPostgres(QSqlDatabase database, int pid)
-{
-    QSqlDatabase kill_db = database;
-
-    if (kill_db.isValid() && kill_db.driverName() == "QPSQL" && pid > 0)
-    {
-        kill_db.open();
-
-        QSqlQuery q(kill_db);
-        q.prepare("SELECT pg_cancel_backend(:pid);");
-        q.bindValue(":pid", m_postgresBackendPID);
-        q.exec();
-
-        kill_db.close();
-    }
-}
-
 QList<QString> QueryManager::getColumNames()
 {
     return m_columnNames;
-}
-
-int QueryManager::numRowsAffected()
-{
-    return m_query.numRowsAffected();
-}
-
-const QString QueryManager::lastError()
-{
-    return m_query.lastError().text();
-}
-
-const QString QueryManager::lastQuery()
-{
-    return m_query.lastQuery();
-}
-
-const QDateTime QueryManager::endTime()
-{
-    return m_endTime;
-}
-
-const QDateTime QueryManager::startTime()
-{
-    return m_startTime;
-}
-
-bool QueryManager::isSelect()
-{
-    return m_query.isSelect();
-}
-
-bool QueryManager::isSuccess()
-{
-    return m_querySuccess;
 }
 
 const QList<TableRow> QueryManager::getNextRowSet(int rowSetSize)
@@ -176,4 +116,56 @@ const QList<TableRow> QueryManager::getNextRowSet(int rowSetSize)
     }
 
     return rows;
+}
+
+const QString QueryManager::lastError()
+{
+    return m_query.lastError().text();
+}
+
+const QString QueryManager::lastQuery()
+{
+    return m_query.lastQuery();
+}
+
+const QDateTime QueryManager::startTime()
+{
+    return m_startTime;
+}
+
+const QDateTime QueryManager::endTime()
+{
+    return m_endTime;
+}
+
+bool QueryManager::isSelect()
+{
+    return m_query.isSelect();
+}
+
+bool QueryManager::isSuccess()
+{
+    return m_querySuccess;
+}
+
+int QueryManager::numRowsAffected()
+{
+    return m_query.numRowsAffected();
+}
+
+void QueryManager::killQueryPostgres(QSqlDatabase database, int pid)
+{
+    QSqlDatabase kill_db = database;
+
+    if (kill_db.isValid() && kill_db.driverName() == "QPSQL" && pid > 0)
+    {
+        kill_db.open();
+
+        QSqlQuery q(kill_db);
+        q.prepare("SELECT pg_cancel_backend(:pid);");
+        q.bindValue(":pid", m_postgresBackendPID);
+        q.exec();
+
+        kill_db.close();
+    }
 }
