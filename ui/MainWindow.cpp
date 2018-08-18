@@ -66,6 +66,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
 	delete ui;
+
+    foreach (QString connectionId, QSqlDatabase::connectionNames())
+    {
+        QSqlDatabase::removeDatabase(connectionId);
+    }
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -150,7 +155,7 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
         tab->close();
         tab->deleteLater();
 
-        invalidateEnabledStates();
+        //invalidateEnabledStates();
     }
 }
 
