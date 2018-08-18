@@ -37,16 +37,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 
     /* set disconnect tool button */
     m_disconnectToolButton = new QToolButton(ui->toolBar);
-    m_disconnectToolButton->setPopupMode(QToolButton::MenuButtonPopup);
+    m_disconnectToolButton->setPopupMode(QToolButton::InstantPopup);
     m_disconnectToolButton->setMenu(&m_openConnectionListMenu);
     m_disconnectToolButton->setIcon(QIcon(":/icons/silk/icons/silk/disconnect.png"));
     m_disconnectToolButton->setToolTip("Disconnect");
     m_disconnectToolButton->setEnabled(false);
     ui->toolBar->addWidget(m_disconnectToolButton);
-
-    ui->toolButton_connectionManager->setMenu(&m_connectionListMenu);
-    ui->toolButton_disconnect->setMenu(&m_openConnectionListMenu);
-    ui->toolButton_disconnect->setEnabled(false);
 
     connect(&m_connectionListMenu, SIGNAL(aboutToShow()), this, SLOT(on_connectionListToolButtonExpandTriggered()));
     connect(&m_connectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_connectionListToolButtonItemTriggered(QAction*)));
@@ -54,7 +50,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
     connect(&m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(on_connectionStateChanged()));
     connect(m_connectionManagerToolButton, SIGNAL(released()), this, SLOT(on_actionConnection_Manager_triggered()));
 
-    connect(m_disconnectToolButton, SIGNAL(pressed()), m_disconnectToolButton, SLOT(showMenu()));
+    connect(ui->actionOpenFile, SIGNAL(triggered(bool)), this, SLOT(on_openFileButton_clicked()));
+    connect(ui->actionNewFile, SIGNAL(triggered(bool)), this, SLOT(on_newFileButton_clicked()));
+    connect(ui->actionSaveFile, SIGNAL(triggered(bool)), this, SLOT(on_saveFileButton_clicked()));
+
+    connect(ui->toolBar, SIGNAL(orientationChanged(Qt::Orientation)), this, SLOT(on_toolbarOrientationChange(Qt::Orientation)));
 }
 
 MainWindow::~MainWindow()
@@ -64,14 +64,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionExit_triggered()
 {
-    /*QList<QString> connectionNames = QSqlDatabase::connectionNames();
-
-    foreach (QString name, connectionNames)
-    {
-        QSqlDatabase::database(name).close();
-        QSqlDatabase::removeDatabase(name);
-    }*/
-
 	QApplication::exit();
 }
 
@@ -173,101 +165,18 @@ void MainWindow::on_newFileButton_clicked()
     invalidateEnabledStates();
 }
 
-void MainWindow::on_newConnectionButton_clicked()
-{
-    Connection connection = Connection::defaultConnection();
-    ConnectionDialog dialog(connection);
-    if(dialog.exec() == QDialog::Accepted)
-    {
-        connection = dialog.getConnection();
-        m_connectionManager.saveConnection(connection);
-        ui->connectionComboBox->addItem(connection.name(), connection.connectionId());
-        int lastIndex = ui->connectionComboBox->count() - 1;
-        ui->connectionComboBox->setCurrentIndex(lastIndex);
-    }
-}
-
-void MainWindow::on_connectionComboBox_currentIndexChanged(int index)
-{
-    invalidateEnabledStates();
-}
-
 void MainWindow::invalidateEnabledStates()
 {
     QueryTab *currentTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
 
     ui->actionCloseFile->setDisabled(currentTab == nullptr);
-    ui->saveFileButton->setDisabled(currentTab == nullptr);
     ui->actionSaveFile->setDisabled(currentTab == nullptr);
     ui->actionSaveFileAs->setDisabled(currentTab == nullptr);
 
-    int index = ui->connectionComboBox->currentIndex();
-    bool connectionAtIndex = index != -1;
-
-    ui->editConnectionButton->setDisabled(!connectionAtIndex);
-    ui->actionEditConnection->setDisabled(!connectionAtIndex);
-    ui->deleteConnectionButton->setDisabled(!connectionAtIndex);
-    ui->actionDeleteConnection->setDisabled(!connectionAtIndex);
-
-    bool isOpen = false;
-    bool queryExists = ui->tabBarConnections->currentIndex() != -1;
-
-    if (connectionAtIndex)
-    {
-        QString connectionId = ui->connectionComboBox->itemData(index).toString();
-        Connection connection = m_connectionManager.getConnections()[connectionId];
-        isOpen = m_connectionManager.isOpen(connectionId);
-    }
-
-    ui->openConnectionButton->setDisabled(isOpen);
-    ui->actionOpenConnection->setDisabled(isOpen);
-    ui->closeConnectionButton->setDisabled(!isOpen);
-    ui->actionCloseConnection->setDisabled(!isOpen);
     //ui->queryBlockButton->setDisabled(!connectionAtIndex || !queryExists);
-    ui->actionQueryBlockAtCursor->setDisabled(!connectionAtIndex || !queryExists);
-//    ui->queryFileButton->setDisabled(!connectionAtIndex || !queryExists);
-//    ui->actionQuery_File->setDisabled(!connectionAtIndex || !queryExists);
-}
-
-void MainWindow::on_editConnectionButton_clicked()
-{
-    int index = ui->connectionComboBox->currentIndex();
-    QString connectionId = ui->connectionComboBox->itemData(index).toString();
-    Connection connection = m_connectionManager.getConnections()[connectionId];
-    ConnectionDialog dialog(connection);
-    dialog.setWindowTitle(tr("Edit Connection"));
-    if(dialog.exec() == QDialog::Accepted)
-    {
-        connection = dialog.getConnection();
-        m_connectionManager.saveConnection(connection);
-        ui->connectionComboBox->setItemText(index, connection.name());
-        invalidateEnabledStates();
-    }
-}
-
-void MainWindow::on_deleteConnectionButton_clicked()
-{
-    int index = ui->connectionComboBox->currentIndex();
-    QString connectionId = ui->connectionComboBox->itemData(index).toString();
-    m_connectionManager.deleteConnection(connectionId);
-    ui->connectionComboBox->removeItem(index);
-    invalidateEnabledStates();
-}
-
-void MainWindow::on_openConnectionButton_clicked()
-{
-    int index = ui->connectionComboBox->currentIndex();
-    QString connectionId = ui->connectionComboBox->itemData(index).toString();
-    m_connectionManager.openConnection(m_connectionManager.getConnections()[connectionId]);
-    invalidateEnabledStates();
-}
-
-void MainWindow::on_closeConnectionButton_clicked()
-{
-    int index = ui->connectionComboBox->currentIndex();
-    QString connectionId = ui->connectionComboBox->itemData(index).toString();
-    m_connectionManager.closeConnection(connectionId);
-    invalidateEnabledStates();
+    //ui->actionQueryBlockAtCursor->setDisabled(!connectionAtIndex || !queryExists);
+    //ui->queryFileButton->setDisabled(!connectionAtIndex || !queryExists);
+    //ui->actionQuery_File->setDisabled(!connectionAtIndex || !queryExists);
 }
 
 void MainWindow::on_actionCloseFile_triggered()
@@ -358,17 +267,7 @@ void MainWindow::on_actionConnection_Manager_triggered()
 
 void MainWindow::on_actionQueryBlockAtCursor_triggered()
 {
-    int index = ui->connectionComboBox->currentIndex();
-    QString connectionId = ui->connectionComboBox->itemData(index).toString();
-
-    /*if (!m_connectionManager.isOpen(connectionId))
-        on_openConnectionButton_clicked();*/
-
-    if (!m_connectionManager.isOpen(connectionId))
-        return;
-
     QueryTab *tab = ((QueryTab*) ui->tabBarConnections->currentWidget());
-    QSqlDatabase db = m_connectionManager.getOpenConnection(connectionId);
     tab->executeQueryAtCursor();
 }
 
@@ -409,9 +308,6 @@ void MainWindow::on_connectionStateChanged()
         }
     }
 
-    if (m_openConnectionListMenu.actions().count() > 0) ui->toolButton_disconnect->setEnabled(true);
-    else ui->toolButton_disconnect->setEnabled(false);
-
     if (m_openConnectionListMenu.actions().count() > 0) m_disconnectToolButton->setEnabled(true);
     else m_disconnectToolButton->setEnabled(false);
 }
@@ -419,4 +315,16 @@ void MainWindow::on_connectionStateChanged()
 void MainWindow::on_disconnectListToolButtonItemTriggered(QAction* triggeredAction)
 {
     m_connectionManager.closeConnection(triggeredAction->data().toString());
+}
+
+void MainWindow::on_toolbarOrientationChange(Qt::Orientation orientation)
+{
+    if (orientation == Qt::Vertical)
+    {
+        qDebug() << "is vertical now";
+    }
+    else if (orientation == Qt::Horizontal)
+    {
+        qDebug() << "is horizontal now";
+    }
 }

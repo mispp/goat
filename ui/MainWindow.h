@@ -30,12 +30,6 @@ private slots:
 	void on_tabBarConnections_tabCloseRequested(int index);
     void on_actionAbout_triggered();
     void on_newFileButton_clicked();
-    void on_newConnectionButton_clicked();
-    void on_connectionComboBox_currentIndexChanged(int index);
-    void on_editConnectionButton_clicked();
-    void on_deleteConnectionButton_clicked();
-    void on_openConnectionButton_clicked();
-    void on_closeConnectionButton_clicked();
     void on_actionCloseFile_triggered();
     void on_openFileButton_clicked();
     void on_saveFileButton_clicked();
@@ -50,6 +44,8 @@ public slots:
     void on_connectionListToolButtonItemTriggered(QAction* triggeredAction);
     void on_connectionStateChanged();
     void on_disconnectListToolButtonItemTriggered(QAction* triggeredAction);
+
+    void on_toolbarOrientationChange(Qt::Orientation orientation);
 
 private:
     void closeEvent(QCloseEvent *event);
