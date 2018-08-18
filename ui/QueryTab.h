@@ -2,7 +2,7 @@
 #define CONNECTIONTAB_H
 
 #include "../src/ConnectionManager.h"
-#include "../src/Query.h"
+#include "../src/QueryManager.h"
 
 #include <QPlainTextEdit>
 #include <QString>
@@ -17,6 +17,7 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QDateTime>
+#include <QThread>
 
 namespace Ui {
 class ConnectionTab;
@@ -49,7 +50,10 @@ private:
     QString m_filename;
     ConnectionManager* m_connectionManager;
 
-    Query m_query;
+    QString m_connectionIdQuery;
+    QString m_connectionIdKill;
+
+    QueryManager m_queryManager;
 
     QFuture<bool> m_queryFuture;
     QFutureWatcher<void> m_queryFutureWatcher;

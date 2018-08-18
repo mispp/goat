@@ -39,13 +39,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionExit_triggered()
 {
-    QList<QString> connectionNames = QSqlDatabase::connectionNames();
+    /*QList<QString> connectionNames = QSqlDatabase::connectionNames();
 
     foreach (QString name, connectionNames)
     {
         QSqlDatabase::database(name).close();
         QSqlDatabase::removeDatabase(name);
-    }
+    }*/
 
 	QApplication::exit();
 }

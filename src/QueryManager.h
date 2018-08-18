@@ -10,16 +10,16 @@
 
 typedef QList<QStandardItem*> TableRow;
 
-class Query : public QObject
+class QueryManager : public QObject
 {
     Q_OBJECT
 
 public:
-    Query();
-    ~Query();
+    QueryManager();
+    ~QueryManager();
 
-    void switchDatabase(QString connectionId);
-    void cancelQuery();
+    void switchDatabase(QSqlDatabase database);
+    void cancelQuery(QSqlDatabase database);
     QList<QString> getColumNames();
     int numRowsAffected();
     const QString lastError();
@@ -27,14 +27,16 @@ public:
     const QDateTime startTime();
     const QDateTime endTime();
     bool isSelect();
+    bool isSuccess();
     const QList<TableRow> getNextRowSet(int rowSetSize);
-    bool executeQuery(const QString query);
+    bool executeQuery(QSqlDatabase database, const QString query);
 
 private:
+    QString m_queryString;
     QSqlQuery m_query;
+    bool m_querySuccess;
 
-    QString m_refConnectionId;
-    QSqlDatabase m_database;
+    QString m_clonedConnectionId;
 
     QDateTime m_startTime;
     QDateTime m_endTime;
@@ -43,8 +45,10 @@ private:
 
     QList<QString> m_columnNames;
 
-    void reconnectDatabase();
-    void killQueryPostgres();
+    void killQueryPostgres(QSqlDatabase database, int pid);
+
+    QMutex m_mutexExecution;
+    QMutex m_mutexRetrieval;
 
 signals:
     void finished();
