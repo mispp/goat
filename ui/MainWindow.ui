@@ -91,13 +91,33 @@
           </property>
           <property name="icon">
            <iconset resource="../resources/icons.qrc">
-            <normaloff>:/icons/silk/icons/silk/database_gear.png</normaloff>:/icons/silk/icons/silk/database_gear.png</iconset>
+            <normaloff>:/icons/silk/icons/silk/connect.png</normaloff>:/icons/silk/icons/silk/connect.png</iconset>
           </property>
           <property name="popupMode">
            <enum>QToolButton::MenuButtonPopup</enum>
           </property>
           <property name="autoRaise">
            <bool>false</bool>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::NoArrow</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_disconnect">
+          <property name="toolTip">
+           <string>Disconnect</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/icons.qrc">
+            <normaloff>:/icons/silk/icons/silk/disconnect.png</normaloff>:/icons/silk/icons/silk/disconnect.png</iconset>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::MenuButtonPopup</enum>
           </property>
           <property name="arrowType">
            <enum>Qt::NoArrow</enum>

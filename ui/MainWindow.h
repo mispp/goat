@@ -47,6 +47,8 @@ private slots:
 public slots:
     void on_connectionListToolButtonExpandTriggered();
     void on_connectionListToolButtonItemTriggered(QAction* triggeredAction);
+    void on_connectionStateChanged();
+    void on_disconnectListToolButtonItemTriggered(QAction* triggeredAction);
 
 private:
     void closeEvent(QCloseEvent *event);
@@ -57,6 +59,7 @@ private:
 	Ui::MainWindow *ui;
     ConnectionManager m_connectionManager;
     QMenu m_connectionListMenu;
+    QMenu m_openConnectionListMenu;
 };
 
 #endif // MAINWINDOW_H

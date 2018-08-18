@@ -28,9 +28,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
     }
 
     ui->toolButton_connectionManager->setMenu(&m_connectionListMenu);
+    ui->toolButton_disconnect->setMenu(&m_openConnectionListMenu);
+
+    ui->toolButton_disconnect->setEnabled(false);
 
     connect(&m_connectionListMenu, SIGNAL(aboutToShow()), this, SLOT(on_connectionListToolButtonExpandTriggered()));
     connect(&m_connectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_connectionListToolButtonItemTriggered(QAction*)));
+
+    connect(&m_openConnectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_disconnectListToolButtonItemTriggered(QAction*)));
+
+    connect(&m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(on_connectionStateChanged()));
 }
 
 MainWindow::~MainWindow()
@@ -366,4 +373,30 @@ void MainWindow::on_connectionListToolButtonExpandTriggered()
 void MainWindow::on_connectionListToolButtonItemTriggered(QAction* triggeredAction)
 {
     m_connectionManager.openConnection(m_connectionManager.getConnections()[triggeredAction->data().toString()]);
+}
+
+void MainWindow::on_connectionStateChanged()
+{
+    m_openConnectionListMenu.clear();
+
+    foreach (Connection connection, m_connectionManager.getConnections().values())
+    {
+        if (QSqlDatabase::database(connection.connectionId()).isOpen())
+        {
+            QAction* disconnectConnectionAction = new QAction();
+            disconnectConnectionAction->setText(connection.name());
+            disconnectConnectionAction->setData(connection.connectionId());
+            disconnectConnectionAction->setIcon(QIcon(":/icons/silk/icons/silk/database_link.png"));
+
+            m_openConnectionListMenu.addAction(disconnectConnectionAction);
+        }
+    }
+
+    if (m_openConnectionListMenu.actions().count() > 0) ui->toolButton_disconnect->setEnabled(true);
+    else ui->toolButton_disconnect->setEnabled(false);
+}
+
+void MainWindow::on_disconnectListToolButtonItemTriggered(QAction* triggeredAction)
+{
+    m_connectionManager.closeConnection(triggeredAction->data().toString());
 }
