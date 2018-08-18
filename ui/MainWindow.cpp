@@ -22,22 +22,39 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
 	readSettings();
     on_newFileButton_clicked();
 
-    foreach(Connection connection, m_connectionManager.getConnections().values())
-    {
-        ui->connectionComboBox->addItem(connection.name(), connection.connectionId()); //TODO order this by name?
-    }
+    ui->toolBar->addAction(ui->actionNewFile);
+    ui->toolBar->addAction(ui->actionOpenFile);
+    ui->toolBar->addAction(ui->actionSaveFile);
+    ui->toolBar->addSeparator();
+
+    /* set connection manager tool button */
+    m_connectionManagerToolButton = new QToolButton(ui->toolBar);
+    m_connectionManagerToolButton->setPopupMode(QToolButton::MenuButtonPopup);
+    m_connectionManagerToolButton->setMenu(&m_connectionListMenu);
+    m_connectionManagerToolButton->setIcon(QIcon(":/icons/silk/icons/silk/connect.png"));
+    m_connectionManagerToolButton->setToolTip("Connection manager");
+    ui->toolBar->addWidget(m_connectionManagerToolButton);
+
+    /* set disconnect tool button */
+    m_disconnectToolButton = new QToolButton(ui->toolBar);
+    m_disconnectToolButton->setPopupMode(QToolButton::MenuButtonPopup);
+    m_disconnectToolButton->setMenu(&m_openConnectionListMenu);
+    m_disconnectToolButton->setIcon(QIcon(":/icons/silk/icons/silk/disconnect.png"));
+    m_disconnectToolButton->setToolTip("Disconnect");
+    m_disconnectToolButton->setEnabled(false);
+    ui->toolBar->addWidget(m_disconnectToolButton);
 
     ui->toolButton_connectionManager->setMenu(&m_connectionListMenu);
     ui->toolButton_disconnect->setMenu(&m_openConnectionListMenu);
-
     ui->toolButton_disconnect->setEnabled(false);
 
     connect(&m_connectionListMenu, SIGNAL(aboutToShow()), this, SLOT(on_connectionListToolButtonExpandTriggered()));
     connect(&m_connectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_connectionListToolButtonItemTriggered(QAction*)));
-
     connect(&m_openConnectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_disconnectListToolButtonItemTriggered(QAction*)));
-
     connect(&m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(on_connectionStateChanged()));
+    connect(m_connectionManagerToolButton, SIGNAL(released()), this, SLOT(on_actionConnection_Manager_triggered()));
+
+    connect(m_disconnectToolButton, SIGNAL(pressed()), m_disconnectToolButton, SLOT(showMenu()));
 }
 
 MainWindow::~MainWindow()
@@ -344,8 +361,8 @@ void MainWindow::on_actionQueryBlockAtCursor_triggered()
     int index = ui->connectionComboBox->currentIndex();
     QString connectionId = ui->connectionComboBox->itemData(index).toString();
 
-    if (!m_connectionManager.isOpen(connectionId))
-        on_openConnectionButton_clicked();
+    /*if (!m_connectionManager.isOpen(connectionId))
+        on_openConnectionButton_clicked();*/
 
     if (!m_connectionManager.isOpen(connectionId))
         return;
@@ -394,6 +411,9 @@ void MainWindow::on_connectionStateChanged()
 
     if (m_openConnectionListMenu.actions().count() > 0) ui->toolButton_disconnect->setEnabled(true);
     else ui->toolButton_disconnect->setEnabled(false);
+
+    if (m_openConnectionListMenu.actions().count() > 0) m_disconnectToolButton->setEnabled(true);
+    else m_disconnectToolButton->setEnabled(false);
 }
 
 void MainWindow::on_disconnectListToolButtonItemTriggered(QAction* triggeredAction)

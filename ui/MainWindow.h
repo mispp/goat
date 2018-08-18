@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QMenu>
+#include <QToolButton>
 
 #include "src/Connection.h"
 #include "src/ConnectionManager.h"
@@ -60,6 +61,9 @@ private:
     ConnectionManager m_connectionManager;
     QMenu m_connectionListMenu;
     QMenu m_openConnectionListMenu;
+
+    QToolButton* m_connectionManagerToolButton;
+    QToolButton* m_disconnectToolButton;
 };
 
 #endif // MAINWINDOW_H
