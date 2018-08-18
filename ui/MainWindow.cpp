@@ -151,11 +151,11 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 
     if(!tab->modified() || closeConfirmationDialog.exec() == QMessageBox::Yes)
     {
+        invalidateEnabledStates();
+
         ui->tabBarConnections->removeTab(index);
         tab->close();
         tab->deleteLater();
-
-        //invalidateEnabledStates();
     }
 }
 
@@ -183,11 +183,6 @@ void MainWindow::invalidateEnabledStates()
     ui->actionCloseFile->setDisabled(currentTab == nullptr);
     ui->actionSaveFile->setDisabled(currentTab == nullptr);
     ui->actionSaveFileAs->setDisabled(currentTab == nullptr);
-
-    //ui->queryBlockButton->setDisabled(!connectionAtIndex || !queryExists);
-    //ui->actionQueryBlockAtCursor->setDisabled(!connectionAtIndex || !queryExists);
-    //ui->queryFileButton->setDisabled(!connectionAtIndex || !queryExists);
-    //ui->actionQuery_File->setDisabled(!connectionAtIndex || !queryExists);
 }
 
 void MainWindow::on_actionCloseFile_triggered()
@@ -256,8 +251,6 @@ void MainWindow::on_actionSaveFileAs_triggered()
 
 void MainWindow::on_currentTabTextChanged()
 {
-    invalidateEnabledStates(); //save button
-
     QueryTab *connectionTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
     if (connectionTab->modified())
     {
