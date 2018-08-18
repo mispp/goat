@@ -36,15 +36,13 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
 
     ui->button_stopQuery->setEnabled(false);
 
-    //m_queryFutureWatcher.setFuture(m_queryFuture);
-
     readFile();
     setModified(false);
     refreshOpenConnections();
 
     connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
     connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
-    connect(&m_queryFutureWatcher, SIGNAL(finished()), this, SLOT(queryFinished()));
+    connect(&m_queryManager, SIGNAL(finished()), this, SLOT(queryFinished()));
 
     connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(resultsGridSliderAtEnd(int)));
 }
@@ -54,82 +52,77 @@ QueryTab::~QueryTab()
 	delete ui;
 }
 
-void QueryTab::executeQueryAtCursor(QSqlDatabase sqlDatabase)
+void QueryTab::executeQueryAtCursor()
 {
-    QString query = ui->codeEditor->getQueryAtCursor();
-
-    if (!query.isEmpty())
+    if (m_queryFuture.isFinished())
     {
-        ui->button_selectionQuery->setEnabled(false);
-        ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-        ui->resultsText->clear();
-        m_queryResultsModel.clear();
+        QString query = ui->codeEditor->getQueryAtCursor();
 
-        m_queryFuture = QtConcurrent::run(this, &QueryTab::executeQuery, sqlDatabase, query);
-        m_queryFutureWatcher.setFuture(m_queryFuture);
+        if (!query.isEmpty())
+        {
+            ui->button_selectionQuery->setEnabled(false);
+            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
+            ui->resultsText->clear();
+            m_queryResultsModel.clear();
+
+            submitQueryForExecution(query);
+        }
     }
 }
 
-void QueryTab::executeSelectedQuery(QSqlDatabase sqlDatabase)
+void QueryTab::executeSelectedQuery()
 {
-    QString query = ui->codeEditor->getSelection();
-
-    if (!query.isEmpty())
+    if (m_queryFuture.isFinished())
     {
-        ui->button_selectionQuery->setEnabled(false);
-        ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-        ui->resultsText->clear();
-        m_queryResultsModel.clear();
+        QString query = ui->codeEditor->getSelection();
 
-        m_queryFuture = QtConcurrent::run(this, &QueryTab::executeQuery, sqlDatabase, query);
-        m_queryFutureWatcher.setFuture(m_queryFuture);
+        if (!query.isEmpty())
+        {
+            ui->button_selectionQuery->setEnabled(false);
+            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
+            ui->resultsText->clear();
+            m_queryResultsModel.clear();
+
+            submitQueryForExecution(query);
+        }
     }
 }
 
-bool QueryTab::executeQuery(QSqlDatabase sqlDatabase, QString query)
+void QueryTab::submitQueryForExecution(const QString query)
 {
-    if (query.trimmed().isEmpty())
-        return false;
-
-    reconnectDatabase();
-
-    m_sqlQuery = QSqlQuery (m_database); //here it stops now (actually it takes a lot of time to finish)
-    m_sqlQuery.setForwardOnly(true);
-
-    m_sqlQueryStart = QDateTime::currentDateTime();
-    bool success = m_sqlQuery.exec(query); //if previous assignment is moved to on_combobox_index_changed, then it stops here
-    m_sqlQueryEnd = QDateTime::currentDateTime();
-
-    return success;
+    m_queryFuture = QtConcurrent::run(&m_queryManager, &QueryManager::executeQuery, QSqlDatabase::database(m_connectionIdQuery), query);
+    m_queryFutureWatcher.setFuture(m_queryFuture);
 }
 
 void QueryTab::queryFinished()
 {
-    displayQueryResults(m_queryFuture.result(), m_sqlQueryStart, m_sqlQueryEnd);
+    displayQueryResults();
 
     ui->button_selectionQuery->setEnabled(true);
     ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
 }
 
-void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
+void QueryTab::displayQueryResults()
 {
-    bool displayGrid = success && m_sqlQuery.isSelect();
+    bool queryResult = m_queryManager.isSuccess();
+    bool queryIsSelect = m_queryManager.isSelect();
 
-    if (displayGrid)
+    if (queryResult && queryIsSelect)
     {
         m_queryResultsModel.clear();
+        m_queryResultsModel.setColumnCount(m_queryManager.getColumNames().count());
 
-        QSqlRecord record = m_sqlQuery.record(); //this is only header, pointer is still at the invalid row
-
-        int columnCount = record.count();
-
-        m_queryResultsModel.setColumnCount(columnCount);
-        for (int col = 0; col < record.count(); ++col)
+        int columnIndex = 0;
+        foreach (QString columnName, m_queryManager.getColumNames())
         {
-            m_queryResultsModel.setHeaderData(col, Qt::Horizontal, record.fieldName(col).toUpper());
+            m_queryResultsModel.setHeaderData(columnIndex, Qt::Horizontal, columnName);
+            ++columnIndex;
         }
 
-        loadChunk(100);
+        foreach (TableRow row, m_queryManager.getNextRowSet(100))
+        {
+            m_queryResultsModel.appendRow(row);
+        }
 
         ui->resultsGrid->resizeColumnsToContents();
         ui->resultsTabBar->setCurrentIndex(0);
@@ -140,16 +133,16 @@ void QueryTab::displayQueryResults(bool success, QDateTime start, QDateTime end)
         ui->resultsTabBar->setCurrentIndex(1);
     }
 
-    ui->resultsText->appendPlainText("Timestamp: " + end.toString("yyyy-MM-dd hh:mm:ss"));
-    ui->resultsText->appendPlainText("Elapsed: " + QString::number(start.msecsTo(end)) + " ms");
-    if (success && !displayGrid)
-        ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(m_sqlQuery.numRowsAffected()));
-    else if (!success)
-        ui->resultsText->appendPlainText(m_sqlQuery.lastError().text());
+    ui->resultsText->appendPlainText("Timestamp: " + m_queryManager.startTime().toString("yyyy-MM-dd hh:mm:ss"));
+    ui->resultsText->appendPlainText("Elapsed: " + QString::number(m_queryManager.startTime().msecsTo(m_queryManager.endTime())) + " ms");
+    if (queryResult && !queryIsSelect)
+        ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(m_queryManager.numRowsAffected()));
+    else if (!queryResult)
+        ui->resultsText->appendPlainText(m_queryManager.lastError());
     ui->resultsText->appendPlainText("");
     ui->resultsText->appendPlainText("Query:");
     ui->resultsText->appendPlainText("-------------------------------");
-    ui->resultsText->appendPlainText(m_sqlQuery.lastQuery());
+    ui->resultsText->appendPlainText(m_queryManager.lastQuery());
 }
 
 bool QueryTab::modified() const
@@ -275,91 +268,49 @@ void QueryTab::refreshOpenConnections()
 
 void QueryTab::on_button_selectionQuery_released()
 {
-    int index = ui->comboBoxConnections->currentIndex();
-    QString connectionId = ui->comboBoxConnections->itemData(index, Qt::UserRole+1).toString();
-
-    if (!m_connectionManager->isOpen(connectionId))
-        return;
-
-    executeSelectedQuery(m_connectionManager->getOpenConnection(connectionId));
+    executeSelectedQuery();
 
     ui->codeEditor->setFocus();
 }
 
 void QueryTab::on_button_stopQuery_released()
 {
-    QtConcurrent::run(m_connectionManager, &ConnectionManager::killQueryPostgres, m_database, m_postgresBackendPID);
-
-    /*if (m_sqlQuery.isActive())
-    {
-        m_sqlQuery.finish();
-    }*/
+    QtConcurrent::run(&m_queryManager, &QueryManager::cancelQuery, QSqlDatabase::database(m_connectionIdKill));
 
     ui->codeEditor->setFocus();
 }
 
 void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
 {
-    m_database.close(); //close previously cloned connection
-
     QString connectionId = ui->comboBoxConnections->itemData(index, Qt::UserRole+1).toString();
-    if (!connectionId.isEmpty())
-    {
-        m_database = QSqlDatabase::cloneDatabase(m_connectionManager->getOpenConnection(connectionId), "CLONED_" + QUuid::createUuid().toString());
-        m_database.open();
 
-        m_postgresBackendPID = -1;
-    }
-}
+    /*
+     * cloning id done here because QSqlDatabase::database() won't extract connections which are created in another thread
+    */
 
+    /* close old connections */
+    QSqlDatabase::database(m_connectionIdQuery).close();
+    QSqlDatabase::database(m_connectionIdKill).close();
+    QSqlDatabase::removeDatabase(m_connectionIdQuery);
+    QSqlDatabase::removeDatabase(m_connectionIdKill);
 
-void QueryTab::reconnectDatabase()
-{
-    //reconnection for running same query twice. seems to be faster.
-    if (m_database.isOpen())
-        m_database.close();
-    m_database.open();
+    /* create new connections */
+    m_connectionIdQuery = "CLONED_" + QUuid::createUuid().toString();
+    m_connectionIdKill = "CLONED_KILL_" + QUuid::createUuid().toString();
+    QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdQuery);
+    QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdKill);
 
-    // set up ability to cancel
-    if (m_database.driverName() == "QPSQL")
-    {
-        QSqlQuery q(m_database);
-        q.prepare("SELECT pg_backend_pid();");
-        q.exec();
-        q.next();
-        int pid = q.value(0).toInt();
-
-        if (pid > 0) m_postgresBackendPID = pid;
-    } else m_postgresBackendPID = -1;
+    /* QSqlDatabase needs to be pushed as a param */
+    m_queryManager.switchDatabase(QSqlDatabase::database(m_connectionIdQuery));
 }
 
 void QueryTab::resultsGridSliderAtEnd(int value)
 {
     if (ui->resultsGrid->verticalScrollBar()->maximum() == value)
     {
-        loadChunk(100);
-    }
-}
-
-void QueryTab::loadChunk(int size)
-{
-    int counter = 0;
-
-    while (counter < size && m_sqlQuery.next())
-    {
-        QSqlRecord record = m_sqlQuery.record();
-
-        QList<QStandardItem*> row;
-
-        for (int col = 0; col < record.count(); ++col)
+        foreach (TableRow row, m_queryManager.getNextRowSet(100))
         {
-            QStandardItem* item = new QStandardItem();
-            item->setData(record.value(col), Qt::DisplayRole);
-            row.append(item);
+            m_queryResultsModel.appendRow(row);
         }
-
-        m_queryResultsModel.appendRow(row);
-
-        ++counter;
     }
 }
