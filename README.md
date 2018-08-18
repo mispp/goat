@@ -68,4 +68,4 @@ Connection manager
 
 Main window
 
-[![Main window](https://i.imgur.com/j0tDvzv.png)](https://i.imgur.com/j0tDvzv.png)
+[![Main window](https://i.imgur.com/Ejp1Mt5.png)](https://i.imgur.com/Ejp1Mt5.png)
