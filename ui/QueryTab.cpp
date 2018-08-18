@@ -30,11 +30,8 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
 
     m_filename = filename;
 
-    m_queryResultsModel = new QStandardItemModel(this);
-    m_openConnectionsModel = new QStandardItemModel(this);
-
-    ui->resultsGrid->setModel(m_queryResultsModel);
-    ui->comboBoxConnections->setModel(m_openConnectionsModel);
+    ui->resultsGrid->setModel(&m_queryResultsModel);
+    ui->comboBoxConnections->setModel(&m_openConnectionsModel);
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
     ui->button_stopQuery->setEnabled(false);
@@ -43,16 +40,19 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     setModified(false);
     refreshOpenConnections();
 
-    connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
+    //connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
     connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
     connect(&m_queryManager, SIGNAL(finished()), this, SLOT(queryFinished()));
 
-    connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(resultsGridSliderAtEnd(int)));
+    connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(on_resultsGridSliderAtEnd(int)));
 }
 
 QueryTab::~QueryTab()
 {
 	delete ui;
+
+    QSqlDatabase::database(m_connectionIdQuery).close();
+    QSqlDatabase::removeDatabase(m_connectionIdQuery);
 }
 
 QString QueryTab::filename() const
@@ -140,17 +140,7 @@ void QueryTab::executeQueryAtCursor()
 {
     if (m_queryFuture.isFinished())
     {
-        QString query = ui->codeEditor->getQueryAtCursor();
-
-        if (!query.isEmpty())
-        {
-            ui->button_selectionQuery->setEnabled(false);
-            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-            ui->resultsText->clear();
-            m_queryResultsModel->clear();
-
-            submitQueryForExecution(query);
-        }
+        submitQueryForExecution(ui->codeEditor->getQueryAtCursor());
     }
 }
 
@@ -158,17 +148,7 @@ void QueryTab::executeSelectedQuery()
 {
     if (m_queryFuture.isFinished())
     {
-        QString query = ui->codeEditor->getSelection();
-
-        if (!query.isEmpty())
-        {
-            ui->button_selectionQuery->setEnabled(false);
-            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-            ui->resultsText->clear();
-            m_queryResultsModel->clear();
-
-            submitQueryForExecution(query);
-        }
+        submitQueryForExecution(ui->codeEditor->getSelection());
     }
 }
 
@@ -179,19 +159,19 @@ void QueryTab::displayQueryResults()
 
     if (queryResult && queryIsSelect)
     {
-        m_queryResultsModel->clear();
-        m_queryResultsModel->setColumnCount(m_queryManager.getColumNames().count());
+        m_queryResultsModel.clear();
+        m_queryResultsModel.setColumnCount(m_queryManager.getColumNames().count());
 
         int columnIndex = 0;
         foreach (QString columnName, m_queryManager.getColumNames())
         {
-            m_queryResultsModel->setHeaderData(columnIndex, Qt::Horizontal, columnName);
+            m_queryResultsModel.setHeaderData(columnIndex, Qt::Horizontal, columnName);
             ++columnIndex;
         }
 
         foreach (TableRow row, m_queryManager.getNextRowSet(100))
         {
-            m_queryResultsModel->appendRow(row);
+            m_queryResultsModel.appendRow(row);
         }
 
         ui->resultsGrid->resizeColumnsToContents();
@@ -199,7 +179,7 @@ void QueryTab::displayQueryResults()
     }
     else
     {
-        m_queryResultsModel->clear();
+        m_queryResultsModel.clear();
         ui->resultsTabBar->setCurrentIndex(1);
     }
 
@@ -217,8 +197,16 @@ void QueryTab::displayQueryResults()
 
 void QueryTab::submitQueryForExecution(const QString query)
 {
-    m_queryFuture = QtConcurrent::run(&m_queryManager, &QueryManager::executeQuery, QSqlDatabase::database(m_connectionIdQuery), query);
-    m_queryFutureWatcher.setFuture(m_queryFuture);
+    if (!query.isEmpty())
+    {
+        ui->button_selectionQuery->setEnabled(false);
+        ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
+        ui->resultsText->clear();
+        m_queryResultsModel.clear();
+
+        m_queryFuture = QtConcurrent::run(&m_queryManager, &QueryManager::executeQuery, QSqlDatabase::database(m_connectionIdQuery), query);
+        m_queryFutureWatcher.setFuture(m_queryFuture);
+    }
 }
 
 void QueryTab::queryFinished()
@@ -235,7 +223,7 @@ void QueryTab::refreshOpenConnections()
 
     QString usedConnectionId = ui->comboBoxConnections->currentData(Qt::UserRole+1).toString();
 
-    m_openConnectionsModel->clear();
+    m_openConnectionsModel.clear();
 
     if (openConnections.count() == 0)
     {
@@ -243,7 +231,7 @@ void QueryTab::refreshOpenConnections()
 
         openConnectionItem->setText("<no open connections>");
 
-        m_openConnectionsModel->appendRow(openConnectionItem);
+        m_openConnectionsModel.appendRow(openConnectionItem);
 
         ui->comboBoxConnections->setCurrentIndex(0);
     }
@@ -256,7 +244,7 @@ void QueryTab::refreshOpenConnections()
             openConnectionItem->setText(openConnections[key]);
             openConnectionItem->setData(key, Qt::UserRole+1);
 
-            m_openConnectionsModel->appendRow(openConnectionItem);
+            m_openConnectionsModel.appendRow(openConnectionItem);
         }
 
         if (!usedConnectionId.isEmpty())
@@ -270,13 +258,13 @@ void QueryTab::refreshOpenConnections()
     }
 }
 
-void QueryTab::resultsGridSliderAtEnd(int value)
+void QueryTab::on_resultsGridSliderAtEnd(int value)
 {
     if (ui->resultsGrid->verticalScrollBar()->maximum() == value)
     {
         foreach (TableRow row, m_queryManager.getNextRowSet(100))
         {
-            m_queryResultsModel->appendRow(row);
+            m_queryResultsModel.appendRow(row);
         }
     }
 }

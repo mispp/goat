@@ -51,8 +51,8 @@ private:
     ConnectionManager* m_connectionManager;
     QString m_filename;
 
-    QStandardItemModel* m_queryResultsModel;
-    QStandardItemModel* m_openConnectionsModel;
+    QStandardItemModel m_queryResultsModel;
+    QStandardItemModel m_openConnectionsModel;
     QString m_connectionIdQuery;
     QString m_connectionIdKill;
     QueryManager m_queryManager;
@@ -64,7 +64,7 @@ private:
 public slots:
     void refreshOpenConnections();
     void queryFinished();
-    void resultsGridSliderAtEnd(int value);
+    void on_resultsGridSliderAtEnd(int value);
 
 private slots:
     void on_button_selectionQuery_released();
