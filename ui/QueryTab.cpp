@@ -46,7 +46,6 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     connect(&m_queryManager, SIGNAL(finished()), this, SLOT(queryFinished()));
 
     connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(on_resultsGridSliderAtEnd(int)));
-    connect(this, SIGNAL(connectionSwitched(QString)), this, SLOT(on_connectionSwitched(QString)));
 }
 
 QueryTab::~QueryTab()
