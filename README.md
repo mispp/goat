@@ -45,6 +45,13 @@ To be considered:
 
 # Installing
 
+## Opensuse Tumbleweed
+
+```
+zypper ar https://download.opensuse.org/repositories/home:/misp/openSUSE_Tumbleweed/ goatrepo
+zypper in goat
+```
+
 ## Ubuntu 18.04
 
 ```
