@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
     ui->toolBar->addAction(ui->actionSaveFile);
     ui->toolBar->addSeparator();
 
+
     /* set connection manager tool button */
     m_connectionManagerToolButton = new QToolButton(ui->toolBar);
     m_connectionManagerToolButton->setPopupMode(QToolButton::MenuButtonPopup);
@@ -48,8 +49,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
     m_disconnectToolButton->setEnabled(false);
     ui->toolBar->addWidget(m_disconnectToolButton);
 
-    /* add open and available connections menus (i know it's redundant, but still) */
+    addAction(ui->actionQueryBlockAtCursor);
+    ui->actionQueryBlockAtCursor->setEnabled(true);
 
+    /* add open and available connections menus (i know it's redundant, but still) */
     ui->menuConnection->addSeparator();
     ui->menuConnection->addMenu(&m_connectionListMenu);
     ui->menuConnection->addMenu(&m_openConnectionListMenu);
@@ -59,6 +62,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
     connect(&m_openConnectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_disconnectListToolButtonItemTriggered(QAction*)));
     connect(&m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(on_connectionStateChanged()));
     connect(m_connectionManagerToolButton, SIGNAL(released()), this, SLOT(on_actionConnection_Manager_triggered()));
+
+    //connect(ui->actionQueryBlockAtCursor, SIGNAL(triggered(bool)), this, );
 
     connect(ui->toolBar, SIGNAL(orientationChanged(Qt::Orientation)), this, SLOT(on_toolbarOrientationChange(Qt::Orientation)));
 }
@@ -151,12 +156,12 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 
     if(!tab->modified() || closeConfirmationDialog.exec() == QMessageBox::Yes)
     {
-        invalidateEnabledStates();
-
-        //ui->tabBarConnections->removeTab(index);
+        ui->tabBarConnections->removeTab(index);
 
         tab->close();
         tab->deleteLater();
+
+        invalidateEnabledStates();
     }
 }
 
@@ -184,6 +189,21 @@ void MainWindow::invalidateEnabledStates()
     ui->actionCloseFile->setDisabled(currentTab == nullptr);
     ui->actionSaveFile->setDisabled(currentTab == nullptr);
     ui->actionSaveFileAs->setDisabled(currentTab == nullptr);
+
+    bool queryExists = ui->tabBarConnections->currentIndex() != -1;
+    bool isOpen = false;
+
+    if (currentTab != nullptr)
+    {
+        const QString connectionId = currentTab->connectionId();
+
+        if (!connectionId.isEmpty())
+            isOpen = m_connectionManager.isOpen(connectionId);
+        else
+            isOpen = false;
+    }
+
+    ui->actionQueryBlockAtCursor->setDisabled(!isOpen || !queryExists);
 }
 
 void MainWindow::on_actionCloseFile_triggered()

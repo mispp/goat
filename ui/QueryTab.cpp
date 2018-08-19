@@ -34,6 +34,7 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     ui->comboBoxConnections->setModel(&m_openConnectionsModel);
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
+    //ui->button_selectionQuery->setEnabled(false);
     ui->button_stopQuery->setEnabled(false);
 
     readFile();
@@ -45,14 +46,18 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     connect(&m_queryManager, SIGNAL(finished()), this, SLOT(queryFinished()));
 
     connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(on_resultsGridSliderAtEnd(int)));
+    connect(this, SIGNAL(connectionSwitched(QString)), this, SLOT(on_connectionSwitched(QString)));
 }
 
 QueryTab::~QueryTab()
 {
 	delete ui;
 
-    QSqlDatabase::database(m_connectionIdQuery).close();
-    QSqlDatabase::removeDatabase(m_connectionIdQuery);
+    if (!m_connectionIdQuery.isEmpty())
+    {
+        QSqlDatabase::database(m_connectionIdQuery).close();
+        QSqlDatabase::removeDatabase(m_connectionIdQuery);
+    }
 }
 
 QString QueryTab::filename() const
@@ -134,6 +139,11 @@ void QueryTab::writeFile()
     {
         setModified(false);
     }
+}
+
+QString QueryTab::connectionId()
+{
+    return m_connectionIdQuery;
 }
 
 void QueryTab::executeQueryAtCursor()
@@ -289,7 +299,7 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
 
     if (!m_queryFuture.isFinished())
     {
-        m_queryManager.cancelQuery(QSqlDatabase::database(m_connectionIdKill));
+        m_queryManager.cancelQuery(QSqlDatabase::database(m_connectionIdQuery));
     }
 
     /*
@@ -298,8 +308,9 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
 
     /* close old connections */
     QSqlDatabase::database(m_connectionIdQuery).close();
-    QSqlDatabase::database(m_connectionIdKill).close();
     QSqlDatabase::removeDatabase(m_connectionIdQuery);
+
+    QSqlDatabase::database(m_connectionIdKill).close();
     QSqlDatabase::removeDatabase(m_connectionIdKill);
 
     /* create new connections */
@@ -311,11 +322,14 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
     else
     {
         m_connectionIdQuery = "CLONED_" + m_connectionIdQuery + "_" + QUuid::createUuid().toString();
-        m_connectionIdKill = "CLONED_KILL_" + m_connectionIdKill + "_" + QUuid::createUuid().toString();
         QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdQuery);
+
+        m_connectionIdKill = "CLONED_KILL_" + m_connectionIdKill + "_" + QUuid::createUuid().toString();
         QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdKill);
     }
 
     /* QSqlDatabase needs to be pushed as a param */
     m_queryManager.switchDatabase(QSqlDatabase::database(m_connectionIdQuery));
+
+    emit connectionSwitched(connectionId);
 }

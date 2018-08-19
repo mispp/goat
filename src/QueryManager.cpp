@@ -79,7 +79,8 @@ bool QueryManager::executeQuery(QSqlDatabase database, const QString query)
 
 void QueryManager::cancelQuery(QSqlDatabase database)
 {
-    killQueryPostgres(database, m_postgresBackendPID);
+    if (database.driverName() == "QPSQL")
+        killQueryPostgres(database, m_postgresBackendPID);
 }
 
 QList<QString> QueryManager::getColumNames()

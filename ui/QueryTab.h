@@ -29,6 +29,7 @@ class QueryTab : public QWidget
 
 signals:
    void textChanged();
+   void connectionSwitched(const QString connectionId);
 
 public:
     explicit QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent = 0);
@@ -41,6 +42,7 @@ public:
     void readFile();
     void writeFile();
 
+    QString connectionId();
     void executeQueryAtCursor();
     void executeSelectedQuery();
     void displayQueryResults();
