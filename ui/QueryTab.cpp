@@ -34,6 +34,7 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     ui->comboBoxConnections->setModel(&m_openConnectionsModel);
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
+    //ui->button_selectionQuery->setEnabled(false);
     ui->button_stopQuery->setEnabled(false);
 
     readFile();
@@ -44,12 +45,18 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
     connect(&m_queryManager, SIGNAL(finished()), this, SLOT(queryFinished()));
 
-    connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(resultsGridSliderAtEnd(int)));
+    connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(on_resultsGridSliderAtEnd(int)));
 }
 
 QueryTab::~QueryTab()
 {
 	delete ui;
+
+    if (!m_connectionIdQuery.isEmpty())
+    {
+        QSqlDatabase::database(m_connectionIdQuery).close();
+        QSqlDatabase::removeDatabase(m_connectionIdQuery);
+    }
 }
 
 QString QueryTab::filename() const
@@ -132,21 +139,16 @@ void QueryTab::writeFile()
     }
 }
 
+QString QueryTab::connectionId()
+{
+    return m_connectionIdQuery;
+}
+
 void QueryTab::executeQueryAtCursor()
 {
     if (m_queryFuture.isFinished())
     {
-        QString query = ui->codeEditor->getQueryAtCursor();
-
-        if (!query.isEmpty())
-        {
-            ui->button_selectionQuery->setEnabled(false);
-            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-            ui->resultsText->clear();
-            m_queryResultsModel.clear();
-
-            submitQueryForExecution(query);
-        }
+        submitQueryForExecution(ui->codeEditor->getQueryAtCursor());
     }
 }
 
@@ -154,17 +156,7 @@ void QueryTab::executeSelectedQuery()
 {
     if (m_queryFuture.isFinished())
     {
-        QString query = ui->codeEditor->getSelection();
-
-        if (!query.isEmpty())
-        {
-            ui->button_selectionQuery->setEnabled(false);
-            ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-            ui->resultsText->clear();
-            m_queryResultsModel.clear();
-
-            submitQueryForExecution(query);
-        }
+        submitQueryForExecution(ui->codeEditor->getSelection());
     }
 }
 
@@ -190,7 +182,7 @@ void QueryTab::displayQueryResults()
             m_queryResultsModel.appendRow(row);
         }
 
-        ui->resultsGrid->resizeColumnsToContents();
+        ui->resultsGrid->resizeColumnsToContents(); //this should be resized to header
         ui->resultsTabBar->setCurrentIndex(0);
     }
     else
@@ -213,8 +205,16 @@ void QueryTab::displayQueryResults()
 
 void QueryTab::submitQueryForExecution(const QString query)
 {
-    m_queryFuture = QtConcurrent::run(&m_queryManager, &QueryManager::executeQuery, QSqlDatabase::database(m_connectionIdQuery), query);
-    m_queryFutureWatcher.setFuture(m_queryFuture);
+    if (!query.isEmpty() && !m_connectionIdQuery.isEmpty())
+    {
+        ui->button_selectionQuery->setEnabled(false);
+        ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
+        ui->resultsText->clear();
+        m_queryResultsModel.clear();
+
+        m_queryFuture = QtConcurrent::run(&m_queryManager, &QueryManager::executeQuery, QSqlDatabase::database(m_connectionIdQuery), query);
+        m_queryFutureWatcher.setFuture(m_queryFuture);
+    }
 }
 
 void QueryTab::queryFinished()
@@ -266,7 +266,7 @@ void QueryTab::refreshOpenConnections()
     }
 }
 
-void QueryTab::resultsGridSliderAtEnd(int value)
+void QueryTab::on_resultsGridSliderAtEnd(int value)
 {
     if (ui->resultsGrid->verticalScrollBar()->maximum() == value)
     {
@@ -286,6 +286,11 @@ void QueryTab::on_button_selectionQuery_released()
 
 void QueryTab::on_button_stopQuery_released()
 {
+    /*
+     *      following errors happen when trying to stop query
+     *      "Unable to free statement: connection pointer is NULL"
+     */
+
     QtConcurrent::run(&m_queryManager, &QueryManager::cancelQuery, QSqlDatabase::database(m_connectionIdKill));
 
     ui->codeEditor->setFocus();
@@ -295,22 +300,39 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
 {
     QString connectionId = ui->comboBoxConnections->itemData(index, Qt::UserRole+1).toString();
 
+    if (!m_queryFuture.isFinished())
+    {
+        m_queryManager.cancelQuery(QSqlDatabase::database(m_connectionIdQuery));
+    }
+
     /*
      *  cloning id done here because QSqlDatabase::database() won't return connections which are created in another thread
      */
 
     /* close old connections */
     QSqlDatabase::database(m_connectionIdQuery).close();
-    QSqlDatabase::database(m_connectionIdKill).close();
     QSqlDatabase::removeDatabase(m_connectionIdQuery);
+
+    QSqlDatabase::database(m_connectionIdKill).close();
     QSqlDatabase::removeDatabase(m_connectionIdKill);
 
     /* create new connections */
-    m_connectionIdQuery = "CLONED_" + QUuid::createUuid().toString();
-    m_connectionIdKill = "CLONED_KILL_" + QUuid::createUuid().toString();
-    QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdQuery);
-    QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdKill);
+    if (connectionId.isEmpty())
+    {
+        m_connectionIdQuery.clear();
+        m_connectionIdKill.clear();
+    }
+    else
+    {
+        m_connectionIdQuery = "CLONED_" + m_connectionIdQuery + "_" + QUuid::createUuid().toString();
+        QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdQuery);
+
+        m_connectionIdKill = "CLONED_KILL_" + m_connectionIdKill + "_" + QUuid::createUuid().toString();
+        QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdKill);
+    }
 
     /* QSqlDatabase needs to be pushed as a param */
     m_queryManager.switchDatabase(QSqlDatabase::database(m_connectionIdQuery));
+
+    emit connectionSwitched(connectionId);
 }
