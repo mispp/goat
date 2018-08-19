@@ -46,6 +46,7 @@ public:
     void executeQueryAtCursor();
     void executeSelectedQuery();
     void displayQueryResults();
+    bool isFinished();
 
 private:
     Ui::ConnectionTab *ui;

@@ -203,6 +203,11 @@ void QueryTab::displayQueryResults()
     ui->resultsText->appendPlainText(m_queryManager.lastQuery());
 }
 
+bool QueryTab::isFinished()
+{
+    return m_queryFuture.isFinished();
+}
+
 void QueryTab::submitQueryForExecution(const QString query)
 {
     if (!query.isEmpty() && !m_connectionIdQuery.isEmpty())
