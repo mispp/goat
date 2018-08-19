@@ -288,6 +288,11 @@ void QueryTab::on_button_selectionQuery_released()
 
 void QueryTab::on_button_stopQuery_released()
 {
+    /*
+     *      following errors happen when trying to stop query
+     *      "Unable to free statement: connection pointer is NULL"
+     */
+
     QtConcurrent::run(&m_queryManager, &QueryManager::cancelQuery, QSqlDatabase::database(m_connectionIdKill));
 
     ui->codeEditor->setFocus();
