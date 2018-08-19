@@ -62,9 +62,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),	ui(new Ui::MainWi
     connect(&m_openConnectionListMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_disconnectListToolButtonItemTriggered(QAction*)));
     connect(&m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(on_connectionStateChanged()));
     connect(m_connectionManagerToolButton, SIGNAL(released()), this, SLOT(on_actionConnection_Manager_triggered()));
-
-    //connect(ui->actionQueryBlockAtCursor, SIGNAL(triggered(bool)), this, );
-
     connect(ui->toolBar, SIGNAL(orientationChanged(Qt::Orientation)), this, SLOT(on_toolbarOrientationChange(Qt::Orientation)));
 }
 
@@ -142,6 +139,9 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 {
     QueryTab *tab = (QueryTab*) ui->tabBarConnections->widget(index);
 
+    if (tab == nullptr)
+            return;
+
     QMessageBox closeConfirmationDialog;
     closeConfirmationDialog.setWindowTitle(tr("Close?"));
     closeConfirmationDialog.setText(tr("Are you sure you want to close?"));
@@ -160,8 +160,6 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 
         tab->close();
         tab->deleteLater();
-
-        invalidateEnabledStates();
     }
 }
 
@@ -179,17 +177,6 @@ void MainWindow::on_actionNewFile_triggered()
     ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
 
     connect(connectionTab, SIGNAL(textChanged()), this, SLOT(on_currentTabTextChanged()));
-    invalidateEnabledStates();
-}
-
-void MainWindow::invalidateEnabledStates()
-{
-    QueryTab *currentTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
-
-    ui->actionCloseFile->setDisabled(currentTab == nullptr);
-    ui->actionSaveFile->setDisabled(currentTab == nullptr);
-    ui->actionSaveFileAs->setDisabled(currentTab == nullptr);
-    ui->actionQueryBlockAtCursor->setDisabled(currentTab == nullptr);
 }
 
 void MainWindow::on_actionCloseFile_triggered()
@@ -204,13 +191,13 @@ void MainWindow::on_actionOpenFile_triggered()
     if (!filename.isEmpty())
     {
         int index = ui->tabBarConnections->currentIndex();
-        /*if (index >= 0)
+        if (index >= 0)
         {
             //can we "replace" the current tab with the file being opened?
             QueryTab *queryTab = (QueryTab*) ui->tabBarConnections->widget(index);
             if (!queryTab->modified() && queryTab->filename().isEmpty())
                 on_tabBarConnections_tabCloseRequested(index);
-        }*/
+        }
 
         QFileInfo fileInfo(filename);
         QueryTab *connectionTab = new QueryTab(filename, &m_connectionManager, ui->tabBarConnections);
@@ -218,7 +205,6 @@ void MainWindow::on_actionOpenFile_triggered()
         ui->tabBarConnections->setCurrentIndex(ui->tabBarConnections->count()-1);
 
         connect(connectionTab, SIGNAL(textChanged()), this, SLOT(on_currentTabTextChanged()));
-        invalidateEnabledStates();
     }
 }
 
@@ -242,6 +228,10 @@ void MainWindow::saveTab(QueryTab *connectionTab)
 void MainWindow::on_actionSaveFile_triggered()
 {
     QueryTab *connectionTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
+
+    if (connectionTab == nullptr)
+            return;
+
     if (connectionTab->filename().isEmpty())
     {
         changeTabFilename(connectionTab);
@@ -259,6 +249,10 @@ void MainWindow::on_actionSaveFileAs_triggered()
 void MainWindow::on_currentTabTextChanged()
 {
     QueryTab *connectionTab = ((QueryTab*) ui->tabBarConnections->currentWidget());
+
+    if (connectionTab == nullptr)
+            return;
+
     if (connectionTab->modified())
     {
         //have tab text show file has been changed
@@ -349,4 +343,15 @@ void MainWindow::on_toolbarOrientationChange(Qt::Orientation orientation)
         qDebug() << "is horizontal now";
         //change it back here
     }
+}
+
+
+void MainWindow::on_tabBarConnections_currentChanged(int index)
+{
+    QueryTab *currentTab = ((QueryTab*) ui->tabBarConnections->widget(index));
+
+    ui->actionCloseFile->setDisabled(currentTab == nullptr);
+    ui->actionSaveFile->setDisabled(currentTab == nullptr);
+    ui->actionSaveFileAs->setDisabled(currentTab == nullptr);
+    ui->actionQueryBlockAtCursor->setDisabled(currentTab == nullptr);
 }

@@ -71,9 +71,7 @@ void QueryTab::setFilename(const QString &filename)
 
 bool QueryTab::modified() const
 {
-    //fails here
-    //return ui->codeEditor->document()->isModified();
-    return false;
+    return ui->codeEditor->document()->isModified();
 }
 
 void QueryTab::setModified(const bool &modified)

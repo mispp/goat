@@ -38,6 +38,8 @@ private slots:
     void on_actionConnection_Manager_triggered();
     void on_actionQueryBlockAtCursor_triggered();
 
+    void on_tabBarConnections_currentChanged(int index);
+
 public slots:
     void on_connectionListToolButtonExpandTriggered();
     void on_connectionListToolButtonItemTriggered(QAction* triggeredAction);
@@ -50,7 +52,6 @@ private:
     void closeEvent(QCloseEvent *event);
     void writeSettings();
     void readSettings();
-    void invalidateEnabledStates();
 
 	Ui::MainWindow *ui;
     ConnectionManager m_connectionManager;
