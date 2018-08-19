@@ -189,21 +189,7 @@ void MainWindow::invalidateEnabledStates()
     ui->actionCloseFile->setDisabled(currentTab == nullptr);
     ui->actionSaveFile->setDisabled(currentTab == nullptr);
     ui->actionSaveFileAs->setDisabled(currentTab == nullptr);
-
-    bool queryExists = ui->tabBarConnections->currentIndex() != -1;
-    bool isOpen = false;
-
-    if (currentTab != nullptr)
-    {
-        const QString connectionId = currentTab->connectionId();
-
-        if (!connectionId.isEmpty())
-            isOpen = m_connectionManager.isOpen(connectionId);
-        else
-            isOpen = false;
-    }
-
-    ui->actionQueryBlockAtCursor->setDisabled(!isOpen || !queryExists);
+    ui->actionQueryBlockAtCursor->setDisabled(currentTab == nullptr);
 }
 
 void MainWindow::on_actionCloseFile_triggered()
@@ -218,13 +204,13 @@ void MainWindow::on_actionOpenFile_triggered()
     if (!filename.isEmpty())
     {
         int index = ui->tabBarConnections->currentIndex();
-        if (index >= 0)
+        /*if (index >= 0)
         {
             //can we "replace" the current tab with the file being opened?
             QueryTab *queryTab = (QueryTab*) ui->tabBarConnections->widget(index);
             if (!queryTab->modified() && queryTab->filename().isEmpty())
                 on_tabBarConnections_tabCloseRequested(index);
-        }
+        }*/
 
         QFileInfo fileInfo(filename);
         QueryTab *connectionTab = new QueryTab(filename, &m_connectionManager, ui->tabBarConnections);
