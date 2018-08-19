@@ -8,8 +8,12 @@ QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = goat
 TEMPLATE = app
+
+TARGET = goat
+TARGET.files = goat
+TARGET.path = /usr/bin
+INSTALLS += TARGET
 
 
 SOURCES += \
