@@ -47,6 +47,7 @@ public:
     void executeSelectedQuery();
     void displayQueryResults();
     bool isFinished();
+    void killQuery();
 
 private:
     Ui::ConnectionTab *ui;

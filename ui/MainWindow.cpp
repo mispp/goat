@@ -142,6 +142,25 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
     if (tab == nullptr)
             return;
 
+    if (!tab->isFinished())
+    {
+        QMessageBox killQueryMsgBox;
+        killQueryMsgBox.setWindowTitle("Cancel query?");
+        killQueryMsgBox.setText(tr("A query is still running."));
+        killQueryMsgBox.setInformativeText(tr("Query will be forcefuly stopped. Do you wish to continue?"));
+        killQueryMsgBox.setIcon(QMessageBox::Warning);
+        killQueryMsgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        killQueryMsgBox.setMinimumSize(QSize(600, 120));
+        //QSpacerItem* horizontalSpacer = new QSpacerItem(500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        //QGridLayout* layout = (QGridLayout*)closeConfirmationDialog.layout();
+
+        if (killQueryMsgBox.exec()== QMessageBox::Yes)
+        {
+            tab->killQuery();
+        }
+        else return;
+    }
+
     QMessageBox closeConfirmationDialog;
     closeConfirmationDialog.setWindowTitle(tr("Close?"));
     closeConfirmationDialog.setText(tr("Are you sure you want to close?"));

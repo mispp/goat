@@ -208,6 +208,11 @@ bool QueryTab::isFinished()
     return m_queryFuture.isFinished();
 }
 
+void QueryTab::killQuery()
+{
+    m_queryManager.cancelQuery(QSqlDatabase::database(m_connectionIdKill));
+}
+
 void QueryTab::submitQueryForExecution(const QString query)
 {
     if (!query.isEmpty() && !m_connectionIdQuery.isEmpty())
