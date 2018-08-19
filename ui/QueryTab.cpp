@@ -174,7 +174,7 @@ void QueryTab::displayQueryResults()
             m_queryResultsModel.appendRow(row);
         }
 
-        ui->resultsGrid->resizeColumnsToContents();
+        ui->resultsGrid->resizeColumnsToContents(); //this should be resized to header
         ui->resultsTabBar->setCurrentIndex(0);
     }
     else
@@ -287,6 +287,11 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
 {
     QString connectionId = ui->comboBoxConnections->itemData(index, Qt::UserRole+1).toString();
 
+    if (!m_queryFuture.isFinished())
+    {
+        m_queryManager.cancelQuery(QSqlDatabase::database(m_connectionIdKill));
+    }
+
     /*
      *  cloning id done here because QSqlDatabase::database() won't return connections which are created in another thread
      */
@@ -305,8 +310,8 @@ void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
     }
     else
     {
-        m_connectionIdQuery = "CLONED_" + QUuid::createUuid().toString();
-        m_connectionIdKill = "CLONED_KILL_" + QUuid::createUuid().toString();
+        m_connectionIdQuery = "CLONED_" + m_connectionIdQuery + "_" + QUuid::createUuid().toString();
+        m_connectionIdKill = "CLONED_KILL_" + m_connectionIdKill + "_" + QUuid::createUuid().toString();
         QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdQuery);
         QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdKill);
     }
