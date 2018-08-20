@@ -45,10 +45,18 @@ To be considered:
 
 # Installing
 
-## Opensuse Tumbleweed
+## Opensuse
 
+Tumbleweed:
 ```
 zypper ar https://download.opensuse.org/repositories/home:/misp/openSUSE_Tumbleweed/ goatrepo
+zypper ref
+zypper in goat
+```
+
+Leap 15:
+```
+zypper ar https://download.opensuse.org/repositories/home:/misp/openSUSE_Leap_15.0/ goatrepo
 zypper ref
 zypper in goat
 ```
