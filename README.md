@@ -49,6 +49,7 @@ To be considered:
 
 ```
 zypper ar https://download.opensuse.org/repositories/home:/misp/openSUSE_Tumbleweed/ goatrepo
+zypper ref
 zypper in goat
 ```
 
@@ -60,7 +61,7 @@ mkdir build
 cd build
 qmake ..
 make
-./Goat
+./goat
 ```
 
 # Recognitions
