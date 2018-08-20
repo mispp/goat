@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=Development
+StartupNotify=true
+Exec=/usr/bin/goat
+Name=Goat
+GenericName=Goat database management
+Terminal=false
+Type=Application
+Icon=goat
+
