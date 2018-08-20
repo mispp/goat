@@ -1,0 +1,17 @@
+name: goat
+version: '0.1'
+summary: Goat database management
+description: |
+  Goat database management, DB frontend written in Qt5
+
+grade: devel
+confinement: devmode
+
+parts:
+  goat:
+    # See 'snapcraft plugins'
+    plugin: qmake
+    source: https://github.com/mispp/goat.git
+    build-packages:
+      - g++
+      - make
