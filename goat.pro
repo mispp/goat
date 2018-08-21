@@ -60,11 +60,10 @@ RESOURCES += \
     resources/data.qrc \
     resources/icons.qrc
 
+ICON.files = packaging/goat.png
+ICON.path = /usr/share/icons/hicolor/16x16
+INSTALLS += ICON
 
 DESKTOP.files = packaging/goat.desktop
 DESKTOP.path = /usr/share/applications
 INSTALLS += DESKTOP
-
-ICON.files = resources/icons/silk/database.png
-ICON.path = /usr/share/icons/hicolor/16x16
-INSTALLS += ICON
