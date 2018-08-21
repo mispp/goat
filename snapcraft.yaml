@@ -12,7 +12,7 @@ base: core18
 
 apps:
   goat:
-    command: /usr/bin/goat
+    command: usr/bin/goat
 
 parts:
   goat:
