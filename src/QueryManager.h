@@ -33,15 +33,13 @@ public:
 
 private:
     bool m_querySuccess;
-    int m_postgresBackendPID;
+    int m_killPid;
     QString m_queryString;
     QSqlQuery m_query;
     QString m_clonedConnectionId;
     QDateTime m_startTime;
     QDateTime m_endTime;
     QList<QString> m_columnNames;
-
-    void killQueryPostgres(QSqlDatabase database, int pid);
 
 signals:
     void finished();
