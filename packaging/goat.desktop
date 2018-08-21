@@ -1,5 +1,5 @@
 [Desktop Entry]
-Categories=Qt;KDE;Development;Database;
+Categories=Development;Utility;Database;
 StartupNotify=true
 Exec=/usr/bin/goat
 Name=Goat
