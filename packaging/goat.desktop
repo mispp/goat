@@ -1,5 +1,5 @@
 [Desktop Entry]
-Categories=Development
+Categories=Development;
 StartupNotify=true
 Exec=/usr/bin/goat
 Name=Goat
