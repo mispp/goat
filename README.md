@@ -8,7 +8,7 @@ This app was made for 2 reasons:
 1. necessity: there is no app in native toolkit available for linux that has querying functionality (there is a plugin for kate in kde, but this just doesnt work for me; not sure about gnome)
 2. learning: improve my qt skills. i'm not a c++ developer, so please excuse shitty code quality
 
-Contributions are welcome!
+Note: what i learned so far is that i shouldn't commit directly to master. From now on development will be done in the dev branch.
 
 What works:
 - connection manager
@@ -42,7 +42,6 @@ To be considered:
 - evaluate scintilla/qscintilla or ktextedit/ktexteditor
 - move from qt classes to native libs (e.g. libpq)
 
-
 # Installing
 
 ## Opensuse
@@ -71,6 +70,18 @@ qmake ..
 make
 ./goat
 ```
+
+# Contributing
+
+Contributions are very welcome!
+
+Following is needed:
+- logo
+- packaging
+
+and not to mention 
+
+- Qt skills
 
 # Recognitions
 
