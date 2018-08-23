@@ -115,6 +115,10 @@ Connection::Connection(const QString &connectionId, const QString &driver, const
     setText(m_name);
 }
 
+Connection::Connection(const Connection &connection) : Connection(connection.connectionId(), connection.driver(), connection.name(), connection.details())
+{
+}
+
 QMap<QString, QString> Connection::details() const
 {
     return m_details;
@@ -143,6 +147,7 @@ QString Connection::name() const
 void Connection::setName(const QString &name)
 {
     m_name = name;
+    setText(m_name);
 }
 
 QString Connection::connectionId() const

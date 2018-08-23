@@ -15,9 +15,10 @@ class ConnectionWidget : public QWidget
 	Q_OBJECT
 
 public:
-    explicit ConnectionWidget(const Connection &connection, QWidget *parent = 0);
+    explicit ConnectionWidget(QWidget *parent = 0);
     ~ConnectionWidget();
     Connection getConnection() const;
+    void setConnection(const Connection &connection);
 
 private slots:
     void on_listDropdownDBDriver_currentIndexChanged(int index);

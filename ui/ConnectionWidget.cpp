@@ -8,12 +8,12 @@
 #include "ui_ConnectionWidget.h"
 #include "src/ConnectionManager.h"
 
-ConnectionWidget::ConnectionWidget(const Connection &connection, QWidget *parent) :	QWidget(parent), ui(new Ui::ConnectionWidget)
+ConnectionWidget::ConnectionWidget(QWidget *parent) :	QWidget(parent), ui(new Ui::ConnectionWidget)
 {
 	ui->setupUi(this);
     this->ignoreChanges = true;
     ui->listDropdownDBDriver->setModel(&m_driversModel);
-    this->m_connection = connection;
+    m_connection = Connection::defaultConnection();
 
     QMap<QString, QString> drivers;
     drivers["PostgreSQL"] = "QPSQL";
@@ -173,4 +173,12 @@ void ConnectionWidget::on_chooseDatabaseFileButton_clicked()
             ui->txtDatabase->setText(filename);
         }
     }
+}
+
+void ConnectionWidget::setConnection(const Connection &connection)
+{
+    ignoreChanges = true;
+    m_connection = connection;
+    setUiValues(m_connection);
+    ignoreChanges = false;
 }

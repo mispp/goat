@@ -10,22 +10,7 @@
 ConnectionManagerDialog::ConnectionManagerDialog(ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QDialog(parent), ui(new Ui::ConnectionManagerDialog)
 {
 	ui->setupUi(this);
-
-    ui->listDropdownDBDriver->setModel(&m_driversModel);
     ui->listViewConnections->setModel(&m_connectionListModel);
-
-    /* set combobox */
-    QMap<QString, QString> drivers;
-    drivers["PostgreSQL"] = "QPSQL";
-    drivers["MySQL/MariaDB"] = "QMYSQL";
-    drivers["Sqlite"] = "QSQLITE";
-
-    foreach(QString key, drivers.keys())
-    {
-        QStandardItem* item = new QStandardItem(key);
-        item->setData(drivers[key], Qt::UserRole+1);
-        m_driversModel.appendRow(item);
-    }
 
     populateConnectionListModel();
 
@@ -81,7 +66,8 @@ void ConnectionManagerDialog::on_rowsInserted(const QModelIndex &source_parent, 
 
 void ConnectionManagerDialog::on_buttonNewConnection_released()
 {
-    Connection* newConnection = new Connection();
+    Connection* newConnection = new Connection(Connection::defaultConnection());
+
     m_connectionListModel.appendRow(newConnection);
     m_connectionManager->saveConnection(*newConnection);
 }
@@ -97,15 +83,7 @@ void ConnectionManagerDialog::on_listViewSelectionChanged(QItemSelection current
     Q_UNUSED(current);
     Q_UNUSED(previous);
 
-    //QMap<QString, QVariant> connectionDefinition = getSelectedConnectionDefinition();
-
-    int driverIndex = ui->listDropdownDBDriver->findData(getSelectedConnection()->driver(), Qt::UserRole+1);
-    ui->listDropdownDBDriver->setCurrentIndex(driverIndex);
-    ui->txtUser->setText(getSelectedConnection()->details()["username"]);
-    ui->txtPass->setText(getSelectedConnection()->details()["pass"]);
-    ui->txtServer->setText(getSelectedConnection()->details()["server"]);
-    ui->txtPort->setText(getSelectedConnection()->details()["port"]);
-    ui->txtDatabase->setText(getSelectedConnection()->details()["database"]);
+    ui->connectionWidget->setConnection(*getSelectedConnection());
 
     //enable UI to be edited
     enableEditing();
@@ -125,22 +103,15 @@ void ConnectionManagerDialog::populateConnectionListModel() {
 void ConnectionManagerDialog::updateCurrentlySelectedConnection()
 {
     Connection *selectedConnection = getSelectedConnection();
+    Connection connection = ui->connectionWidget->getConnection();
 
     if (selectedConnection != nullptr)
     {
-        QMap<QString, QString> details;
-
-        details["database"] = ui->txtDatabase->text();
-        details["pass"] = ui->txtPass->text();
-        details["port"] = ui->txtPort->text();
-        details["server"] = ui->txtServer->text();
-        details["username"] = ui->txtUser->text();
-
         if (!selectedConnection->connectionId().isEmpty())
         {
-            selectedConnection->setDetails(details);
-            selectedConnection->setDriver(ui->listDropdownDBDriver->currentData(Qt::UserRole+1).toString());
-            selectedConnection->setName(selectedConnection->text());
+            selectedConnection->setDetails(connection.details());
+            selectedConnection->setDriver(connection.driver());
+            selectedConnection->setName(connection.name());
             m_connectionManager->saveConnection(*selectedConnection);
         }
     }
@@ -175,12 +146,7 @@ void ConnectionManagerDialog::on_button_deleteConnection_released()
 void ConnectionManagerDialog::disableEditing()
 {
     /* disable ui to be edited until we have connection selected/created */
-    ui->txtDatabase->setDisabled(true);
-    ui->txtPass->setDisabled(true);
-    ui->txtPort->setDisabled(true);
-    ui->txtServer->setDisabled(true);
-    ui->txtUser->setDisabled(true);
-    ui->listDropdownDBDriver->setDisabled(true);
+    ui->connectionWidget->setDisabled(true);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
 }
@@ -189,11 +155,6 @@ void ConnectionManagerDialog::enableEditing()
 {
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
-    ui->txtDatabase->setEnabled(true);
-    ui->txtPass->setEnabled(true);
-    ui->txtPort->setEnabled(true);
-    ui->txtServer->setEnabled(true);
-    ui->txtUser->setEnabled(true);
-    ui->listDropdownDBDriver->setEnabled(true);
+    ui->connectionWidget->setEnabled(true);
 }
 
