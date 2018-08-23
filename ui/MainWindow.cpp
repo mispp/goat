@@ -4,6 +4,7 @@
 #include "ui/AboutDialog.h"
 #include "ui/ConnectionManagerDialog.h"
 
+#include <QApplication>
 #include <QCloseEvent>
 #include <QDebug>
 #include <QFileDialog>
@@ -113,7 +114,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::readSettings()
 {
-	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "settings");
+	QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "settings");
 	settings.beginGroup("MainWindow");
 
 	resize(settings.value("size",  QSize(640, 480)).toSize());
@@ -125,7 +126,7 @@ void MainWindow::readSettings()
 
 void MainWindow::writeSettings()
 {
-	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "settings");
+	QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "settings");
 	settings.beginGroup("MainWindow");
 
 	settings.setValue("size", this->size());
