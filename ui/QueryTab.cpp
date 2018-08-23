@@ -24,7 +24,7 @@
 #include <QSqlRecord>
 #include <QScrollBar>
 
-QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QWidget(parent), ui(new Ui::ConnectionTab)
+QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : QWidget(parent), ui(new Ui::ConnectionTab), m_connectionManager(connectionManager)
 {
 	ui->setupUi(this);
 
