@@ -83,7 +83,7 @@ Connection ConnectionDialog::getConnection() const
     return m_connection;
 }
 
-void ConnectionDialog::on_listDropdownDBDriver_currentIndexChanged(int index)
+void ConnectionDialog::on_listDropdownDBDriver_currentIndexChanged(int)
 {
     if (this->ignoreChanges)
         return;
@@ -137,32 +137,32 @@ void ConnectionDialog::updateConnection()
     m_connection = buildConnection();
 }
 
-void ConnectionDialog::on_txtName_textChanged(const QString &arg1)
+void ConnectionDialog::on_txtName_textChanged(const QString &)
 {
     m_connection.setName(ui->txtName->text());
 }
 
-void ConnectionDialog::on_txtServer_textChanged(const QString &arg1)
+void ConnectionDialog::on_txtServer_textChanged(const QString &)
 {
     updateConnection();
 }
 
-void ConnectionDialog::on_txtPort_textChanged(const QString &arg1)
+void ConnectionDialog::on_txtPort_textChanged(const QString &)
 {
     updateConnection();
 }
 
-void ConnectionDialog::on_txtDatabase_textChanged(const QString &arg1)
+void ConnectionDialog::on_txtDatabase_textChanged(const QString &)
 {
     updateConnection();
 }
 
-void ConnectionDialog::on_txtUser_textChanged(const QString &arg1)
+void ConnectionDialog::on_txtUser_textChanged(const QString &)
 {
     updateConnection();
 }
 
-void ConnectionDialog::on_txtPass_textChanged(const QString &arg1)
+void ConnectionDialog::on_txtPass_textChanged(const QString &)
 {
     updateConnection();
 }
