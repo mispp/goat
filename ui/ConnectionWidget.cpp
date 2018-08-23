@@ -73,7 +73,7 @@ Connection ConnectionWidget::getConnection() const
     return m_connection;
 }
 
-void ConnectionWidget::on_listDropdownDBDriver_currentIndexChanged(int index)
+void ConnectionWidget::on_listDropdownDBDriver_currentIndexChanged(int)
 {
     if (this->ignoreChanges)
         return;
@@ -127,32 +127,32 @@ void ConnectionWidget::updateConnection()
     m_connection = buildConnection();
 }
 
-void ConnectionWidget::on_txtName_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtName_textChanged(const QString &)
 {
     m_connection.setName(ui->txtName->text());
 }
 
-void ConnectionWidget::on_txtServer_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtServer_textChanged(const QString &)
 {
     updateConnection();
 }
 
-void ConnectionWidget::on_txtPort_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtPort_textChanged(const QString &)
 {
     updateConnection();
 }
 
-void ConnectionWidget::on_txtDatabase_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtDatabase_textChanged(const QString &)
 {
     updateConnection();
 }
 
-void ConnectionWidget::on_txtUser_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtUser_textChanged(const QString &)
 {
     updateConnection();
 }
 
-void ConnectionWidget::on_txtPass_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtPass_textChanged(const QString &)
 {
     updateConnection();
 }
