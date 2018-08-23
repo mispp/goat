@@ -1,28 +1,25 @@
-#ifndef CONNECTIONDIALOG_H
-#define CONNECTIONDIALOG_H
+#ifndef CONNECTIONWIDGET_H
+#define CONNECTIONWIDGET_H
 
 #include "src/Connection.h"
 
-#include <QDialog>
 #include <QStandardItemModel>
+#include <QWidget>
 
 namespace Ui {
-class ConnectionDialog;
+class ConnectionWidget;
 }
 
-class ConnectionDialog : public QDialog
+class ConnectionWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-    explicit ConnectionDialog(const Connection &connection, QWidget *parent = 0);
-    ~ConnectionDialog();
+    explicit ConnectionWidget(const Connection &connection, QWidget *parent = 0);
+    ~ConnectionWidget();
     Connection getConnection() const;
 
 private slots:
-    void on_buttonBox_accepted();
-	void on_buttonBox_rejected();
-
     void on_listDropdownDBDriver_currentIndexChanged(int index);
     void on_txtName_textChanged(const QString &arg1);
     void on_txtServer_textChanged(const QString &arg1);
@@ -33,7 +30,7 @@ private slots:
     void on_chooseDatabaseFileButton_clicked();
 
 private:
-    Ui::ConnectionDialog *ui;
+    Ui::ConnectionWidget *ui;
     QStandardItemModel m_driversModel;
     Connection m_connection;
     bool ignoreChanges;
@@ -46,4 +43,4 @@ private:
     void updateConnection();
 };
 
-#endif // CONNECTIONDIALOG_H
+#endif // CONNECTIONWIDGET_H

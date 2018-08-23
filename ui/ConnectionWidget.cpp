@@ -4,11 +4,11 @@
 #include <QSettings>
 #include <QUuid>
 
-#include "ui/ConnectionDialog.h"
-#include "ui_ConnectionDialog.h"
+#include "ui/ConnectionWidget.h"
+#include "ui_ConnectionWidget.h"
 #include "src/ConnectionManager.h"
 
-ConnectionDialog::ConnectionDialog(const Connection &connection, QWidget *parent) :	QDialog(parent), ui(new Ui::ConnectionDialog)
+ConnectionWidget::ConnectionWidget(const Connection &connection, QWidget *parent) :	QWidget(parent), ui(new Ui::ConnectionWidget)
 {
 	ui->setupUi(this);
     this->ignoreChanges = true;
@@ -31,11 +31,11 @@ ConnectionDialog::ConnectionDialog(const Connection &connection, QWidget *parent
     this->ignoreChanges = false;
 }
 
-ConnectionDialog::~ConnectionDialog() {
+ConnectionWidget::~ConnectionWidget() {
 	delete ui;
 }
 
-void ConnectionDialog::setUiValues(const Connection &connection)
+void ConnectionWidget::setUiValues(const Connection &connection)
 {
     int idx = ui->listDropdownDBDriver->findData(connection.driver(), Qt::UserRole + 1);
     ui->listDropdownDBDriver->setCurrentIndex(idx);
@@ -53,7 +53,7 @@ void ConnectionDialog::setUiValues(const Connection &connection)
     ui->txtPass->setDisabled(connection.driver() == "QSQLITE");
 }
 
-Connection ConnectionDialog::buildConnection()
+Connection ConnectionWidget::buildConnection()
 {
     QString driver = ui->listDropdownDBDriver->currentData(Qt::UserRole + 1).toString();
 
@@ -68,22 +68,12 @@ Connection ConnectionDialog::buildConnection()
     return connection;
 }
 
-void ConnectionDialog::on_buttonBox_accepted() {
-
-    m_connection = buildConnection();
-	accept();
-}
-
-void ConnectionDialog::on_buttonBox_rejected() {
-	reject();
-}
-
-Connection ConnectionDialog::getConnection() const
+Connection ConnectionWidget::getConnection() const
 {
     return m_connection;
 }
 
-void ConnectionDialog::on_listDropdownDBDriver_currentIndexChanged(int index)
+void ConnectionWidget::on_listDropdownDBDriver_currentIndexChanged(int index)
 {
     if (this->ignoreChanges)
         return;
@@ -125,7 +115,7 @@ void ConnectionDialog::on_listDropdownDBDriver_currentIndexChanged(int index)
     m_connection = connection;
 }
 
-void ConnectionDialog::updateConnection()
+void ConnectionWidget::updateConnection()
 {
     if (this->ignoreChanges)
         return;
@@ -137,37 +127,37 @@ void ConnectionDialog::updateConnection()
     m_connection = buildConnection();
 }
 
-void ConnectionDialog::on_txtName_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtName_textChanged(const QString &arg1)
 {
     m_connection.setName(ui->txtName->text());
 }
 
-void ConnectionDialog::on_txtServer_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtServer_textChanged(const QString &arg1)
 {
     updateConnection();
 }
 
-void ConnectionDialog::on_txtPort_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtPort_textChanged(const QString &arg1)
 {
     updateConnection();
 }
 
-void ConnectionDialog::on_txtDatabase_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtDatabase_textChanged(const QString &arg1)
 {
     updateConnection();
 }
 
-void ConnectionDialog::on_txtUser_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtUser_textChanged(const QString &arg1)
 {
     updateConnection();
 }
 
-void ConnectionDialog::on_txtPass_textChanged(const QString &arg1)
+void ConnectionWidget::on_txtPass_textChanged(const QString &arg1)
 {
     updateConnection();
 }
 
-void ConnectionDialog::on_chooseDatabaseFileButton_clicked()
+void ConnectionWidget::on_chooseDatabaseFileButton_clicked()
 {
     QFileDialog dialog(this);
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
