@@ -1,5 +1,6 @@
 #include "ConnectionManager.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QGridLayout>
 #include <QMessageBox>
@@ -89,7 +90,7 @@ void ConnectionManager::saveConnection(const Connection &connection)
 
     m_connections[connection.connectionId()] = connection;
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "connections");
 
     settings.beginGroup(connection.connectionId());
 
@@ -111,7 +112,7 @@ void ConnectionManager::deleteConnection(const QString &connectionId)
     closeConnection(connectionId);
     m_connections.remove(connectionId);
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "connections");
     settings.remove(connectionId);
     settings.sync();
 
@@ -156,7 +157,7 @@ QList<Connection> ConnectionManager::loadConnections()
 {
     QList<Connection> connections;
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "goat", "connections");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "connections");
 
     foreach(QString connectionId, settings.childGroups())
     {
