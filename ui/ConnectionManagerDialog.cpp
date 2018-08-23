@@ -7,7 +7,7 @@
 #include "ui_ConnectionManagerDialog.h"
 #include "src/ConnectionManager.h"
 
-ConnectionManagerDialog::ConnectionManagerDialog(ConnectionManager *connectionManager, QWidget *parent) : m_connectionManager(connectionManager), QDialog(parent), ui(new Ui::ConnectionManagerDialog)
+ConnectionManagerDialog::ConnectionManagerDialog(ConnectionManager *connectionManager, QWidget *parent) : QDialog(parent), ui(new Ui::ConnectionManagerDialog), m_connectionManager(connectionManager)
 {
 	ui->setupUi(this);
 
