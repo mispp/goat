@@ -26,7 +26,7 @@ SOURCES += \
     ui/CodeEditor.cpp \
     ui/Highlighter.cpp \
     ui/AboutDialog.cpp \
-    ui/ConnectionDialog.cpp \
+    ui/ConnectionWidget.cpp \
     ui/ConnectionManagerDialog.cpp \
     ui/QueryTab.cpp \
     src/QueryManager.cpp
@@ -39,7 +39,7 @@ HEADERS  += \
     ui/CodeEditor.h \
     ui/Highlighter.h \
     ui/AboutDialog.h \
-    ui/ConnectionDialog.h \
+    ui/ConnectionWidget.h \
     ui/ConnectionManagerDialog.h \
     ui/QueryTab.h \
     src/QueryManager.h
@@ -47,7 +47,7 @@ HEADERS  += \
 FORMS    += \
     ui/MainWindow.ui \
     ui/AboutDialog.ui \
-    ui/ConnectionDialog.ui \
+    ui/ConnectionWidget.ui \
     ui/ConnectionManagerDialog.ui \
     ui/QueryTab.ui
 

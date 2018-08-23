@@ -13,6 +13,7 @@ public:
 
     Connection();
     Connection(const QString &connectionId, const QString &driver, const QString &name, const QMap<QString, QString> &details);
+    Connection(const Connection &connection);
     QString connectionId() const;
     QString driver() const;
     void setDriver(const QString &driver);

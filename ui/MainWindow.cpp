@@ -1,6 +1,5 @@
 #include "ui/MainWindow.h"
 #include "ui_MainWindow.h"
-#include "ui/ConnectionDialog.h"
 #include "ui/QueryTab.h"
 #include "ui/AboutDialog.h"
 #include "ui/ConnectionManagerDialog.h"
