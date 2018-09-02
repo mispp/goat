@@ -13,6 +13,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 SOURCES += \
     src/ConnectionManager.cpp \
     src/Connection.cpp \
+    src/Csv.cpp \
+    ui/TableView.cpp \
     ui/MainWindow.cpp \
     ui/CodeEditor.cpp \
     ui/Highlighter.cpp \
@@ -27,6 +29,8 @@ SOURCES += \
 HEADERS  += \
     src/ConnectionManager.h \
     src/Connection.h \
+    src/Csv.h \
+    ui/TableView.h \
     ui/MainWindow.h \
     ui/CodeEditor.h \
     ui/Highlighter.h \
@@ -40,6 +44,7 @@ HEADERS  += \
 
 FORMS    += \
     ui/MainWindow.ui \
+    ui/TableView.ui \
     ui/AboutDialog.ui \
     ui/ConnectionWidget.ui \
     ui/ConnectionManagerDialog.ui \
