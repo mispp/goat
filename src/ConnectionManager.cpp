@@ -13,6 +13,8 @@
 #include <QSqlQuery>
 #include <QAction>
 
+#include "StringUtils.h"
+
 ConnectionManager::ConnectionManager() : QObject()
 {
     foreach(Connection connection, loadConnections())
@@ -37,11 +39,29 @@ void ConnectionManager::openConnection(const Connection &connection)
 
     QSqlDatabase db = QSqlDatabase::addDatabase(connection.driver(), connection.connectionId());
 
-    db.setHostName(connection.details()["server"]);
-    db.setDatabaseName(connection.details()["database"]);
-    db.setUserName(connection.details()["username"]);
-    db.setPassword(connection.details()["pass"]);
-    db.setPort(connection.details()["port"].toInt());
+    if (connection.driver() == "QODBC")
+    {
+        QMap<QString, QString> values;
+
+        foreach (QString key, connection.details().keys())
+        {
+            values[key] = connection.details()[key];
+            values["escaped-" + key] = connection.details()[key].replace("}", "}}");
+        }
+
+        QString databaseName = StringUtils::interpolate(values["connection"], values);
+        db.setDatabaseName(databaseName);
+        db.setConnectOptions(connection.details()["options"]);
+    }
+    else
+    {
+        db.setHostName(connection.details()["server"]);
+        db.setPort(connection.details()["port"].toInt());
+        db.setDatabaseName(connection.details()["database"]);
+        db.setConnectOptions(connection.details()["options"]);
+        db.setUserName(connection.details()["username"]);
+        db.setPassword(connection.details()["pass"]);
+    }
 
 	bool ok = db.open();
 

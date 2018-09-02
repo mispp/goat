@@ -29,6 +29,7 @@ private slots:
     void on_txtUser_textChanged(const QString &arg1);
     void on_txtPass_textChanged(const QString &arg1);
     void on_chooseDatabaseFileButton_clicked();
+    void on_optionDocumentionButton_clicked();
 
 private:
     Ui::ConnectionWidget *ui;

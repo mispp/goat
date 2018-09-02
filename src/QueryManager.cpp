@@ -41,6 +41,8 @@ bool QueryManager::executeQuery(QSqlDatabase database, const QString query)
             sql = "select pg_backend_pid();";
         else if (clonedDatabase.driverName() == "QMYSQL")
             sql = "SELECT CONNECTION_ID();";
+        else if (clonedDatabase.driverName() == "QODBC")
+            sql = "SELECT @@SPID;";
 
         /* get postgres cancel query pid */
         if (clonedDatabase.isOpen() && !sql.isEmpty())
@@ -98,6 +100,8 @@ void QueryManager::cancelQuery(QSqlDatabase database)
         sql = "SELECT pg_cancel_backend(:pid);";
     else if (kill_db.driverName() == "QMYSQL")
         sql = "KILL QUERY :pid";
+    else if (kill_db.driverName() == "QODBC")
+        sql = "KILL :pid";
     else
         return;
 
