@@ -10,16 +10,7 @@ CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TEMPLATE = app
-
-TARGET = goat
-TARGET.files = goat
-TARGET.path = /usr/bin
-INSTALLS += TARGET
-
-
 SOURCES += \
-    src/main.cpp \
     src/ConnectionManager.cpp \
     src/Connection.cpp \
     ui/MainWindow.cpp \
@@ -29,7 +20,8 @@ SOURCES += \
     ui/ConnectionWidget.cpp \
     ui/ConnectionManagerDialog.cpp \
     ui/QueryTab.cpp \
-    src/QueryManager.cpp
+    src/QueryManager.cpp \
+    src/StringUtils.cpp
 
 
 HEADERS  += \
@@ -42,7 +34,9 @@ HEADERS  += \
     ui/ConnectionWidget.h \
     ui/ConnectionManagerDialog.h \
     ui/QueryTab.h \
-    src/QueryManager.h
+    src/QueryManager.h \
+    src/StringUtils.h
+
 
 FORMS    += \
     ui/MainWindow.ui \
@@ -60,10 +54,39 @@ RESOURCES += \
     resources/data.qrc \
     resources/icons.qrc
 
-ICON.files = packaging/goat.png
-ICON.path = /usr/share/icons/hicolor/16x16
-INSTALLS += ICON
+test {
 
-DESKTOP.files = packaging/goat.desktop
-DESKTOP.path = /usr/share/applications
-INSTALLS += DESKTOP
+    TEMPLATE = app
+    TARGET = tests
+
+    QT += testlib
+
+    HEADERS += \
+		test/TestStringUtils.h
+
+    SOURCES += \
+	    test/TestStringUtils.cpp \
+			test/test_main.cpp
+
+} else {
+
+	TEMPLATE = app
+
+	TARGET = goat
+	TARGET.files = goat
+	TARGET.path = /usr/bin
+	INSTALLS += TARGET
+
+	SOURCES += \
+		src/main.cpp
+
+	ICON.files = packaging/goat.png
+	ICON.path = /usr/share/icons/hicolor/16x16
+	INSTALLS += ICON
+
+	DESKTOP.files = packaging/goat.desktop
+	DESKTOP.path = /usr/share/applications
+	INSTALLS += DESKTOP
+
+}
+

@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QDesktopServices>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
@@ -18,6 +19,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :	QWidget(parent), ui(new Ui
     QMap<QString, QString> drivers;
     drivers["PostgreSQL"] = "QPSQL";
     drivers["MySQL/MariaDB"] = "QMYSQL";
+    drivers["ODBC/MS Sql Server"] = "QODBC";
     drivers["Sqlite"] = "QSQLITE";
 
     foreach(QString key, drivers.keys())
@@ -45,12 +47,20 @@ void ConnectionWidget::setUiValues(const Connection &connection)
     ui->txtDatabase->setText(connection.details()["database"]);
     ui->txtUser->setText(connection.details()["username"]);
     ui->txtPass->setText(connection.details()["pass"]);
+    ui->txtOptions->setText(connection.details()["options"]);
+    ui->txtConnection->setText(connection.details()["connection"]);
+    ui->txtLibrary->setText(connection.details()["library"]);
+    ui->txtSetup->setText(connection.details()["setup"]);
 
     ui->chooseDatabaseFileButton->setDisabled(connection.driver() != "QSQLITE");
     ui->txtServer->setDisabled(connection.driver() == "QSQLITE");
     ui->txtPort->setDisabled(connection.driver() == "QSQLITE");
     ui->txtUser->setDisabled(connection.driver() == "QSQLITE");
     ui->txtPass->setDisabled(connection.driver() == "QSQLITE");
+
+    ui->txtConnection->setDisabled(connection.driver() != "QODBC");
+    ui->txtLibrary->setDisabled(connection.driver() != "QODBC");
+    ui->txtSetup->setDisabled(connection.driver() != "QODBC");
 }
 
 Connection ConnectionWidget::buildConnection()
@@ -63,6 +73,11 @@ Connection ConnectionWidget::buildConnection()
     details["database"] = ui->txtDatabase->text();
     details["username"] = ui->txtUser->text();
     details["pass"] = ui->txtPass->text();
+    details["options"] = ui->txtOptions->text();
+
+    details["connection"] = ui->txtConnection->text();
+    details["library"] = ui->txtLibrary->text();
+    details["setup"] = ui->txtSetup->text();
 
     Connection connection(m_connection.connectionId(), driver, ui->txtName->text(), details);
     return connection;
@@ -103,6 +118,13 @@ void ConnectionWidget::on_listDropdownDBDriver_currentIndexChanged(int)
             details.remove("port");
             details.remove("username");
             details.remove("pass");
+        }
+
+        if (connection.driver() != "QODBC")
+        {
+            details.remove("connection");
+            details.remove("library");
+            details.remove("setup");
         }
     }
 
@@ -181,4 +203,9 @@ void ConnectionWidget::setConnection(const Connection &connection)
     m_connection = connection;
     setUiValues(m_connection);
     ignoreChanges = false;
+}
+
+void ConnectionWidget::on_optionDocumentionButton_clicked()
+{
+    QDesktopServices::openUrl(QUrl("http://doc.qt.io/qt-5/qsqldatabase.html#setConnectOptions", QUrl::TolerantMode));
 }

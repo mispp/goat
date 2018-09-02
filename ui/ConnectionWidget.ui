@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>498</width>
-    <height>351</height>
+    <width>600</width>
+    <height>432</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,13 +16,33 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
+     <item row="7" column="0">
+      <widget class="QLabel" name="optionsLabel">
+       <property name="text">
+        <string>Options:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="2" colspan="2">
+      <widget class="QLineEdit" name="txtLibrary"/>
+     </item>
+     <item row="10" column="2" colspan="2">
+      <widget class="QLineEdit" name="txtSetup"/>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Library:</string>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="label_6">
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
        </property>
        <property name="text">
-        <string>Database:</string>
+        <string>Driver:</string>
        </property>
       </widget>
      </item>
@@ -166,6 +186,40 @@
         <bool>false</bool>
        </property>
       </widget>
+     </item>
+     <item row="10" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Setup:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="3">
+      <widget class="QPushButton" name="optionDocumentionButton">
+       <property name="toolTip">
+        <string>Open Connection Options Documentation</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/icons.qrc">
+         <normaloff>:/icons/silk/icons/silk/help.png</normaloff>:/icons/silk/icons/silk/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="connectionLabel">
+       <property name="text">
+        <string>Connection:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="2" colspan="2">
+      <widget class="QLineEdit" name="txtOptions"/>
+     </item>
+     <item row="8" column="2" colspan="2">
+      <widget class="QLineEdit" name="txtConnection"/>
      </item>
     </layout>
    </item>
