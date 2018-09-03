@@ -29,6 +29,6 @@ private:
     QMap<QString, QString> m_details;
 };
 
-//Q_DECLARE_METATYPE(Connection*);
+Q_DECLARE_METATYPE(Connection)
 
 #endif // CONNECTION_H

@@ -24,39 +24,62 @@
 #include <QSqlRecord>
 #include <QScrollBar>
 
-QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) : QWidget(parent), ui(new Ui::ConnectionTab), m_connectionManager(connectionManager)
+QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::ConnectionTab),
+    m_connectionManager(connectionManager),
+    m_tabId("TAB_" + QUuid::createUuid().toString()),
+    m_filename(filename)
 {
 	ui->setupUi(this);
 
-    m_filename = filename;
+    qDebug () << "tab created with id: " + m_tabId;
+
+    qRegisterMetaType<QSqlRecord>("QSqlRecord");
 
     ui->resultsGrid->setModel(&m_queryResultsModel);
     ui->comboBoxConnections->setModel(&m_openConnectionsModel);
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
-    //ui->button_selectionQuery->setEnabled(false);
-    ui->button_stopQuery->setEnabled(false);
-
     readFile();
     setModified(false);
     refreshOpenConnections();
 
-    connect(ui->codeEditor, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
-    connect(m_connectionManager, SIGNAL(connectionStateChanged()), this, SLOT(refreshOpenConnections()));
-    connect(&m_queryManager, SIGNAL(finished()), this, SLOT(queryFinished()));
+    //handle file changes
+    connect(ui->codeEditor, &CodeEditor::textChanged, this, &QueryTab::textChanged);
 
-    connect(ui->resultsGrid->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(on_resultsGridSliderAtEnd(int)));
+    //handle connection changes
+    connect(m_connectionManager, &ConnectionManager::connectionStateChanged, this, &QueryTab::refreshOpenConnections);
+
+    //get thread for query to be displayed
+    m_queryThread = new QThread();
+    m_query = new Query();
+    m_query->moveToThread(m_queryThread);
+    connect(m_queryThread, &QThread::finished, m_queryThread, &QThread::deleteLater);
+    connect(m_queryThread, &QThread::finished, m_query, &Query::deleteLater);
+    connect(this, &QueryTab::executeSql, m_query, &Query::executeSql); //push sql to query object
+    connect(m_query, &Query::queryExecutionFinished, this, &QueryTab::on_queryFinished); //when successfull
+    connect(m_query, &Query::queryExecutionFailed, this, &QueryTab::on_queryFailed); //when fail
+    connect(this, &QueryTab::requestNextRowSet, m_query, &Query::requestNextRowSet); //push request for more rows
+    connect(m_query, &Query::nextRowSet, this, &QueryTab::on_rowSetReceived); //handle results
+    m_queryThread->start();
+
+    //handle tableview
+    connect(ui->resultsGrid->verticalScrollBar(), &QScrollBar::valueChanged, this, &QueryTab::on_resultsGridSliderAtEnd);
+
+
+    /* todo
+     *
+     * add another object, query stopper in its own thread
+     */
+
 }
 
 QueryTab::~QueryTab()
 {
 	delete ui;
 
-    if (!m_connectionIdQuery.isEmpty())
-    {
-        QSqlDatabase::database(m_connectionIdQuery).close();
-        QSqlDatabase::removeDatabase(m_connectionIdQuery);
-    }
+    m_queryThread->quit();
 }
 
 QString QueryTab::filename() const
@@ -139,100 +162,101 @@ void QueryTab::writeFile()
     }
 }
 
-QString QueryTab::connectionId()
-{
-    return m_connectionIdQuery;
-}
-
-void QueryTab::executeQueryAtCursor()
-{
-    if (m_queryFuture.isFinished())
-    {
-        submitQueryForExecution(ui->codeEditor->getQueryAtCursor());
-    }
-}
-
-void QueryTab::executeSelectedQuery()
-{
-    if (m_queryFuture.isFinished())
-    {
-        submitQueryForExecution(ui->codeEditor->getSelection());
-    }
-}
-
-void QueryTab::displayQueryResults()
-{
-    bool queryResult = m_queryManager.isSuccess();
-    bool queryIsSelect = m_queryManager.isSelect();
-
-    if (queryResult && queryIsSelect)
-    {
-        m_queryResultsModel.clear();
-        m_queryResultsModel.setColumnCount(m_queryManager.getColumNames().count());
-
-        int columnIndex = 0;
-        foreach (QString columnName, m_queryManager.getColumNames())
-        {
-            m_queryResultsModel.setHeaderData(columnIndex, Qt::Horizontal, columnName);
-            ++columnIndex;
-        }
-
-        foreach (TableRow row, m_queryManager.getNextRowSet(100))
-        {
-            m_queryResultsModel.appendRow(row);
-        }
-
-        ui->resultsGrid->resizeColumnsToContents(); //this should be resized to header
-        ui->resultsTabBar->setCurrentIndex(0);
-    }
-    else
-    {
-        m_queryResultsModel.clear();
-        ui->resultsTabBar->setCurrentIndex(1);
-    }
-
-    ui->resultsText->appendPlainText("Timestamp: " + m_queryManager.startTime().toString("yyyy-MM-dd hh:mm:ss"));
-    ui->resultsText->appendPlainText("Elapsed: " + QString::number(m_queryManager.startTime().msecsTo(m_queryManager.endTime())) + " ms");
-    if (queryResult && !queryIsSelect)
-        ui->resultsText->appendPlainText("Number of rows affected: " + QString::number(m_queryManager.numRowsAffected()));
-    else if (!queryResult)
-        ui->resultsText->appendPlainText(m_queryManager.lastError());
-    ui->resultsText->appendPlainText("");
-    ui->resultsText->appendPlainText("Query:");
-    ui->resultsText->appendPlainText("-------------------------------");
-    ui->resultsText->appendPlainText(m_queryManager.lastQuery());
-}
+/************************************************************************************************************************************************************/
 
 bool QueryTab::isFinished()
 {
-    return m_queryFuture.isFinished();
+    //should return status of query and export
+    return true;
 }
 
-void QueryTab::killQuery()
+void QueryTab::runQueryAtCursor()
 {
-    m_queryManager.cancelQuery(QSqlDatabase::database(m_connectionIdKill));
+    QString connectionId = ui->comboBoxConnections->currentData(Qt::UserRole+1).toString();
+    if (!connectionId.isEmpty())
+    {
+        Connection connection = m_connectionManager->getConnections()[connectionId];
+
+        //if (m_queryFuture.isFinished())
+        {
+            submitQueryForExecution(ui->codeEditor->getQueryAtCursor(), connection);
+        }
+    }
 }
 
-void QueryTab::submitQueryForExecution(const QString query)
+void QueryTab::runSelectedQuery()
 {
-    if (!query.isEmpty() && !m_connectionIdQuery.isEmpty())
+    QString connectionId = ui->comboBoxConnections->currentData(Qt::UserRole+1).toString();
+    if (!connectionId.isEmpty())
+    {
+        Connection connection = m_connectionManager->getConnections()[connectionId];
+
+        //if (m_queryFuture.isFinished())
+        {
+            submitQueryForExecution(ui->codeEditor->getSelection(), connection);
+        }
+    }
+}
+
+void QueryTab::submitQueryForExecution(const QString query, const Connection connection)
+{
+    if (!query.isEmpty())
     {
         ui->button_selectionQuery->setEnabled(false);
         ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
         ui->resultsText->clear();
         m_queryResultsModel.clear();
 
-        m_queryFuture = QtConcurrent::run(&m_queryManager, &QueryManager::executeQuery, QSqlDatabase::database(m_connectionIdQuery), query);
-        m_queryFutureWatcher.setFuture(m_queryFuture);
+
+        emit executeSql(query, connection);
     }
 }
 
-void QueryTab::queryFinished()
+void QueryTab::on_queryFinished(bool isSelect, QSqlRecord header, QStringList message)
 {
-    displayQueryResults();
+    if (isSelect)
+    {
+        QFont font = ui->resultsGrid->horizontalHeader()->font();
+        QFontMetrics fm(font);
+
+        for(int i=0; i<header.count(); ++i)
+        {
+            QString fieldName = header.field(i).name().toUpper();
+
+            m_queryResultsModel.setHorizontalHeaderItem(i, new QStandardItem(fieldName));
+            ui->resultsGrid->setColumnWidth(i, fm.width(fieldName)+40); // fit to column width
+        }
+
+        foreach (QString line, message)
+        {
+            ui->resultsText->appendPlainText(line);
+        }
+
+        emit requestNextRowSet(100);
+    }
+    else
+    {
+        foreach (QString line, message)
+        {
+            ui->resultsText->appendPlainText(line);
+        }
+    }
 
     ui->button_selectionQuery->setEnabled(true);
     ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
+    ui->resultsTabBar->setCurrentIndex(0);
+}
+
+void QueryTab::on_queryFailed(QStringList message)
+{
+    foreach (QString line, message)
+    {
+        ui->resultsText->appendPlainText(line);
+    }
+
+    ui->button_selectionQuery->setEnabled(true);
+    ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
+    ui->resultsTabBar->setCurrentIndex(1);
 }
 
 void QueryTab::refreshOpenConnections()
@@ -276,73 +300,35 @@ void QueryTab::refreshOpenConnections()
     }
 }
 
+
+/*******************************************************************************************************************************************************/
+
 void QueryTab::on_resultsGridSliderAtEnd(int value)
 {
     if (ui->resultsGrid->verticalScrollBar()->maximum() == value)
     {
-        foreach (TableRow row, m_queryManager.getNextRowSet(100))
-        {
-            m_queryResultsModel.appendRow(row);
-        }
+        emit requestNextRowSet(100);
+    }
+}
+
+void QueryTab::on_rowSetReceived(RowSet rowSet)
+{
+    foreach(Row row, rowSet)
+    {
+        m_queryResultsModel.appendRow(row);
     }
 }
 
 void QueryTab::on_button_selectionQuery_released()
 {
-    executeSelectedQuery();
+    runSelectedQuery();
 
     ui->codeEditor->setFocus();
 }
 
 void QueryTab::on_button_stopQuery_released()
 {
-    /*
-     *      following errors happen when trying to stop query
-     *      "Unable to free statement: connection pointer is NULL"
-     */
-
-    QtConcurrent::run(&m_queryManager, &QueryManager::cancelQuery, QSqlDatabase::database(m_connectionIdKill));
+    //m_queryStopper.stop(Connection connection, int pid);
 
     ui->codeEditor->setFocus();
-}
-
-void QueryTab::on_comboBoxConnections_currentIndexChanged(int index)
-{
-    QString connectionId = ui->comboBoxConnections->itemData(index, Qt::UserRole+1).toString();
-
-    if (!m_queryFuture.isFinished())
-    {
-        m_queryManager.cancelQuery(QSqlDatabase::database(m_connectionIdQuery));
-    }
-
-    /*
-     *  cloning id done here because QSqlDatabase::database() won't return connections which are created in another thread
-     */
-
-    /* close old connections */
-    QSqlDatabase::database(m_connectionIdQuery).close();
-    QSqlDatabase::removeDatabase(m_connectionIdQuery);
-
-    QSqlDatabase::database(m_connectionIdKill).close();
-    QSqlDatabase::removeDatabase(m_connectionIdKill);
-
-    /* create new connections */
-    if (connectionId.isEmpty())
-    {
-        m_connectionIdQuery.clear();
-        m_connectionIdKill.clear();
-    }
-    else
-    {
-        m_connectionIdQuery = "CLONED_" + m_connectionIdQuery + "_" + QUuid::createUuid().toString();
-        QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdQuery);
-
-        m_connectionIdKill = "CLONED_KILL_" + m_connectionIdKill + "_" + QUuid::createUuid().toString();
-        QSqlDatabase::cloneDatabase(QSqlDatabase::database(connectionId), m_connectionIdKill);
-    }
-
-    /* QSqlDatabase needs to be pushed as a param */
-    m_queryManager.switchDatabase(QSqlDatabase::database(m_connectionIdQuery));
-
-    emit connectionSwitched(connectionId);
 }

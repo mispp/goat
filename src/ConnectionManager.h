@@ -12,6 +12,11 @@ class ConnectionManager : public QObject
 {
     Q_OBJECT
 
+signals:
+    void connectionStateChanged();
+    void connectionAdded(Connection*);
+    void connectionDeleted(QString connectionId);
+
 public:
     ConnectionManager();
     ~ConnectionManager();
@@ -23,17 +28,14 @@ public:
     QSqlDatabase getOpenConnection(const QString &connectionId);
     QMap<QString, QString> getOpenConnections();
 
+    static QSqlDatabase cloneConnection(const Connection connection, const QString newConnectionId);
+
 public slots:
     void openConnection(const Connection &connection);
 
 private:
     QList<Connection> loadConnections();
     QMap<QString, Connection> m_connections;
-
-signals:
-    void connectionStateChanged();
-    void connectionAdded(Connection*);
-    void connectionDeleted(QString connectionId);
 
 };
 

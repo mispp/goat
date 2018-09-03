@@ -156,7 +156,7 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 
         if (killQueryMsgBox.exec()== QMessageBox::Yes)
         {
-            tab->killQuery();
+            //tab->killQuery();
         }
         else return;
     }
@@ -292,7 +292,7 @@ void MainWindow::on_actionConnection_Manager_triggered()
 void MainWindow::on_actionQueryBlockAtCursor_triggered()
 {
     QueryTab *tab = ((QueryTab*) ui->tabBarConnections->currentWidget());
-    tab->executeQueryAtCursor();
+    tab->runQueryAtCursor();
 }
 
 void MainWindow::on_connectionListToolButtonExpandTriggered()
