@@ -14,12 +14,15 @@ What works:
 - connection manager
     - saves information (warning! connection manager saves unencrypted passwords. always!)
     - delete connections
+    - based on the driver, set default port to what makes sense
 - queries can be executed with ctrl-enter for current query (query where cursor is currently located), as well as for selection with a button (but not as as script yet)
 - basic syntax highlighter
 - opening and saving files
 - queries can be cancelled
     - works currently only on postgres
 - coloring of NULL values in results grid
+- export data
+    - as c/p from the results grid
 
 
 Todos:
@@ -28,7 +31,6 @@ Todos:
 - execute query as a script
 - further improve connection manager
     - option to save or not to save password (per connection)
-    - based on the driver, set default port to what makes sense
 - autosave settings
     - e.g. height of the bottom part of tab
 - settings dialog
