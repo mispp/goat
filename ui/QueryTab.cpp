@@ -40,6 +40,7 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     ui->resultsGrid->setModel(&m_queryResultsModel);
     ui->comboBoxConnections->setModel(&m_openConnectionsModel);
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    ui->button_stopQuery->setEnabled(false);
 
     readFile();
     setModified(false);
@@ -71,18 +72,11 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     connect(m_queryExporterThread, &QThread::finished, m_queryExporterThread, &QThread::deleteLater);
     connect(m_queryExporterThread, &QThread::finished, m_queryExporter, &Query::deleteLater);
     connect(this, &QueryTab::requestQueryExport, m_queryExporter, &QueryExporter::executeSqlAndExport);
-    connect(this, &QueryTab::requestExportStop, m_queryExporter, &QueryExporter::stopExport);
+    //connect(this, &QueryTab::requestExportStop, m_queryExporter, &QueryExporter::stopExport);
     m_queryExporterThread->start();
 
     //handle tableview
     connect(ui->resultsGrid->verticalScrollBar(), &QScrollBar::valueChanged, this, &QueryTab::on_resultsGridSliderAtEnd);
-
-
-    /* todo
-     *
-     * add another object, query stopper in its own thread
-     */
-
 }
 
 QueryTab::~QueryTab()
@@ -177,8 +171,7 @@ void QueryTab::writeFile()
 
 bool QueryTab::isFinished()
 {
-    //should return status of query and export
-    return true;
+    return m_query->isFinished() && m_queryExporter->isFinished();
 }
 
 void QueryTab::runQueryAtCursor()
@@ -287,6 +280,7 @@ void QueryTab::refreshOpenConnections()
         m_openConnectionsModel.appendRow(openConnectionItem);
 
         ui->comboBoxConnections->setCurrentIndex(0);
+        ui->button_selectionQuery->setEnabled(false);
     }
     else
     {
@@ -308,6 +302,8 @@ void QueryTab::refreshOpenConnections()
                 ui->comboBoxConnections->setCurrentIndex(index);
             }
         }
+
+        ui->button_selectionQuery->setEnabled(true);
     }
 }
 
@@ -339,9 +335,16 @@ void QueryTab::on_button_selectionQuery_released()
 
 void QueryTab::on_button_stopQuery_released()
 {
-    //m_queryStopper.stop(Connection connection, int pid);
+    qDebug()<< "stop button pressed";
 
-    ui->codeEditor->setFocus();
+    //m_queryStopper.stop(Connection connection, int pid);
+    if (!m_query->isFinished())
+    {
+        QueryStopper stopper;
+        stopper.executeStopSession(m_query->connection(), m_query->sessionPid());
+
+        ui->codeEditor->setFocus();
+    }
 }
 
 void QueryTab::on_button_exportQueryResults_released()
@@ -357,5 +360,12 @@ void QueryTab::on_button_exportQueryResults_released()
 
 void QueryTab::on_button_stopExport_released()
 {
-    emit requestExportStop();
+    if (!m_queryExporter->isFinished())
+    {
+        //emit requestExportStop();
+
+        QueryStopper stopper;
+
+        stopper.executeStopSession(m_queryExporter->connection(), m_queryExporter->sessionPid());
+    }
 }

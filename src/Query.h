@@ -32,6 +32,7 @@ public:
     bool isFinished();
     bool isSelect();
     Connection connection();
+    int sessionPid();
     QString lastQuery();
 
 public slots:
@@ -44,6 +45,9 @@ private:
     QSqlQuery m_query;
     QList<QSqlField> m_header;
     Connection m_connection;
+    int m_sessionPid;
+
+    int getSessionPid(QSqlDatabase clonedDatabase);
 
 };
 

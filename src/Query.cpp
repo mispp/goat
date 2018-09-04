@@ -5,7 +5,7 @@ Query::Query(QObject *parent) :
     m_queryConnecionId("CLONED_" + QUuid::createUuid().toString()),
     m_isFinished(true)
 {
-    qDebug() << "query created with id: " + m_queryConnecionId;
+
 }
 
 Query::~Query()
@@ -34,6 +34,11 @@ Connection Query::connection()
     return m_connection;
 }
 
+int Query::sessionPid()
+{
+    return m_sessionPid;
+}
+
 QString Query::lastQuery()
 {
     return m_query.lastQuery();
@@ -51,33 +56,35 @@ void Query::executeSql(QString sql, Connection connection)
 
     //QSqlDatabase clonedConnection = ConnectionManager::cloneConnection(connection, m_queryConnecionId);
 
-    QSqlDatabase clonedConnection = QSqlDatabase::addDatabase(connection.driver(), m_queryConnecionId);
+    QSqlDatabase clonedDatabase = QSqlDatabase::addDatabase(connection.driver(), m_queryConnecionId);
 
-    clonedConnection.setHostName(connection.details()["server"]);
-    clonedConnection.setPort(connection.details()["port"].toInt());
-    clonedConnection.setDatabaseName(connection.details()["database"]);
-    clonedConnection.setConnectOptions(connection.details()["options"]);
-    clonedConnection.setUserName(connection.details()["username"]);
-    clonedConnection.setPassword(connection.details()["pass"]);
+    clonedDatabase.setHostName(connection.details()["server"]);
+    clonedDatabase.setPort(connection.details()["port"].toInt());
+    clonedDatabase.setDatabaseName(connection.details()["database"]);
+    clonedDatabase.setConnectOptions(connection.details()["options"]);
+    clonedDatabase.setUserName(connection.details()["username"]);
+    clonedDatabase.setPassword(connection.details()["pass"]);
 
-    bool ok = clonedConnection.open();
+    bool ok = clonedDatabase.open();
 
     if (!ok)
     {
         QSqlDatabase::removeDatabase(connection.connectionId());
 
         QStringList errorList;
-        errorList.append(clonedConnection.lastError().driverText());
-        errorList.append(clonedConnection.lastError().databaseText());
-        errorList.append(clonedConnection.lastError().nativeErrorCode());
+        errorList.append(clonedDatabase.lastError().driverText());
+        errorList.append(clonedDatabase.lastError().databaseText());
+        errorList.append(clonedDatabase.lastError().nativeErrorCode());
 
         emit queryExecutionFailed(errorList);
     }
     else
     {
+        m_sessionPid = getSessionPid(clonedDatabase);
+
         m_isFinished = false;
 
-        m_query = QSqlQuery(clonedConnection);
+        m_query = QSqlQuery(clonedDatabase);
         m_query.setForwardOnly(true);
 
         bool queryOK = m_query.exec(sql);
@@ -98,6 +105,8 @@ void Query::executeSql(QString sql, Connection connection)
 
         m_isFinished = true;
     }
+
+    m_sessionPid = -1;
 }
 
 void Query::requestNextRowSet(int rowCount)
@@ -129,4 +138,29 @@ void Query::requestNextRowSet(int rowCount)
     }
 
     emit nextRowSet(rows);
+}
+
+int Query::getSessionPid(QSqlDatabase clonedDatabase)
+{
+    QString sql;
+
+    if (clonedDatabase.driverName() == "QPSQL")
+        sql = "select pg_backend_pid();";
+    else if (clonedDatabase.driverName() == "QMYSQL")
+        sql = "SELECT CONNECTION_ID();";
+    else if (clonedDatabase.driverName() == "QODBC")
+        sql = "SELECT @@SPID;";
+
+    QSqlQuery q(clonedDatabase);
+    q.prepare(sql);
+    bool result = q.exec();
+    if (result)
+    {
+        q.next();
+        int pid = q.value(0).toInt();
+
+        if (pid > 0) return pid;
+        else return -1;
+    }
+    else return -1;
 }

@@ -4,6 +4,7 @@
 #include "../src/ConnectionManager.h"
 #include "../src/Query.h"
 #include "../src/QueryExporter.h"
+#include "../src/QueryStopper.h"
 #include "../src/Csv.h"
 
 #include <QPlainTextEdit>
@@ -36,7 +37,8 @@ signals:
    void executeSql(QString sql, Connection connection);
    void requestNextRowSet(int rowCount);
    void requestQueryExport(QString sql, Connection connection, QString outputFilePath, Csv csvHandler);
-   void requestExportStop();
+   //void requestExportStop();
+   void requestStopSession(Connection connection, int pid);
 
 public:
     explicit QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent = 0);

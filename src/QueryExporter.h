@@ -29,6 +29,8 @@ public:
     ~QueryExporter();
 
     bool isFinished();
+    Connection connection();
+    int sessionPid();
 
 public slots:
     void executeSqlAndExport(QString sql, Connection connection, QString outputFilePath, Csv csvHandler);
@@ -37,8 +39,14 @@ public slots:
 private:
     const QString m_queryConnecionId;
     QSqlQuery m_query;
-    //QList<QSqlField> m_header;
+    QList<QSqlField> m_header;
     bool m_stopFlag;
+    bool m_isFinished;
+
+    Connection m_connection;
+    int m_sessionPid;
+
+    int getSessionPid(QSqlDatabase clonedDatabase);
 
 };
 

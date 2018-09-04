@@ -24,7 +24,8 @@ SOURCES += \
     ui/QueryTab.cpp \
     src/StringUtils.cpp \
     src/Query.cpp \
-    src/QueryExporter.cpp
+    src/QueryExporter.cpp \
+    src/QueryStopper.cpp
 
 
 HEADERS  += \
@@ -43,7 +44,8 @@ HEADERS  += \
     src/Query.h \
     src/Row.h \
     src/RowSet.h \
-    src/QueryExporter.h
+    src/QueryExporter.h \
+    src/QueryStopper.h
 
 
 FORMS    += \
