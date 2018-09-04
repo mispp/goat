@@ -31,6 +31,29 @@ void Csv::write(QTextStream *stream, QAbstractItemModel *model)
     }
 }
 
+void Csv::write(QTextStream *stream, QSqlQuery *query, bool* stopFlag)
+{
+    QSqlRecord header = query->record();
+
+    while (!*stopFlag && query->next())
+    {
+        QStringList row;
+
+        QSqlRecord record = query->record();
+
+        for (int col=0; col < record.count(); ++col)
+        {
+            QSqlField field = record.field(col);
+            QString value = escape(field.value().toString());
+
+            row.append(value);
+        }
+
+        (*stream) << row.join(m_delimiter);
+        (*stream) << endl;
+    }
+}
+
 QString Csv::writeSelectionToString(QAbstractItemModel *model, const QItemSelection &selection, bool includeHeaders)
 {
     QString text;

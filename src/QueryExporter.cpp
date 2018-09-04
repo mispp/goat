@@ -1,14 +1,14 @@
-#include "Query.h"
+#include "QueryExporter.h"
 
-Query::Query(QObject *parent) :
+QueryExporter::QueryExporter(QObject *parent) :
     QObject(parent),
-    m_queryConnecionId("CLONED_" + QUuid::createUuid().toString()),
-    m_isFinished(true)
+    m_queryConnecionId("CLONED_EXPORT_" + QUuid::createUuid().toString()),
+    m_stopFlag(false)
 {
-    qDebug() << "query created with id: " + m_queryConnecionId;
+    qDebug() << "queryexporter created with id: " + m_queryConnecionId;
 }
 
-Query::~Query()
+QueryExporter::~QueryExporter()
 {
     m_query.finish();
 
@@ -19,37 +19,18 @@ Query::~Query()
     }
 }
 
-bool Query::isFinished()
+bool QueryExporter::isFinished()
 {
-    return m_isFinished;
+    return false;
 }
 
-bool Query::isSelect()
+void QueryExporter::executeSqlAndExport(QString sql, Connection connection, QString outputFilePath, Csv csvHandler)
 {
-    return m_query.isSelect();
-}
-
-Connection Query::connection()
-{
-    return m_connection;
-}
-
-QString Query::lastQuery()
-{
-    return m_query.lastQuery();
-}
-
-void Query::executeSql(QString sql, Connection connection)
-{
-    m_connection = connection;
-
     if (QSqlDatabase::contains(m_queryConnecionId))
     {
         QSqlDatabase::database(m_queryConnecionId).close();
         QSqlDatabase::removeDatabase(m_queryConnecionId);
     }
-
-    //QSqlDatabase clonedConnection = ConnectionManager::cloneConnection(connection, m_queryConnecionId);
 
     QSqlDatabase clonedConnection = QSqlDatabase::addDatabase(connection.driver(), m_queryConnecionId);
 
@@ -75,8 +56,6 @@ void Query::executeSql(QString sql, Connection connection)
     }
     else
     {
-        m_isFinished = false;
-
         m_query = QSqlQuery(clonedConnection);
         m_query.setForwardOnly(true);
 
@@ -86,7 +65,19 @@ void Query::executeSql(QString sql, Connection connection)
         {
             QStringList message;
 
-            emit queryExecutionFinished(m_query.isSelect(), m_query.record(), message);
+            QFile file(outputFilePath);
+
+            if (!file.open(QFile::WriteOnly|QFile::Truncate))
+            {
+                message.append("Cannot open file " + outputFilePath + " for writing.");
+                emit queryExecutionFailed(message);
+            }
+            else
+            {
+                QTextStream stream(&file);
+                csvHandler.write(&stream, &m_query, &m_stopFlag);
+                emit queryExecutionFinished(message);
+            }
         }
         else
         {
@@ -96,37 +87,14 @@ void Query::executeSql(QString sql, Connection connection)
             emit queryExecutionFailed(message);
         }
 
-        m_isFinished = true;
+        m_query.finish();
     }
 }
 
-void Query::requestNextRowSet(int rowCount)
+void QueryExporter::stopExport()
 {
-    RowSet rows;
-
-    int counter = 0;
-
-    while (counter < rowCount && m_query.next())
-    {
-        QSqlRecord record = m_query.record();
-
-        Row row;
-
-        for (int col = 0; col < record.count(); ++col)
-        {
-            QStandardItem* item = new QStandardItem();
-            item->setData(record.value(col), Qt::DisplayRole);
-            if (record.value(col).isNull())
-            {
-                item->setData(QColor("#f7ff87"), Qt::BackgroundRole);
-            }
-            row.append(item);
-        }
-
-        rows.append(row);
-
-        ++counter;
-    }
-
-    emit nextRowSet(rows);
+    QMutex mutex;
+    mutex.lock();
+    m_stopFlag = true;
+    mutex.unlock();
 }

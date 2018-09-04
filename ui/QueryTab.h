@@ -3,6 +3,8 @@
 
 #include "../src/ConnectionManager.h"
 #include "../src/Query.h"
+#include "../src/QueryExporter.h"
+#include "../src/Csv.h"
 
 #include <QPlainTextEdit>
 #include <QString>
@@ -33,6 +35,8 @@ signals:
    //void connectionSwitched(const QString connectionId);
    void executeSql(QString sql, Connection connection);
    void requestNextRowSet(int rowCount);
+   void requestQueryExport(QString sql, Connection connection, QString outputFilePath, Csv csvHandler);
+   void requestExportStop();
 
 public:
     explicit QueryTab(QString filename, ConnectionManager *connectionManager, QWidget *parent = 0);
@@ -62,6 +66,9 @@ private:
     Query* m_query;
     QThread* m_queryThread;
 
+    QueryExporter* m_queryExporter;
+    QThread* m_queryExporterThread;
+
     void submitQueryForExecution(const QString query, const Connection connection);
 
 public slots:
@@ -74,7 +81,8 @@ public slots:
 private slots:
     void on_button_selectionQuery_released();
     void on_button_stopQuery_released();
-
+    void on_button_exportQueryResults_released();
+    void on_button_stopExport_released();
 };
 
 #endif // CONNECTIONTAB_H

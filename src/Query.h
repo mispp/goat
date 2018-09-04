@@ -30,18 +30,20 @@ public:
     ~Query();
 
     bool isFinished();
+    bool isSelect();
+    Connection connection();
+    QString lastQuery();
 
 public slots:
     void executeSql(QString sql, Connection connection);
-    void executeSqlAndExport(QString sql, Connection connection, QString outputFilePath, Csv csvHandler);
     void requestNextRowSet(int rowCount);
-    void stopExport();
 
 private:
     QString m_queryConnecionId;
+    bool m_isFinished;
     QSqlQuery m_query;
     QList<QSqlField> m_header;
-    bool m_stopFlag;
+    Connection m_connection;
 
 };
 

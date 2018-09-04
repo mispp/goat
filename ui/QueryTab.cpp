@@ -64,6 +64,16 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     connect(m_query, &Query::nextRowSet, this, &QueryTab::on_rowSetReceived); //handle results
     m_queryThread->start();
 
+    //get thread for exporting
+    m_queryExporterThread = new QThread();
+    m_queryExporter = new QueryExporter();
+    m_queryExporter->moveToThread(m_queryExporterThread);
+    connect(m_queryExporterThread, &QThread::finished, m_queryExporterThread, &QThread::deleteLater);
+    connect(m_queryExporterThread, &QThread::finished, m_queryExporter, &Query::deleteLater);
+    connect(this, &QueryTab::requestQueryExport, m_queryExporter, &QueryExporter::executeSqlAndExport);
+    connect(this, &QueryTab::requestExportStop, m_queryExporter, &QueryExporter::stopExport);
+    m_queryExporterThread->start();
+
     //handle tableview
     connect(ui->resultsGrid->verticalScrollBar(), &QScrollBar::valueChanged, this, &QueryTab::on_resultsGridSliderAtEnd);
 
@@ -80,6 +90,7 @@ QueryTab::~QueryTab()
 	delete ui;
 
     m_queryThread->quit();
+    m_queryExporterThread->quit();
 }
 
 QString QueryTab::filename() const
@@ -331,4 +342,20 @@ void QueryTab::on_button_stopQuery_released()
     //m_queryStopper.stop(Connection connection, int pid);
 
     ui->codeEditor->setFocus();
+}
+
+void QueryTab::on_button_exportQueryResults_released()
+{
+    QString filename = QFileDialog::getSaveFileName(this, "Save file", "~/", ".csv files (*.csv)");
+    if (filename.isEmpty() || !m_query->isFinished() || !m_query->isSelect())
+        return;
+
+    Csv csv;
+
+    emit requestQueryExport(m_query->lastQuery(), m_query->connection(), filename, csv);
+}
+
+void QueryTab::on_button_stopExport_released()
+{
+    emit requestExportStop();
 }

@@ -23,7 +23,8 @@ SOURCES += \
     ui/ConnectionManagerDialog.cpp \
     ui/QueryTab.cpp \
     src/StringUtils.cpp \
-    src/Query.cpp
+    src/Query.cpp \
+    src/QueryExporter.cpp
 
 
 HEADERS  += \
@@ -41,7 +42,8 @@ HEADERS  += \
     src/StringUtils.h \
     src/Query.h \
     src/Row.h \
-    src/RowSet.h
+    src/RowSet.h \
+    src/QueryExporter.h
 
 
 FORMS    += \
