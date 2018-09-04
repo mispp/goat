@@ -35,7 +35,7 @@ public slots:
     void stopExport();
 
 private:
-    QString m_queryConnecionId;
+    const QString m_queryConnecionId;
     QSqlQuery m_query;
     //QList<QSqlField> m_header;
     bool m_stopFlag;

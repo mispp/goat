@@ -39,7 +39,7 @@ public slots:
     void requestNextRowSet(int rowCount);
 
 private:
-    QString m_queryConnecionId;
+    const QString m_queryConnecionId;
     bool m_isFinished;
     QSqlQuery m_query;
     QList<QSqlField> m_header;
