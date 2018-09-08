@@ -59,8 +59,8 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     connect(m_queryThread, &QThread::finished, m_queryThread, &QThread::deleteLater);
     connect(m_queryThread, &QThread::finished, m_query, &Query::deleteLater);
     connect(this, &QueryTab::executeSql, m_query, &Query::executeSql); //push sql to query object
-    connect(m_query, &Query::queryExecutionFinished, this, &QueryTab::on_queryFinished); //when successfull
-    connect(m_query, &Query::queryExecutionFailed, this, &QueryTab::on_queryFailed); //when fail
+    connect(m_query, &Query::finished, this, &QueryTab::on_queryFinished); //when successfull
+    connect(m_query, &Query::failed, this, &QueryTab::on_queryFailed); //when fail
     connect(this, &QueryTab::requestNextRowSet, m_query, &Query::requestNextRowSet); //push request for more rows
     connect(m_query, &Query::nextRowSet, this, &QueryTab::on_rowSetReceived); //handle results
     m_queryThread->start();
@@ -71,7 +71,7 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     m_queryExporter->moveToThread(m_queryExporterThread);
     connect(m_queryExporterThread, &QThread::finished, m_queryExporterThread, &QThread::deleteLater);
     connect(m_queryExporterThread, &QThread::finished, m_queryExporter, &Query::deleteLater);
-    connect(this, &QueryTab::requestQueryExport, m_queryExporter, &QueryExporter::executeSqlAndExport);
+    connect(this, &QueryTab::requestQueryExport, m_queryExporter, &QueryExporter::executeSql);
     //connect(this, &QueryTab::requestExportStop, m_queryExporter, &QueryExporter::stopExport);
     m_queryExporterThread->start();
 
@@ -169,11 +169,6 @@ void QueryTab::writeFile()
 
 /************************************************************************************************************************************************************/
 
-bool QueryTab::isFinished()
-{
-    return m_query->isFinished() && m_queryExporter->isFinished();
-}
-
 void QueryTab::runQueryAtCursor()
 {
     QString connectionId = ui->comboBoxConnections->currentData(Qt::UserRole+1).toString();
@@ -199,6 +194,25 @@ void QueryTab::runSelectedQuery()
         {
             submitQueryForExecution(ui->codeEditor->getSelection(), connection);
         }
+    }
+}
+
+bool QueryTab::isFinished()
+{
+    return m_query->isFinished() && m_queryExporter->isFinished();
+}
+
+void QueryTab::stopActivities()
+{
+    if (!m_query->isFinished())
+    {
+        QueryStopper stopper;
+        stopper.executeStopSession(m_query->connection(), m_query->sessionPid());
+    }
+
+    if (!m_queryExporter->isFinished())
+    {
+        on_button_stopExport_released();
     }
 }
 
@@ -337,7 +351,6 @@ void QueryTab::on_button_stopQuery_released()
 {
     qDebug()<< "stop button pressed";
 
-    //m_queryStopper.stop(Connection connection, int pid);
     if (!m_query->isFinished())
     {
         QueryStopper stopper;
@@ -362,7 +375,7 @@ void QueryTab::on_button_stopExport_released()
 {
     if (!m_queryExporter->isFinished())
     {
-        //emit requestExportStop();
+        m_queryExporter->setStopExportFlag(true); //true means "yes, interupt the export loop"
 
         QueryStopper stopper;
 

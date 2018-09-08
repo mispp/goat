@@ -1,47 +1,13 @@
 #include "Query.h"
 
-Query::Query(QObject *parent) :
-    QObject(parent),
-    m_queryConnecionId("CLONED_" + QUuid::createUuid().toString()),
-    m_isFinished(true)
+Query::Query(QObject *parent) : AbstractQuery(parent)
 {
 
 }
 
 Query::~Query()
 {
-    m_query.finish();
 
-    if (QSqlDatabase::contains(m_queryConnecionId))
-    {
-        QSqlDatabase::database(m_queryConnecionId).close();
-        QSqlDatabase::removeDatabase(m_queryConnecionId);
-    }
-}
-
-bool Query::isFinished()
-{
-    return m_isFinished;
-}
-
-bool Query::isSelect()
-{
-    return m_query.isSelect();
-}
-
-Connection Query::connection()
-{
-    return m_connection;
-}
-
-int Query::sessionPid()
-{
-    return m_sessionPid;
-}
-
-QString Query::lastQuery()
-{
-    return m_query.lastQuery();
 }
 
 void Query::executeSql(QString sql, Connection connection)
@@ -76,7 +42,7 @@ void Query::executeSql(QString sql, Connection connection)
         errorList.append(clonedDatabase.lastError().databaseText());
         errorList.append(clonedDatabase.lastError().nativeErrorCode());
 
-        emit queryExecutionFailed(errorList);
+        emit failed(errorList);
     }
     else
     {
@@ -93,14 +59,14 @@ void Query::executeSql(QString sql, Connection connection)
         {
             QStringList message;
 
-            emit queryExecutionFinished(m_query.isSelect(), m_query.record(), message);
+            emit finished(m_query.isSelect(), m_query.record(), message);
         }
         else
         {
             QStringList message;
             message.append(m_query.lastError().text());
 
-            emit queryExecutionFailed(message);
+            emit failed(message);
         }
 
         m_isFinished = true;
@@ -140,27 +106,3 @@ void Query::requestNextRowSet(int rowCount)
     emit nextRowSet(rows);
 }
 
-int Query::getSessionPid(QSqlDatabase clonedDatabase)
-{
-    QString sql;
-
-    if (clonedDatabase.driverName() == "QPSQL")
-        sql = "select pg_backend_pid();";
-    else if (clonedDatabase.driverName() == "QMYSQL")
-        sql = "SELECT CONNECTION_ID();";
-    else if (clonedDatabase.driverName() == "QODBC")
-        sql = "SELECT @@SPID;";
-
-    QSqlQuery q(clonedDatabase);
-    q.prepare(sql);
-    bool result = q.exec();
-    if (result)
-    {
-        q.next();
-        int pid = q.value(0).toInt();
-
-        if (pid > 0) return pid;
-        else return -1;
-    }
-    else return -1;
-}

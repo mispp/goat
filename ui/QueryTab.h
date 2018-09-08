@@ -55,6 +55,8 @@ public:
     void runSelectedQuery();
     bool isFinished();
 
+    void stopActivities();
+
 private:
     Ui::ConnectionTab *ui;
 

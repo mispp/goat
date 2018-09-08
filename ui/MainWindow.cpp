@@ -156,7 +156,7 @@ void MainWindow::on_tabBarConnections_tabCloseRequested(int index)
 
         if (killQueryMsgBox.exec()== QMessageBox::Yes)
         {
-            //tab->killQuery();
+            tab->stopActivities();
         }
         else return;
     }

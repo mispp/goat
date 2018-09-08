@@ -25,7 +25,8 @@ SOURCES += \
     src/StringUtils.cpp \
     src/Query.cpp \
     src/QueryExporter.cpp \
-    src/QueryStopper.cpp
+    src/QueryStopper.cpp \
+    src/AbstractQuery.cpp
 
 
 HEADERS  += \
@@ -45,7 +46,8 @@ HEADERS  += \
     src/Row.h \
     src/RowSet.h \
     src/QueryExporter.h \
-    src/QueryStopper.h
+    src/QueryStopper.h \
+    src/AbstractQuery.h
 
 
 FORMS    += \

@@ -1,6 +1,7 @@
 #ifndef QUERYEXPORTER_H
 #define QUERYEXPORTER_H
 
+#include "src/AbstractQuery.h"
 #include "src/Connection.h"
 #include "src/Csv.h"
 
@@ -16,37 +17,24 @@
 #include <QMutex>
 #include <QFile>
 
-class QueryExporter : public QObject
+class QueryExporter : public AbstractQuery
 {
     Q_OBJECT
 
 signals:
-    void queryExecutionFinished(QStringList message);
-    void queryExecutionFailed(QStringList message);
+    void finished(QStringList message);
 
 public:
     explicit QueryExporter(QObject *parent = nullptr);
     ~QueryExporter();
 
-    bool isFinished();
-    Connection connection();
-    int sessionPid();
-
 public slots:
-    void executeSqlAndExport(QString sql, Connection connection, QString outputFilePath, Csv csvHandler);
-    void stopExport();
+    void executeSql(QString sql, Connection connection, QString outputFilePath, Csv csvHandler);
+    void setStopExportFlag(bool newValue);
 
 private:
-    const QString m_queryConnecionId;
-    QSqlQuery m_query;
-    QList<QSqlField> m_header;
-    bool m_stopFlag;
-    bool m_isFinished;
-
-    Connection m_connection;
-    int m_sessionPid;
-
-    int getSessionPid(QSqlDatabase clonedDatabase);
+    bool m_stopExportFlag;
+    QMutex m_mutex;
 
 };
 

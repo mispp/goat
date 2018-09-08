@@ -1,6 +1,7 @@
 #ifndef QUERY_H
 #define QUERY_H
 
+#include "src/AbstractQuery.h"
 #include "src/Connection.h"
 #include "src/Csv.h"
 #include "src/RowSet.h"
@@ -16,38 +17,24 @@
 #include <QSqlError>
 #include <QSqlRecord>
 
-class Query : public QObject
+class Query : public AbstractQuery
 {
     Q_OBJECT
 
 signals:
-    void queryExecutionFinished(bool isSelect, QSqlRecord header, QStringList message);
-    void queryExecutionFailed(QStringList message);
+    void finished(bool isSelect, QSqlRecord header, QStringList message);
     void nextRowSet(RowSet);
 
 public:
     explicit Query(QObject *parent = nullptr);
     ~Query();
 
-    bool isFinished();
-    bool isSelect();
-    Connection connection();
-    int sessionPid();
-    QString lastQuery();
-
 public slots:
     void executeSql(QString sql, Connection connection);
     void requestNextRowSet(int rowCount);
 
 private:
-    const QString m_queryConnecionId;
-    bool m_isFinished;
-    QSqlQuery m_query;
-    QList<QSqlField> m_header;
-    Connection m_connection;
-    int m_sessionPid;
 
-    int getSessionPid(QSqlDatabase clonedDatabase);
 
 };
 
