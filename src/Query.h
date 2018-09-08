@@ -16,6 +16,7 @@
 #include <QSqlField>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <QDateTime>
 
 class Query : public AbstractQuery
 {

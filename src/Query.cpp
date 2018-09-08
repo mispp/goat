@@ -38,26 +38,41 @@ void Query::executeSql(QString sql, Connection connection)
 
         m_isFinished = false;
 
+        QDateTime start = QDateTime::currentDateTime();
+
         m_query = QSqlQuery(clonedDatabase);
         m_query.setForwardOnly(true);
 
         bool queryOK = m_query.exec(sql);
 
+        QDateTime end = QDateTime::currentDateTime();
+
+        QStringList message;
+        message.append("Timestamp: " + start.toString("yyyy-MM-dd hh:mm:ss"));
+        message.append("Elapsed: ");
+        message.append("  ms: " + QString::number(start.msecsTo(end)));
+        message.append("   s: " + QString::number(start.secsTo(end)));
+        message.append("------------------------------");
+
         if (queryOK)
         {
-            QStringList message;
+            if (!m_query.isSelect())
+            {
+                message.append("Number of rows affected: " + QString::number(m_query.numRowsAffected()));
+                message.append("------------------------------");
+            }
+            message.append(m_query.lastQuery());
 
             emit finished(m_query.isSelect(), m_query.record(), message);
         }
         else
         {
-            QStringList message;
             message.append(m_query.lastError().text());
+            message.append("------------------------------");
+            message.append(m_query.lastQuery());
 
             emit failed(message);
         }
-
-        m_isFinished = true;
     }
 
     m_isFinished = true;
