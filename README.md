@@ -91,10 +91,10 @@ Icons used are called Silk. From [here](http://www.famfamfam.com/lab/icons/silk/
 
 # Screenshots
 
-Connection manager
+Main window and connection manager
 
-[![Connection manager](https://i.imgur.com/yJTrOYM.png)](https://i.imgur.com/yJTrOYM.png)
+[![Connection manager](https://i.imgur.com/XES59p0.png)](https://i.imgur.com/XES59p0.png)
 
-Main window
+Main window and export data dialog
 
-[![Main window](https://i.imgur.com/rYoxDqK.png)](https://i.imgur.com/rYoxDqK.png)
+[![Export data](https://i.imgur.com/A3W9qAL.png)](https://i.imgur.com/A3W9qAL.png)
