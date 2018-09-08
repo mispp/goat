@@ -73,7 +73,8 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     connect(m_queryExporterThread, &QThread::finished, m_queryExporterThread, &QThread::deleteLater);
     connect(m_queryExporterThread, &QThread::finished, m_queryExporter, &Query::deleteLater);
     connect(this, &QueryTab::requestQueryExport, m_queryExporter, &QueryExporter::executeSql);
-    //connect(this, &QueryTab::requestExportStop, m_queryExporter, &QueryExporter::stopExport);
+    connect(m_queryExporter, &QueryExporter::finished, this, &QueryTab::on_exportFinished);
+    connect(m_queryExporter, &QueryExporter::failed, this, &QueryTab::on_exportFinished);
     m_queryExporterThread->start();
 
     //handle tableview
