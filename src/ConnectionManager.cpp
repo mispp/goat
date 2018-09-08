@@ -32,66 +32,6 @@ ConnectionManager::~ConnectionManager()
     m_connections.clear();
 }
 
-void ConnectionManager::openConnection(const Connection &connection)
-{
-    if (QSqlDatabase::contains(connection.connectionId()))
-        return;
-
-    QSqlDatabase db = QSqlDatabase::addDatabase(connection.driver(), connection.connectionId());
-
-    if (connection.driver() == "QODBC")
-    {
-        QMap<QString, QString> values;
-
-        foreach (QString key, connection.details().keys())
-        {
-            values[key] = connection.details()[key];
-            values["escaped-" + key] = connection.details()[key].replace("}", "}}");
-        }
-
-        QString databaseName = StringUtils::interpolate(values["connection"], values);
-        db.setDatabaseName(databaseName);
-        db.setConnectOptions(connection.details()["options"]);
-    }
-    else
-    {
-        db.setHostName(connection.details()["server"]);
-        db.setPort(connection.details()["port"].toInt());
-        db.setDatabaseName(connection.details()["database"]);
-        db.setConnectOptions(connection.details()["options"]);
-        db.setUserName(connection.details()["username"]);
-        db.setPassword(connection.details()["pass"]);
-    }
-
-	bool ok = db.open();
-
-    if (!ok)
-    {
-        QSqlDatabase::removeDatabase(connection.connectionId());
-
-		qDebug() << "Error making connection";
-
-		QString e1 = db.lastError().driverText() + "\n\n"
-				   + db.lastError().databaseText() + "\n\n"
-				   + "Native error code: " + db.lastError().nativeErrorCode();
-
-		QMessageBox errorCreatingDBConnectionDialog;
-		errorCreatingDBConnectionDialog.setWindowTitle("Error");
-		errorCreatingDBConnectionDialog.setText("Error creating DB connection?");
-		errorCreatingDBConnectionDialog.setInformativeText(e1);
-		errorCreatingDBConnectionDialog.setIcon(QMessageBox::Critical);
-		errorCreatingDBConnectionDialog.setStandardButtons(QMessageBox::Ok);
-		errorCreatingDBConnectionDialog.setMinimumSize(QSize(600, 120));
-		QSpacerItem* horizontalSpacer = new QSpacerItem(500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-		QGridLayout* layout = (QGridLayout*)errorCreatingDBConnectionDialog.layout();
-		layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
-
-		errorCreatingDBConnectionDialog.exec();
-	}
-
-    emit connectionStateChanged();
-}
-
 void ConnectionManager::closeConnection(const QString &connectionId)
 {
     if (!QSqlDatabase::contains(connectionId))
@@ -171,6 +111,66 @@ QMap<QString, QString> ConnectionManager::getOpenConnections()
 QMap<QString, Connection> ConnectionManager::getConnections() const
 {
     return m_connections;
+}
+
+void ConnectionManager::openConnection(const Connection &connection)
+{
+    if (QSqlDatabase::contains(connection.connectionId())) //should this be changed? what if definition of Connection has changed e.g. different pass?
+        return;
+
+    QSqlDatabase db = QSqlDatabase::addDatabase(connection.driver(), connection.connectionId());
+
+    if (connection.driver() == "QODBC")
+    {
+        QMap<QString, QString> values;
+
+        foreach (QString key, connection.details().keys())
+        {
+            values[key] = connection.details()[key];
+            values["escaped-" + key] = connection.details()[key].replace("}", "}}");
+        }
+
+        QString databaseName = StringUtils::interpolate(values["connection"], values);
+        db.setDatabaseName(databaseName);
+        db.setConnectOptions(connection.details()["options"]);
+    }
+    else
+    {
+        db.setHostName(connection.details()["server"]);
+        db.setPort(connection.details()["port"].toInt());
+        db.setDatabaseName(connection.details()["database"]);
+        db.setConnectOptions(connection.details()["options"]);
+        db.setUserName(connection.details()["username"]);
+        db.setPassword(connection.details()["pass"]);
+    }
+
+    bool ok = db.open();
+
+    if (!ok)
+    {
+        QSqlDatabase::removeDatabase(connection.connectionId());
+
+        qDebug() << "Error making connection";
+
+        QString e1 = db.lastError().driverText() + "\n\n"
+                   + db.lastError().databaseText() + "\n\n"
+                   + "Native error code: " + db.lastError().nativeErrorCode();
+
+        QMessageBox errorCreatingDBConnectionDialog;
+        errorCreatingDBConnectionDialog.setWindowTitle("Error");
+        errorCreatingDBConnectionDialog.setText("Error creating DB connection?");
+        errorCreatingDBConnectionDialog.setInformativeText(e1);
+        errorCreatingDBConnectionDialog.setIcon(QMessageBox::Critical);
+        errorCreatingDBConnectionDialog.setStandardButtons(QMessageBox::Ok);
+        errorCreatingDBConnectionDialog.setMinimumSize(QSize(600, 120));
+        QSpacerItem* horizontalSpacer = new QSpacerItem(500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        QGridLayout* layout = (QGridLayout*)errorCreatingDBConnectionDialog.layout();
+        layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+
+        errorCreatingDBConnectionDialog.exec();
+    }
+
+    emit connectionStateChanged();
 }
 
 QList<Connection> ConnectionManager::loadConnections()

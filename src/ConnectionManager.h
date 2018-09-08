@@ -12,6 +12,11 @@ class ConnectionManager : public QObject
 {
     Q_OBJECT
 
+signals:
+    void connectionStateChanged();
+    void connectionAdded(Connection*);
+    void connectionDeleted(QString connectionId);
+
 public:
     ConnectionManager();
     ~ConnectionManager();
@@ -29,11 +34,6 @@ public slots:
 private:
     QList<Connection> loadConnections();
     QMap<QString, Connection> m_connections;
-
-signals:
-    void connectionStateChanged();
-    void connectionAdded(Connection*);
-    void connectionDeleted(QString connectionId);
 
 };
 

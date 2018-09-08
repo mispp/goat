@@ -150,13 +150,24 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QToolButton" name="button_exportQueryResults">
+             <widget class="QPushButton" name="button_exportQueryResults">
               <property name="text">
                <string/>
               </property>
               <property name="icon">
                <iconset resource="../resources/icons.qrc">
                 <normaloff>:/icons/silk/icons/silk/page_white_go.png</normaloff>:/icons/silk/icons/silk/page_white_go.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_stopExport">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources/icons.qrc">
+                <normaloff>:/icons/silk/icons/silk/cancel.png</normaloff>:/icons/silk/icons/silk/cancel.png</iconset>
               </property>
              </widget>
             </item>

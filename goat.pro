@@ -22,8 +22,12 @@ SOURCES += \
     ui/ConnectionWidget.cpp \
     ui/ConnectionManagerDialog.cpp \
     ui/QueryTab.cpp \
-    src/QueryManager.cpp \
-    src/StringUtils.cpp
+    src/StringUtils.cpp \
+    src/Query.cpp \
+    src/QueryExporter.cpp \
+    src/QueryStopper.cpp \
+    src/AbstractQuery.cpp \
+    ui/ExportQueryDialog.cpp
 
 
 HEADERS  += \
@@ -38,8 +42,14 @@ HEADERS  += \
     ui/ConnectionWidget.h \
     ui/ConnectionManagerDialog.h \
     ui/QueryTab.h \
-    src/QueryManager.h \
-    src/StringUtils.h
+    src/StringUtils.h \
+    src/Query.h \
+    src/Row.h \
+    src/RowSet.h \
+    src/QueryExporter.h \
+    src/QueryStopper.h \
+    src/AbstractQuery.h \
+    ui/ExportQueryDialog.h
 
 
 FORMS    += \
@@ -48,7 +58,8 @@ FORMS    += \
     ui/AboutDialog.ui \
     ui/ConnectionWidget.ui \
     ui/ConnectionManagerDialog.ui \
-    ui/QueryTab.ui
+    ui/QueryTab.ui \
+    ui/ExportQueryDialog.ui
 
 DISTFILES += \
     LICENSE \

@@ -1,5 +1,7 @@
 #include "Csv.h"
 
+#include <QDebug>
+
 Csv::Csv(QString delimiter, QString quote)
 {
     m_delimiter = delimiter;
@@ -31,6 +33,29 @@ void Csv::write(QTextStream *stream, QAbstractItemModel *model)
     }
 }
 
+void Csv::write(QTextStream *stream, QSqlQuery *query, bool* stopFlag)
+{
+    QSqlRecord header = query->record();
+
+    while (!*stopFlag && query->next())
+    {
+        QStringList row;
+
+        QSqlRecord record = query->record();
+
+        for (int col=0; col < record.count(); ++col)
+        {
+            QSqlField field = record.field(col);
+            QString value = escape(field.value().toString());
+
+            row.append(value);
+        }
+
+        (*stream) << row.join(m_delimiter);
+        (*stream) << endl;
+    }
+}
+
 QString Csv::writeSelectionToString(QAbstractItemModel *model, const QItemSelection &selection, bool includeHeaders)
 {
     QString text;
@@ -54,7 +79,6 @@ QString Csv::writeSelectionToString(QAbstractItemModel *model, const QItemSelect
         text += rowContents.join(m_delimiter);
         text += "\n";
     }
-
     if (!selection.isEmpty())
     {
         for (auto row = range.top(); row <= range.bottom(); ++row)
@@ -68,6 +92,35 @@ QString Csv::writeSelectionToString(QAbstractItemModel *model, const QItemSelect
             text += rowContents.join(m_delimiter);
             text += "\n";
         }
+    }
+
+    return text;
+}
+
+QString Csv::writeSelectionToString(QAbstractItemModel *model, bool includeHeaders, int sampleSize)
+{
+    QString text;
+
+    if (includeHeaders)
+    {
+        QStringList rowContents;
+
+        for (int col=0; col < model->columnCount(); ++col)
+            rowContents << escape(model->headerData(col, Qt::Horizontal).toString());
+        text += rowContents.join(m_delimiter);
+        text += "\n";
+    }
+
+    for (int row=0; row < model->rowCount() && row < sampleSize; ++row)
+    {
+        QStringList rowContents;
+        for (int col=0; col < model->columnCount(); ++col)
+        {
+            QVariant value = model->index(row, col).data();
+            rowContents << escape(value.isNull() ? "" : value.toString());
+        }
+        text += rowContents.join(m_delimiter);
+        text += "\n";
     }
 
     return text;
