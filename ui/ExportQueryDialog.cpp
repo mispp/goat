@@ -26,7 +26,7 @@ ExportQueryDialog::~ExportQueryDialog()
 
 void ExportQueryDialog::on_pushButton_released()
 {
-    m_outputFilePath = QFileDialog::getSaveFileName(this, "Save file", "~/", ".csv files (*.csv)");
+    m_outputFilePath = QFileDialog::getSaveFileName(this, "Save file", QDir::homePath(), ".csv files (*.csv)");
     ui->linedit_outputFilePath->setText(m_outputFilePath);
 }
 
