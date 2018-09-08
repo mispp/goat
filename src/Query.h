@@ -26,7 +26,7 @@ signals:
     void nextRowSet(RowSet);
 
 public:
-    explicit Query(QObject *parent = nullptr);
+    explicit Query(ConnectionManager* connectionManager, QObject *parent = nullptr);
     ~Query();
 
 public slots:

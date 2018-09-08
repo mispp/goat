@@ -1,6 +1,7 @@
 #ifndef ABSTRACTQUERY_H
 #define ABSTRACTQUERY_H
 
+#include "src/ConnectionManager.h"
 #include "src/Connection.h"
 
 #include <QObject>
@@ -18,7 +19,7 @@ signals:
     void failed(QStringList message);
 
 public:
-    explicit AbstractQuery(QObject *parent = nullptr);
+    explicit AbstractQuery(ConnectionManager* connectionManager, QObject *parent = nullptr);
     ~AbstractQuery();
 
     bool isFinished();
@@ -31,6 +32,7 @@ public slots:
     //virtual void executeSql() = 0;
 
 protected:
+    ConnectionManager* m_connectionManager;
     const QString m_queryConnecionId;
     bool m_isFinished;
     QSqlQuery m_query;

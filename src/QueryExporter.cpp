@@ -1,7 +1,7 @@
 #include "QueryExporter.h"
 
-QueryExporter::QueryExporter(QObject *parent) :
-    AbstractQuery(parent),
+QueryExporter::QueryExporter(ConnectionManager* connectionManager, QObject *parent) :
+    AbstractQuery(connectionManager, parent),
     m_stopExportFlag(false)
 {
 
@@ -14,37 +14,26 @@ QueryExporter::~QueryExporter()
 
 void QueryExporter::executeSql(QString sql, Connection connection, QString outputFilePath, Csv csvHandler)
 {
-    m_connection = connection;
-
     setStopExportFlag(false);
 
     m_isFinished = false;
 
-    if (QSqlDatabase::contains(m_queryConnecionId))
-    {
-        QSqlDatabase::database(m_queryConnecionId).close();
-        QSqlDatabase::removeDatabase(m_queryConnecionId);
-    }
+    m_connection = Connection(m_queryConnecionId, connection.driver(), "CLONED_" + connection.name(), connection.details());
+    m_connectionManager->closeConnection(m_queryConnecionId);
+    m_connectionManager->openConnection(m_connection);
 
-    QSqlDatabase clonedDatabase = QSqlDatabase::addDatabase(connection.driver(), m_queryConnecionId);
-
-    clonedDatabase.setHostName(connection.details()["server"]);
-    clonedDatabase.setPort(connection.details()["port"].toInt());
-    clonedDatabase.setDatabaseName(connection.details()["database"]);
-    clonedDatabase.setConnectOptions(connection.details()["options"]);
-    clonedDatabase.setUserName(connection.details()["username"]);
-    clonedDatabase.setPassword(connection.details()["pass"]);
+    QSqlDatabase clonedDatabase = m_connectionManager->getOpenConnection(m_queryConnecionId);
 
     bool ok = clonedDatabase.open();
 
     if (!ok)
     {
-        QSqlDatabase::removeDatabase(connection.connectionId());
-
         QStringList errorList;
         errorList.append(clonedDatabase.lastError().driverText());
         errorList.append(clonedDatabase.lastError().databaseText());
         errorList.append(clonedDatabase.lastError().nativeErrorCode());
+
+        m_connectionManager->closeConnection(m_queryConnecionId);
 
         emit failed(errorList);
     }

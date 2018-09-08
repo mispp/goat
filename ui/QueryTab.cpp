@@ -54,7 +54,7 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
 
     //get thread for query to be displayed
     m_queryThread = new QThread();
-    m_query = new Query();
+    m_query = new Query(m_connectionManager);
     m_query->moveToThread(m_queryThread);
     connect(m_queryThread, &QThread::finished, m_queryThread, &QThread::deleteLater);
     connect(m_queryThread, &QThread::finished, m_query, &Query::deleteLater);
@@ -67,7 +67,7 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
 
     //get thread for exporting
     m_queryExporterThread = new QThread();
-    m_queryExporter = new QueryExporter();
+    m_queryExporter = new QueryExporter(m_connectionManager);
     m_queryExporter->moveToThread(m_queryExporterThread);
     connect(m_queryExporterThread, &QThread::finished, m_queryExporterThread, &QThread::deleteLater);
     connect(m_queryExporterThread, &QThread::finished, m_queryExporter, &Query::deleteLater);

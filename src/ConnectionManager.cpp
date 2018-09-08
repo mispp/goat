@@ -32,8 +32,6 @@ ConnectionManager::~ConnectionManager()
     m_connections.clear();
 }
 
-
-
 void ConnectionManager::closeConnection(const QString &connectionId)
 {
     if (!QSqlDatabase::contains(connectionId))
@@ -113,35 +111,6 @@ QMap<QString, QString> ConnectionManager::getOpenConnections()
 QMap<QString, Connection> ConnectionManager::getConnections() const
 {
     return m_connections;
-}
-
-QSqlDatabase ConnectionManager::cloneConnection(const Connection connection, const QString newConnectionId)
-{
-    QSqlDatabase db = QSqlDatabase::addDatabase(connection.driver(), newConnectionId);
-
-    if (connection.driver() == "QODBC")
-    {
-        QMap<QString, QString> values;
-
-        foreach (QString key, connection.details().keys())
-        {
-            values[key] = connection.details()[key];
-            values["escaped-" + key] = connection.details()[key].replace("}", "}}");
-        }
-
-        QString databaseName = StringUtils::interpolate(values["connection"], values);
-        db.setDatabaseName(databaseName);
-        db.setConnectOptions(connection.details()["options"]);
-    }
-    else
-    {
-        db.setHostName(connection.details()["server"]);
-        db.setPort(connection.details()["port"].toInt());
-        db.setDatabaseName(connection.details()["database"]);
-        db.setConnectOptions(connection.details()["options"]);
-        db.setUserName(connection.details()["username"]);
-        db.setPassword(connection.details()["pass"]);
-    }
 }
 
 void ConnectionManager::openConnection(const Connection &connection)

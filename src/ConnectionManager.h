@@ -28,8 +28,6 @@ public:
     QSqlDatabase getOpenConnection(const QString &connectionId);
     QMap<QString, QString> getOpenConnections();
 
-    static QSqlDatabase cloneConnection(const Connection connection, const QString newConnectionId);
-
 public slots:
     void openConnection(const Connection &connection);
 

@@ -1,7 +1,8 @@
 #include "AbstractQuery.h"
 
-AbstractQuery::AbstractQuery(QObject *parent) :
+AbstractQuery::AbstractQuery(ConnectionManager* connectionManager, QObject *parent) :
     QObject(parent),
+    m_connectionManager(connectionManager),
     m_queryConnecionId("CLONED_" + QUuid::createUuid().toString()),
     m_isFinished(true)
 {

@@ -25,7 +25,7 @@ signals:
     void finished(QStringList message);
 
 public:
-    explicit QueryExporter(QObject *parent = nullptr);
+    explicit QueryExporter(ConnectionManager* connectionManager, QObject *parent = nullptr);
     ~QueryExporter();
 
 public slots:

@@ -1,6 +1,7 @@
 #include "Query.h"
 
-Query::Query(QObject *parent) : AbstractQuery(parent)
+Query::Query(ConnectionManager* connectionManager, QObject *parent) :
+    AbstractQuery(connectionManager, parent)
 {
 
 }
@@ -12,35 +13,22 @@ Query::~Query()
 
 void Query::executeSql(QString sql, Connection connection)
 {
-    m_connection = connection;
+    m_connection = Connection(m_queryConnecionId, connection.driver(), "CLONED_" + connection.name(), connection.details());
+    m_connectionManager->closeConnection(m_queryConnecionId);
+    m_connectionManager->openConnection(m_connection);
 
-    if (QSqlDatabase::contains(m_queryConnecionId))
-    {
-        QSqlDatabase::database(m_queryConnecionId).close();
-        QSqlDatabase::removeDatabase(m_queryConnecionId);
-    }
-
-    //QSqlDatabase clonedConnection = ConnectionManager::cloneConnection(connection, m_queryConnecionId);
-
-    QSqlDatabase clonedDatabase = QSqlDatabase::addDatabase(connection.driver(), m_queryConnecionId);
-
-    clonedDatabase.setHostName(connection.details()["server"]);
-    clonedDatabase.setPort(connection.details()["port"].toInt());
-    clonedDatabase.setDatabaseName(connection.details()["database"]);
-    clonedDatabase.setConnectOptions(connection.details()["options"]);
-    clonedDatabase.setUserName(connection.details()["username"]);
-    clonedDatabase.setPassword(connection.details()["pass"]);
+    QSqlDatabase clonedDatabase = m_connectionManager->getOpenConnection(m_queryConnecionId);
 
     bool ok = clonedDatabase.open();
 
     if (!ok)
     {
-        QSqlDatabase::removeDatabase(connection.connectionId());
-
         QStringList errorList;
         errorList.append(clonedDatabase.lastError().driverText());
         errorList.append(clonedDatabase.lastError().databaseText());
         errorList.append(clonedDatabase.lastError().nativeErrorCode());
+
+        m_connectionManager->closeConnection(m_queryConnecionId);
 
         emit failed(errorList);
     }
@@ -72,6 +60,7 @@ void Query::executeSql(QString sql, Connection connection)
         m_isFinished = true;
     }
 
+    m_isFinished = true;
     m_sessionPid = -1;
 }
 
