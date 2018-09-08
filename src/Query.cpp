@@ -5,9 +5,11 @@
 Query::Query(ConnectionManager* connectionManager, QObject *parent) :
     AbstractQuery(connectionManager, parent)
 {
-    m_numberTypeIds << 2 << 3 << 6 << 32 << 4 << 35 << 5 << 36 << 38;
-    m_stringTypeIds << 7 << 10 << 34;
-    m_timeTypeIds << 14 << 15 << 16;
+    m_numberTypeIds << QMetaType::Int << QMetaType::UInt << QMetaType::Double << QMetaType::Long
+                    << QMetaType::LongLong << QMetaType::ULong << QMetaType::ULongLong << QMetaType::UShort
+                    << QMetaType::Float;
+    m_stringTypeIds << QMetaType::QChar << QMetaType::QString << QMetaType::Char;
+    m_timeTypeIds << QMetaType::QDate << QMetaType::QTime << QMetaType::QDateTime;
 }
 
 Query::~Query()
