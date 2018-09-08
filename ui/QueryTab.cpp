@@ -394,7 +394,7 @@ void QueryTab::on_button_stopExport_released()
     }
 }
 
-void QueryTab::on_exportFinished(QStringList message)
+void QueryTab::on_exportFinished(QStringList)
 {
     ui->button_exportQueryResults->setEnabled(true);
     ui->button_stopExport->setEnabled(false);

@@ -1,9 +1,13 @@
 #include "Query.h"
 
+#include <QVariant>
+
 Query::Query(ConnectionManager* connectionManager, QObject *parent) :
     AbstractQuery(connectionManager, parent)
 {
-
+    m_numberTypeIds << 2 << 3 << 6 << 32 << 4 << 35 << 5 << 36 << 38;
+    m_stringTypeIds << 7 << 10 << 34;
+    m_timeTypeIds << 14 << 15 << 16;
 }
 
 Query::~Query()
@@ -99,6 +103,16 @@ void Query::requestNextRowSet(int rowCount)
             {
                 item->setData(QColor("#f7ff87"), Qt::BackgroundRole);
             }
+
+            int type_id  = record.field(col).type();
+
+            if (m_numberTypeIds.contains(type_id))
+                item->setData(QColor("#1746d3"), Qt::ForegroundRole); //numers -> blue
+            else if (m_stringTypeIds.contains(type_id))
+                item->setData(QColor("#ba2837"), Qt::ForegroundRole); //string -> dark red
+            else if (m_timeTypeIds.contains(type_id))
+                item->setData(QColor("#0fc643"), Qt::ForegroundRole); //time/date -> green
+
             row.append(item);
         }
 

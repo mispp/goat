@@ -31,7 +31,9 @@ public slots:
     void requestNextRowSet(int rowCount);
 
 private:
-
+    QList<int> m_numberTypeIds;
+    QList<int> m_stringTypeIds;
+    QList<int> m_timeTypeIds;
 
 };
 
