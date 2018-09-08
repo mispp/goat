@@ -26,7 +26,8 @@ SOURCES += \
     src/Query.cpp \
     src/QueryExporter.cpp \
     src/QueryStopper.cpp \
-    src/AbstractQuery.cpp
+    src/AbstractQuery.cpp \
+    ui/ExportQueryDialog.cpp
 
 
 HEADERS  += \
@@ -47,7 +48,8 @@ HEADERS  += \
     src/RowSet.h \
     src/QueryExporter.h \
     src/QueryStopper.h \
-    src/AbstractQuery.h
+    src/AbstractQuery.h \
+    ui/ExportQueryDialog.h
 
 
 FORMS    += \
@@ -56,7 +58,8 @@ FORMS    += \
     ui/AboutDialog.ui \
     ui/ConnectionWidget.ui \
     ui/ConnectionManagerDialog.ui \
-    ui/QueryTab.ui
+    ui/QueryTab.ui \
+    ui/ExportQueryDialog.ui
 
 DISTFILES += \
     LICENSE \

@@ -2,13 +2,9 @@
 #define QUERY_H
 
 #include "src/AbstractQuery.h"
-#include "src/Connection.h"
-#include "src/Csv.h"
 #include "src/RowSet.h"
-#include "src/ConnectionManager.h"
 
 #include <QDebug>
-#include <QObject>
 #include <QUuid>
 #include <QStandardItem>
 #include <QSqlDatabase>

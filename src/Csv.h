@@ -16,6 +16,7 @@ public:
     void write(QTextStream *stream, QAbstractItemModel *model);
     void write(QTextStream *stream, QSqlQuery *query, bool* stopFlag);
     QString writeSelectionToString(QAbstractItemModel *model, const QItemSelection &selection, bool includeHeaders = true);
+    QString writeSelectionToString(QAbstractItemModel *model, const bool includeHeaders, const int sampleSize = 10);
 private:
     QString m_delimiter;
     QString m_quote;

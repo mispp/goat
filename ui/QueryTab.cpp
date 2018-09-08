@@ -41,6 +41,7 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
     ui->comboBoxConnections->setModel(&m_openConnectionsModel);
     ui->resultsText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     ui->button_stopQuery->setEnabled(false);
+    ui->button_stopExport->setEnabled(false);
 
     readFile();
     setModified(false);
@@ -362,13 +363,22 @@ void QueryTab::on_button_stopQuery_released()
 
 void QueryTab::on_button_exportQueryResults_released()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "Save file", "~/", ".csv files (*.csv)");
-    if (filename.isEmpty() || !m_query->isFinished() || !m_query->isSelect())
-        return;
+    ExportQueryDialog dialog(&m_queryResultsModel, this);
 
-    Csv csv;
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        QString filename = dialog.outputFilePath();
 
-    emit requestQueryExport(m_query->lastQuery(), m_query->connection(), filename, csv);
+        if (filename.isEmpty() || !m_query->isFinished() || !m_query->isSelect())
+            return;
+
+        Csv csv(dialog.delimiter(), dialog.quoteSymbol());
+
+        ui->button_exportQueryResults->setEnabled(false);
+        ui->button_stopExport->setEnabled(true);
+
+        emit requestQueryExport(m_query->lastQuery(), m_query->connection(), filename, csv);
+    }
 }
 
 void QueryTab::on_button_stopExport_released()
@@ -381,4 +391,10 @@ void QueryTab::on_button_stopExport_released()
 
         stopper.executeStopSession(m_queryExporter->connection(), m_queryExporter->sessionPid());
     }
+}
+
+void QueryTab::on_exportFinished(QStringList message)
+{
+    ui->button_exportQueryResults->setEnabled(true);
+    ui->button_stopExport->setEnabled(false);
 }
