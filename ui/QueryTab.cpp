@@ -33,8 +33,6 @@ QueryTab::QueryTab(QString filename, ConnectionManager *connectionManager, QWidg
 {
 	ui->setupUi(this);
 
-    qDebug () << "tab created with id: " + m_tabId;
-
     qRegisterMetaType<QSqlRecord>("QSqlRecord");
 
     ui->resultsGrid->setModel(&m_queryResultsModel);
