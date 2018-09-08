@@ -11,6 +11,11 @@ This app was made for 2 reasons:
 Note: what i learned so far is that i shouldn't commit directly to master. From now on development will be done in the dev branch.
 
 What works:
+- multiple database options
+    - postgres
+    - mysql
+    - sqlite
+    - odbc
 - connection manager
     - saves information (warning! connection manager saves unencrypted passwords. always!)
     - delete connections
@@ -22,19 +27,19 @@ What works:
     - works currently only on postgres
 - coloring of NULL values in results grid
 - export data
-    - as c/p from the results grid
-
+    - c/p from results grid
+    - export dialog which re-executes query and saves data to csv
+- autosave state
+    - window size
 
 Todos:
-- support more database options
-    - connection manager needs to be able to handle file to actual sqlite db
 - execute query as a script
 - further improve connection manager
     - option to save or not to save password (per connection)
+    - encrypted passwords
+- settings dialog
 - autosave settings
     - e.g. height of the bottom part of tab
-- settings dialog
-- export data
 - import data
 - general code quality improvement
     - refactoring of querying (move to separate class?)
