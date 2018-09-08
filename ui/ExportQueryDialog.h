@@ -29,6 +29,7 @@ public slots:
     void checkFilename(const QString text);
     void on_checkBoxStateChanged(int);
     void on_comboboxCurrentIndexChanged(int);
+    void on_comboboxCurrentTextChanged(QString);
 
 private slots:
     void on_pushButton_released();

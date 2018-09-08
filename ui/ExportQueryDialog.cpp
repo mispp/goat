@@ -13,7 +13,9 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
     connect(ui->linedit_outputFilePath, &QLineEdit::textChanged, this, &ExportQueryDialog::checkFilename);
 
     connect(ui->combobox_delimiter, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int))); //weird, doesnt work with new signal/slot syntax
+    connect(ui->combobox_delimiter, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
     connect(ui->combobox_quote, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int)));
+    connect(ui->combobox_quote, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
     connect(ui->checkbox_includeHeader, &QCheckBox::stateChanged, this, &ExportQueryDialog::on_checkBoxStateChanged);
 
     refreshText();
@@ -74,6 +76,12 @@ void ExportQueryDialog::on_checkBoxStateChanged(int)
 {
     refreshText();
 }
+
+void ExportQueryDialog::on_comboboxCurrentTextChanged(QString)
+{
+    refreshText();
+}
+
 
 void ExportQueryDialog::on_comboboxCurrentIndexChanged(int)
 {
