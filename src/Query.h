@@ -31,7 +31,10 @@ public slots:
     void requestNextRowSet(int rowCount);
 
 private:
-
+    QSet<int> m_numberTypeIds;
+    QSet<int> m_stringTypeIds;
+    QSet<int> m_timeTypeIds;
+    //QHash<int /*typeid*/, QColor> m_typeToColor;
 
 };
 
