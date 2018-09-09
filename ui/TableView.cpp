@@ -18,7 +18,12 @@ void TableView::keyPressEvent(QKeyEvent *event)
     {
         if (event->matches(QKeySequence::Copy))
         {
+            //QHash<QString, QString> parameters;
+            //parameters["delimiter"] = "\t";
+            //parameters["quote"] = "\"";
+
             QString text = Csv("\t", "\"").writeSelectionToString(model(), selectionModel()->selection());
+
             QApplication::clipboard()->setText(text);
         }
         else

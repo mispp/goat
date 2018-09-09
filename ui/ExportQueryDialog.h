@@ -24,6 +24,8 @@ public:
     QString outputFilePath();
     QString delimiter();
     QString quoteSymbol();
+    QLocale locale();
+    QHash<QString, QString> formatOverrides();
 
 public slots:
     void checkFilename(const QString text);
@@ -34,6 +36,8 @@ public slots:
 private slots:
     void on_pushButton_released();
     void on_linedit_outputFilePath_textChanged(const QString &arg1);
+
+    void on_combobox_locale_currentIndexChanged(int index);
 
 private:
     Ui::ExportQueryDialog *ui;

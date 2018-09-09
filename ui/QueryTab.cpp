@@ -367,6 +367,10 @@ void QueryTab::on_button_exportQueryResults_released()
     if (dialog.exec() == QDialog::Accepted)
     {
         QString filename = dialog.outputFilePath();
+        //QString numberFormat = dialog.numberFormat();
+        //QString dateFormat = dialog.dateFormat();
+        //QString timeFormat = dialog.timeFormat();
+        //QString timestampFormat = dialog.timestampFormat();
 
         if (filename.isEmpty() || !m_query->isFinished() || !m_query->isSelect())
             return;
