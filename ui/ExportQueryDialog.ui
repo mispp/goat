@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>698</width>
-    <height>534</height>
+    <width>860</width>
+    <height>663</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,15 +33,21 @@
      <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>300</width>
          <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="title">
@@ -119,17 +125,20 @@
           </item>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Include header</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="1">
          <widget class="QCheckBox" name="checkbox_includeHeader">
           <property name="text">
-           <string/>
+           <string>Include header</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QCheckBox" name="checkbox_quoteStringColumns">
+          <property name="text">
+           <string>Quote string columns</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -154,26 +163,11 @@
         <item row="4" column="3">
          <widget class="QComboBox" name="combobox_timeFormat">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="editable">
            <bool>true</bool>
           </property>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>HH:mm</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>HH:mm:ss</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item row="0" column="1">
@@ -189,46 +183,21 @@
         <item row="2" column="3">
          <widget class="QComboBox" name="combobox_dateFormat">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="editable">
            <bool>true</bool>
           </property>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>yyyy-MM-dd</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item row="3" column="3">
          <widget class="QComboBox" name="combobox_timestampFormat">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="editable">
            <bool>true</bool>
           </property>
-          <item>
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>yyyy-MM-dd HH:mm:ss</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>yyyy-MM-ddTHH:mm:ss</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item row="5" column="3">

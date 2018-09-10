@@ -367,15 +367,13 @@ void QueryTab::on_button_exportQueryResults_released()
     if (dialog.exec() == QDialog::Accepted)
     {
         QString filename = dialog.outputFilePath();
-        //QString numberFormat = dialog.numberFormat();
-        //QString dateFormat = dialog.dateFormat();
-        //QString timeFormat = dialog.timeFormat();
-        //QString timestampFormat = dialog.timestampFormat();
+
 
         if (filename.isEmpty() || !m_query->isFinished() || !m_query->isSelect())
             return;
 
-        Csv csv(dialog.delimiter(), dialog.quoteSymbol());
+        //Csv(QString delimiter = ",", QString quote = "\"", bool includeHeader = true, bool quoteStringColumns = true, QLocale locale = QLocale::system(), QHash<QString, QString> formatOverrides = QHash<QString, QString>());
+        Csv csv(dialog.delimiter(), dialog.quoteSymbol(), dialog.includeHeader(), dialog.quoteStringColumns(), dialog.locale(), dialog.formatOverrides());
 
         ui->button_exportQueryResults->setEnabled(false);
         ui->button_stopExport->setEnabled(true);

@@ -2,10 +2,16 @@
 
 #include <QDebug>
 
-Csv::Csv(QString delimiter, QString quote)
+Csv::Csv(QString delimiter, QString quote, bool includeHeader, bool quoteStringColumns, QLocale locale, QHash<QString, QString> formatOverrides) :
+    m_delimiter(delimiter),
+    m_quote(quote),
+    m_includeHeader(includeHeader),
+    m_locale(locale),
+    m_quoteStringColumns(quoteStringColumns)
 {
-    m_delimiter = delimiter;
-    m_quote = quote;
+    m_dateFormat = formatOverrides.contains("dateFormat") ? formatOverrides["dateFormat"] : locale.dateFormat(QLocale::ShortFormat);
+    m_timeFormat = formatOverrides.contains("timeFormat") ? formatOverrides["timeFormat"] : locale.timeFormat(QLocale::ShortFormat);
+    m_timestampFormat = formatOverrides.contains("timestampFormat") ? formatOverrides["timestampFormat"] : locale.dateTimeFormat(QLocale::ShortFormat);
 }
 
 void Csv::write(QTextStream *stream, QAbstractItemModel *model)
@@ -35,7 +41,20 @@ void Csv::write(QTextStream *stream, QAbstractItemModel *model)
 
 void Csv::write(QTextStream *stream, QSqlQuery *query, bool* stopFlag)
 {
-    QSqlRecord header = query->record();
+    if (m_includeHeader)
+    {
+        QSqlRecord record = query->record();
+
+        QStringList row;
+
+        for (int col=0; col < record.count(); ++col)
+        {
+            row.append(record.field(col).name().toUpper());
+        }
+
+        (*stream) << row.join(m_delimiter);
+        (*stream) << endl;
+    }
 
     while (!*stopFlag && query->next())
     {
@@ -45,10 +64,7 @@ void Csv::write(QTextStream *stream, QSqlQuery *query, bool* stopFlag)
 
         for (int col=0; col < record.count(); ++col)
         {
-            QSqlField field = record.field(col);
-            QString value = escape(field.value().toString());
-
-            row.append(value);
+            row.append(processValue(record.field(col).value()));
         }
 
         (*stream) << row.join(m_delimiter);
@@ -79,6 +95,7 @@ QString Csv::writeSelectionToString(QAbstractItemModel *model, const QItemSelect
         text += rowContents.join(m_delimiter);
         text += "\n";
     }
+
     if (!selection.isEmpty())
     {
         for (auto row = range.top(); row <= range.bottom(); ++row)
@@ -106,7 +123,8 @@ QString Csv::writeSelectionToString(QAbstractItemModel *model, bool includeHeade
         QStringList rowContents;
 
         for (int col=0; col < model->columnCount(); ++col)
-            rowContents << escape(model->headerData(col, Qt::Horizontal).toString());
+            rowContents << escape(model->headerData(col, Qt::Horizontal).toString(), false);
+
         text += rowContents.join(m_delimiter);
         text += "\n";
     }
@@ -116,8 +134,7 @@ QString Csv::writeSelectionToString(QAbstractItemModel *model, bool includeHeade
         QStringList rowContents;
         for (int col=0; col < model->columnCount(); ++col)
         {
-            QVariant value = model->index(row, col).data();
-            rowContents << escape(value.isNull() ? "" : value.toString());
+            rowContents.append(processValue(model->index(row, col).data()));
         }
         text += rowContents.join(m_delimiter);
         text += "\n";
@@ -126,10 +143,35 @@ QString Csv::writeSelectionToString(QAbstractItemModel *model, bool includeHeade
     return text;
 }
 
-QString Csv::escape(QString value)
+QString Csv::escape(QString value, bool quoteStringData)
 {
     //TODO replace this with a real csv library
     if (value.contains(m_delimiter) || value.contains("\n") || value.contains(m_quote))
         return m_quote + value.replace(m_quote, m_quote + m_quote) + m_quote;
-    return value;
+    else if (quoteStringData)
+        return m_quote + value + m_quote;
+    else
+        return value;
+}
+
+QString Csv::processValue(QVariant value)
+{
+    QString processedValue;
+
+    if (value.isNull())
+        processedValue = "";
+    else if (value.type() == QVariant::Date)
+        processedValue = value.toDate().toString(m_dateFormat);
+    else if (value.type() == QVariant::DateTime)
+        processedValue = value.toDateTime().toString(m_timestampFormat);
+    else if (value.type() == QVariant::Time)
+        processedValue = value.toTime().toString(m_timeFormat);
+    else if (value.type() == QVariant::String)
+        processedValue = escape(value.toString(), m_quoteStringColumns);
+    else if (value.type() == QVariant::Double)
+        processedValue = m_locale.toString(value.toDouble());
+    else
+        processedValue = value.toString();
+
+    return processedValue;
 }

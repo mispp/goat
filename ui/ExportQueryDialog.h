@@ -3,6 +3,7 @@
 
 #include "src/Csv.h"
 
+#include <QDebug>
 #include <QAbstractButton>
 #include <QDialog>
 #include <QFileDialog>
@@ -26,10 +27,13 @@ public:
     QString quoteSymbol();
     QLocale locale();
     QHash<QString, QString> formatOverrides();
+    bool includeHeader();
+    bool quoteStringColumns();
 
 public slots:
     void checkFilename(const QString text);
     void on_checkBoxStateChanged(int);
+    void on_checkBoxToggled(bool);
     void on_comboboxCurrentIndexChanged(int);
     void on_comboboxCurrentTextChanged(QString);
 
