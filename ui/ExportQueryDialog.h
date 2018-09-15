@@ -41,9 +41,6 @@ public slots:
 private slots:
     void on_pushButton_released();
     void on_linedit_outputFilePath_textChanged(const QString &arg1);
-
-    void on_combobox_locale_currentIndexChanged(int index);
-
     void on_buttonBox_accepted();
 
 private:
@@ -51,6 +48,8 @@ private:
     QString m_outputFilePath;
 
     QStandardItemModel* m_model;
+
+    QLocale m_locale;
 
     void refreshText();
 };

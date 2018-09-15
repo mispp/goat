@@ -4,7 +4,8 @@
 ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ExportQueryDialog),
-    m_model(model)
+    m_model(model),
+    m_locale(QLocale::system())
 {
     ui->setupUi(this);
     ui->textbox_preview->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
@@ -18,8 +19,6 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
     connect(ui->combobox_quote, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
     connect(ui->combobox_dateFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int)));
     connect(ui->combobox_dateFormat, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
-    connect(ui->combobox_locale, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int)));
-    connect(ui->combobox_locale, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
     connect(ui->combobox_timeFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int)));
     connect(ui->combobox_timeFormat, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
     connect(ui->combobox_timestampFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int)));
@@ -36,20 +35,8 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
     connect(ui->checkbox_customTimeFormat, &QCheckBox::toggled, this, &ExportQueryDialog::on_checkBoxToggled);
     connect(ui->checkbox_customTimestampFormat, &QCheckBox::toggled, this, &ExportQueryDialog::on_checkBoxToggled);
 
-
-    QMap<QString, QLocale> allLocales;
-
-    foreach (QLocale locale, QLocale::matchingLocales(QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyCountry))
-    {
-        allLocales[QLocale::countryToString(locale.country()) + " (" + locale.name() + ")"] = locale;
-    }
-
-    ui->combobox_locale->addItem("<system locale>", QLocale::system());
-
-    foreach(QString key, allLocales.keys())
-    {
-        ui->combobox_locale->addItem(key, allLocales[key]);
-    }
+    ui->textbox_decimalSeparator->setText(QLocale::system().decimalPoint());
+    ui->textbox_thousandSeparator->setText(QLocale::system().groupSeparator());
 
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "settings");
     settings.beginGroup("Export");
@@ -75,6 +62,7 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
     ui->checkbox_includeHeader->setChecked(settings.value("includeHeader", true).toBool());
     ui->checkbox_quoteStringColumns->setChecked(settings.value("quoteStringColumns", true).toBool());
     ui->linedit_outputFilePath->setText(settings.value("lastFile", "").toString());
+    m_outputFilePath = settings.value("lastFile", "").toString();
 
     settings.endGroup();
 
@@ -123,7 +111,7 @@ QHash<QString, QString> ExportQueryDialog::formatOverrides()
 
 QLocale ExportQueryDialog::locale()
 {
-    return ui->combobox_locale->currentData().value<QLocale>();
+    return m_locale;
 }
 
 bool ExportQueryDialog::includeHeader()
@@ -151,21 +139,15 @@ void ExportQueryDialog::checkFilename(const QString text)
 
 void ExportQueryDialog::refreshText()
 {
-    QString delimiter = ui->combobox_delimiter->currentText();
+    QString delimiter = ui->combobox_delimiter->currentText() == "<tab>" ? "\t" : ui->combobox_delimiter->currentText();
     QString quoteSymbol = ui->combobox_quote->currentText();
 
     ui->textbox_preview->clear();
 
-    int index = ui->combobox_locale->currentIndex();
-
-    QLocale selectedLocale = ui->combobox_locale->itemData(index, Qt::UserRole+1).value<QLocale>();
-
     bool quoteStringColumns = ui->checkbox_quoteStringColumns->isChecked();
     bool includeHeader = ui->checkbox_includeHeader->isChecked();
 
-    //qDebug() << "using format: " + formatOverrides()["dateFormat"];
-
-    Csv csv(delimiter, quoteSymbol, includeHeader, quoteStringColumns, selectedLocale, formatOverrides());
+    Csv csv(delimiter, quoteSymbol, includeHeader, quoteStringColumns, m_locale, formatOverrides());
 
     ui->textbox_preview->appendPlainText(csv.writeSelectionToString(m_model, ui->checkbox_includeHeader->isChecked(), 10));
 }
@@ -177,23 +159,17 @@ void ExportQueryDialog::on_checkBoxStateChanged(int)
 
 void ExportQueryDialog::on_checkBoxToggled(bool)
 {
-    /* ugly hack; i guess here is needed a custom QTextBox or whatever */
-
-    int index = ui->combobox_locale->currentIndex();
-
-    QLocale selectedLocale = ui->combobox_locale->itemData(index, Qt::UserRole+1).value<QLocale>();
-
-    ui->textbox_decimalSeparator->setText(selectedLocale.decimalPoint());
-    ui->textbox_thousandSeparator->setText(selectedLocale.groupSeparator());
+    ui->textbox_decimalSeparator->setText(m_locale.decimalPoint());
+    ui->textbox_thousandSeparator->setText(m_locale.groupSeparator());
 
     if (!ui->checkbox_customDateFormat->isChecked())
-        ui->combobox_dateFormat->setCurrentText(selectedLocale.dateFormat(QLocale::ShortFormat));
+        ui->combobox_dateFormat->setCurrentText(m_locale.dateFormat(QLocale::ShortFormat));
 
     if (!ui->checkbox_customTimeFormat->isChecked())
-        ui->combobox_timeFormat->setCurrentText(selectedLocale.timeFormat(QLocale::ShortFormat));
+        ui->combobox_timeFormat->setCurrentText(m_locale.timeFormat(QLocale::ShortFormat));
 
     if (!ui->checkbox_customTimestampFormat->isChecked())
-        ui->combobox_timestampFormat->setCurrentText(selectedLocale.dateTimeFormat(QLocale::ShortFormat));
+        ui->combobox_timestampFormat->setCurrentText(m_locale.dateTimeFormat(QLocale::ShortFormat));
 
     refreshText();
 }
@@ -205,25 +181,6 @@ void ExportQueryDialog::on_comboboxCurrentTextChanged(QString)
 
 void ExportQueryDialog::on_comboboxCurrentIndexChanged(int)
 {
-    refreshText();
-}
-
-void ExportQueryDialog::on_combobox_locale_currentIndexChanged(int index)
-{
-    QLocale selectedLocale = ui->combobox_locale->itemData(index, Qt::UserRole+1).value<QLocale>();
-
-    ui->textbox_decimalSeparator->setText(selectedLocale.decimalPoint());
-    ui->textbox_thousandSeparator->setText(selectedLocale.groupSeparator());
-
-    if (!ui->checkbox_customDateFormat->isChecked())
-        ui->combobox_dateFormat->setCurrentText(selectedLocale.dateFormat(QLocale::ShortFormat));
-
-    if (!ui->checkbox_customTimeFormat->isChecked())
-        ui->combobox_timeFormat->setCurrentText(selectedLocale.timeFormat(QLocale::ShortFormat));
-
-    if (!ui->checkbox_customTimestampFormat->isChecked())
-        ui->combobox_timestampFormat->setCurrentText(selectedLocale.dateTimeFormat(QLocale::ShortFormat));
-
     refreshText();
 }
 
