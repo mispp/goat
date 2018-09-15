@@ -74,6 +74,7 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
 
     ui->checkbox_includeHeader->setChecked(settings.value("includeHeader", true).toBool());
     ui->checkbox_quoteStringColumns->setChecked(settings.value("quoteStringColumns", true).toBool());
+    ui->linedit_outputFilePath->setText(settings.value("lastFile", "").toString());
 
     settings.endGroup();
 
@@ -248,6 +249,8 @@ void ExportQueryDialog::on_buttonBox_accepted()
 
     settings.setValue("includeHeader", ui->checkbox_includeHeader->isChecked());
     settings.setValue("quoteStringColumns", ui->checkbox_quoteStringColumns->isChecked());
+
+    settings.setValue("lastFile", ui->linedit_outputFilePath->text());
 
     settings.endGroup();
 }
