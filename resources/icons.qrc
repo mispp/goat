@@ -1001,10 +1001,10 @@
         <file>icons/silk/zoom_out.png</file>
         <file>icons/silk/zoom.png</file>
     </qresource>
-    <qresource prefix="/icons/db">
-        <file alias="QODBC">icons/logos/microsoft.svg</file>
-        <file alias="QMYSQL">icons/logos/mysql-workbench.svg</file>
-        <file alias="QPSQL">icons/logos/pgadmin.svg</file>
-        <file alias="QSQLITE">icons/logos/sqlitebrowser.svg</file>
+    <qresource prefix="/icons/papirus">
+        <file alias="QODBC">icons/papirus/16x16/microsoft.svg</file>
+        <file alias="QMYSQL">icons/papirus/16x16/mysql-workbench.svg</file>
+        <file alias="QPSQL">icons/papirus/16x16/pgadmin.svg</file>
+        <file alias="QSQLITE">icons/papirus/16x16/sqlitebrowser.svg</file>
     </qresource>
 </RCC>

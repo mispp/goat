@@ -304,8 +304,8 @@ void QueryTab::refreshOpenConnections()
 
             openConnectionItem->setText(openConnections[key]);
             openConnectionItem->setData(key, Qt::UserRole+1);
-            //setIcon(QIcon(":/icons/db/" + m_driver));
-            openConnectionItem->setIcon(QIcon(":/icons/db/" + QSqlDatabase::database(key).driverName()));
+            //setIcon(QIcon(":/icons/papirus/" + m_driver));
+            openConnectionItem->setIcon(QIcon(":/icons/papirus/" + QSqlDatabase::database(key).driverName()));
 
             m_openConnectionsModel.appendRow(openConnectionItem);
         }

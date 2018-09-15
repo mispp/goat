@@ -25,7 +25,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :	QWidget(parent), ui(new Ui
     foreach(QString key, drivers.keys())
     {
         QStandardItem* item = new QStandardItem(key);
-        item->setIcon(QIcon(":/icons/db/" + drivers[key]));
+        item->setIcon(QIcon(":/icons/papirus/" + drivers[key]));
         item->setData(drivers[key]);
         m_driversModel.appendRow(item);
     }
