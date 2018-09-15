@@ -155,10 +155,14 @@ void ExportQueryDialog::refreshText()
 
     ui->textbox_preview->clear();
 
-    QLocale selectedLocale = ui->combobox_locale->currentData().value<QLocale>();
+    int index = ui->combobox_locale->currentIndex();
+
+    QLocale selectedLocale = ui->combobox_locale->itemData(index, Qt::UserRole+1).value<QLocale>();
 
     bool quoteStringColumns = ui->checkbox_quoteStringColumns->isChecked();
     bool includeHeader = ui->checkbox_includeHeader->isChecked();
+
+    //qDebug() << "using format: " + formatOverrides()["dateFormat"];
 
     Csv csv(delimiter, quoteSymbol, includeHeader, quoteStringColumns, selectedLocale, formatOverrides());
 
@@ -173,7 +177,10 @@ void ExportQueryDialog::on_checkBoxStateChanged(int)
 void ExportQueryDialog::on_checkBoxToggled(bool)
 {
     /* ugly hack; i guess here is needed a custom QTextBox or whatever */
-    QLocale selectedLocale = ui->combobox_locale->currentData(Qt::UserRole+1).value<QLocale>();
+
+    int index = ui->combobox_locale->currentIndex();
+
+    QLocale selectedLocale = ui->combobox_locale->itemData(index, Qt::UserRole+1).value<QLocale>();
 
     ui->textbox_decimalSeparator->setText(selectedLocale.decimalPoint());
     ui->textbox_thousandSeparator->setText(selectedLocale.groupSeparator());
@@ -202,7 +209,7 @@ void ExportQueryDialog::on_comboboxCurrentIndexChanged(int)
 
 void ExportQueryDialog::on_combobox_locale_currentIndexChanged(int index)
 {
-    QLocale selectedLocale = ui->combobox_locale->itemData(index).value<QLocale>();
+    QLocale selectedLocale = ui->combobox_locale->itemData(index, Qt::UserRole+1).value<QLocale>();
 
     ui->textbox_decimalSeparator->setText(selectedLocale.decimalPoint());
     ui->textbox_thousandSeparator->setText(selectedLocale.groupSeparator());
