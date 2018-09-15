@@ -146,6 +146,21 @@ void ExportQueryDialog::on_checkBoxStateChanged(int)
 
 void ExportQueryDialog::on_checkBoxToggled(bool)
 {
+    /* ugly hack; i guess here is needed a custom QTextBox or whatever */
+    QLocale selectedLocale = ui->combobox_locale->currentData(Qt::UserRole+1).value<QLocale>();
+
+    ui->textbox_decimalSeparator->setText(selectedLocale.decimalPoint());
+    ui->textbox_thousandSeparator->setText(selectedLocale.groupSeparator());
+
+    if (!ui->checkbox_customDateFormat->isChecked())
+        ui->combobox_dateFormat->setCurrentText(selectedLocale.dateFormat(QLocale::ShortFormat));
+
+    if (!ui->checkbox_customTimeFormat->isChecked())
+        ui->combobox_timeFormat->setCurrentText(selectedLocale.timeFormat(QLocale::ShortFormat));
+
+    if (!ui->checkbox_customTimestampFormat->isChecked())
+        ui->combobox_timestampFormat->setCurrentText(selectedLocale.dateTimeFormat(QLocale::ShortFormat));
+
     refreshText();
 }
 

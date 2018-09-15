@@ -103,8 +103,7 @@ QString Csv::writeSelectionToString(QAbstractItemModel *model, const QItemSelect
             QStringList rowContents;
             for (auto col = range.left(); col <= range.right(); ++col)
             {
-                QVariant value = model->index(row, col).data();
-                rowContents << escape(value.isNull() ? "" : value.toString());
+                rowContents << processValue(model->index(row, col).data());
             }
             text += rowContents.join(m_delimiter);
             text += "\n";
