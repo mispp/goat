@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QFontDatabase>
 #include <QStandardItemModel>
+#include <QSettings>
 
 namespace Ui {
 class ExportQueryDialog;
@@ -42,6 +43,8 @@ private slots:
     void on_linedit_outputFilePath_textChanged(const QString &arg1);
 
     void on_combobox_locale_currentIndexChanged(int index);
+
+    void on_buttonBox_accepted();
 
 private:
     Ui::ExportQueryDialog *ui;

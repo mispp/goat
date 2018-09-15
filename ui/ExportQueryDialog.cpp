@@ -51,6 +51,32 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
         ui->combobox_locale->addItem(key, allLocales[key]);
     }
 
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "settings");
+    settings.beginGroup("Export");
+
+    if (settings.contains("dateFormat"))
+    {
+        ui->checkbox_customDateFormat->setChecked(true);
+        ui->combobox_dateFormat->setCurrentText(settings.value("dateFormat").toString());
+    }
+
+    if (settings.contains("timeFormat"))
+    {
+        ui->checkbox_customTimeFormat->setChecked(true);
+        ui->combobox_timeFormat->setCurrentText(settings.value("timeFormat").toString());
+    }
+
+    if (settings.contains("timestampFormat"))
+    {
+        ui->checkbox_customTimestampFormat->setChecked(true);
+        ui->combobox_timestampFormat->setCurrentText(settings.value("timestampFormat").toString());
+    }
+
+    ui->checkbox_includeHeader->setChecked(settings.value("includeHeader", true).toBool());
+    ui->checkbox_quoteStringColumns->setChecked(settings.value("quoteStringColumns", true).toBool());
+
+    settings.endGroup();
+
     refreshText();
 }
 
@@ -191,4 +217,30 @@ void ExportQueryDialog::on_combobox_locale_currentIndexChanged(int index)
         ui->combobox_timestampFormat->setCurrentText(selectedLocale.dateTimeFormat(QLocale::ShortFormat));
 
     refreshText();
+}
+
+void ExportQueryDialog::on_buttonBox_accepted()
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "settings");
+    settings.beginGroup("Export");
+
+    if (ui->checkbox_customDateFormat->isChecked() &&  !ui->combobox_dateFormat->currentText().isEmpty())
+        settings.setValue("dateFormat", ui->combobox_dateFormat->currentText());
+    else
+        settings.remove("dateFormat");
+
+    if (ui->checkbox_customTimestampFormat->isChecked() && !ui->combobox_timestampFormat->currentText().isEmpty())
+        settings.setValue("timestampFormat", ui->combobox_timestampFormat->currentText());
+    else
+        settings.remove("timestampFormat");
+
+    if (ui->checkbox_customTimeFormat->isChecked() && !ui->combobox_timeFormat->currentText().isEmpty())
+        settings.setValue("timeFormat", ui->combobox_timeFormat->currentText());
+    else
+        settings.remove("timeFormat");
+
+    settings.setValue("includeHeader", ui->checkbox_includeHeader->isChecked());
+    settings.setValue("quoteStringColumns", ui->checkbox_quoteStringColumns->isChecked());
+
+    settings.endGroup();
 }
