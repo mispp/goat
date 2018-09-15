@@ -304,7 +304,7 @@ void MainWindow::on_connectionListToolButtonExpandTriggered()
         QAction* establishConnectionAction = new QAction();
         establishConnectionAction->setText(connection.name());
         establishConnectionAction->setData(connection.connectionId());
-        establishConnectionAction->setIcon(QIcon(":/icons/papirus/" + connection.driver()));
+        establishConnectionAction->setIcon(QIcon(":/icons/papirus/apps/" + connection.driver()));
 
         m_connectionListMenu.addAction(establishConnectionAction);
     }
@@ -326,7 +326,7 @@ void MainWindow::on_connectionStateChanged()
             QAction* disconnectConnectionAction = new QAction();
             disconnectConnectionAction->setText(connection.name());
             disconnectConnectionAction->setData(connection.connectionId());
-            disconnectConnectionAction->setIcon(QIcon(":/icons/papirus/" + connection.driver()));
+            disconnectConnectionAction->setIcon(QIcon(":/icons/papirus/apps/" + connection.driver()));
 
             m_openConnectionListMenu.addAction(disconnectConnectionAction);
         }
