@@ -8,6 +8,7 @@ Connection Connection::defaultConnection(const QString &driver)
 {
     Connection connection;
     connection.setDriver(driver);
+    connection.setIcon(QIcon(":/icons/papirus/apps/" + driver));
 
     QMap<QString, QString> details;
 
@@ -112,6 +113,7 @@ Connection::Connection() : QStandardItem()
     m_details["username"] = "";
     m_details["pass"] = "";
 
+    setIcon(QIcon(":/icons/papirus/apps/" + m_driver));
     setText(m_name);
 }
 
@@ -125,6 +127,7 @@ Connection::Connection(const QString &connectionId, const QString &driver, const
     m_driver = driver;
     m_details = details;
 
+    setIcon(QIcon(":/icons/papirus/apps/" + m_driver));
     setText(m_name);
 }
 

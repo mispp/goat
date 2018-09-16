@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>504</width>
-    <height>453</height>
+    <height>573</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
-       <pointsize>80</pointsize>
+       <pointsize>60</pointsize>
       </font>
      </property>
      <property name="text">
@@ -42,7 +42,12 @@ License: GPL v3
 Icons: Silk
 Author: Mark James
 Source: http://www.famfamfam.com/lab/icons/silk/
-License: Creative Commons Attribution 2.5 License</string>
+License: Creative Commons Attribution 2.5 License
+
+DB logos:
+Author: PapirusDevelopmentTeam
+Source: https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/LICENSE
+License: GNU General Public License v3.0</string>
      </property>
     </widget>
    </item>
