@@ -368,10 +368,13 @@ void QueryTab::on_button_exportQueryResults_released()
     {
         QString filename = dialog.outputFilePath();
 
+
         if (filename.isEmpty() || !m_query->isFinished() || !m_query->isSelect())
             return;
 
-        Csv csv(dialog.delimiter(), dialog.quoteSymbol());
+        QString delimiter = dialog.delimiter() == "<tab>" ? "\t" : dialog.delimiter();
+
+        Csv csv(delimiter, dialog.quoteSymbol(), dialog.includeHeader(), dialog.quoteStringColumns(), dialog.locale(), dialog.formatOverrides());
 
         ui->button_exportQueryResults->setEnabled(false);
         ui->button_stopExport->setEnabled(true);

@@ -4,10 +4,11 @@
 ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ExportQueryDialog),
-    m_model(model)
+    m_model(model),
+    m_locale(QLocale::system())
 {
     ui->setupUi(this);
-    ui->textedit_preview->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    ui->textbox_preview->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
 
     connect(ui->linedit_outputFilePath, &QLineEdit::textChanged, this, &ExportQueryDialog::checkFilename);
@@ -16,7 +17,54 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
     connect(ui->combobox_delimiter, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
     connect(ui->combobox_quote, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int)));
     connect(ui->combobox_quote, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
+    connect(ui->combobox_dateFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int)));
+    connect(ui->combobox_dateFormat, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
+    connect(ui->combobox_timeFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int)));
+    connect(ui->combobox_timeFormat, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
+    connect(ui->combobox_timestampFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboboxCurrentIndexChanged(int)));
+    connect(ui->combobox_timestampFormat, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
+    connect(ui->combobox_quote, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
     connect(ui->checkbox_includeHeader, &QCheckBox::stateChanged, this, &ExportQueryDialog::on_checkBoxStateChanged);
+    connect(ui->checkbox_quoteStringColumns, &QCheckBox::stateChanged, this, &ExportQueryDialog::on_checkBoxStateChanged);
+
+    connect(ui->checkbox_customDateFormat, &QCheckBox::toggled, ui->combobox_dateFormat, &QComboBox::setEnabled);
+    connect(ui->checkbox_customTimeFormat, &QCheckBox::toggled, ui->combobox_timeFormat, &QComboBox::setEnabled);
+    connect(ui->checkbox_customTimestampFormat, &QCheckBox::toggled, ui->combobox_timestampFormat, &QComboBox::setEnabled);
+
+    connect(ui->checkbox_customDateFormat, &QCheckBox::toggled, this, &ExportQueryDialog::on_checkBoxToggled);
+    connect(ui->checkbox_customTimeFormat, &QCheckBox::toggled, this, &ExportQueryDialog::on_checkBoxToggled);
+    connect(ui->checkbox_customTimestampFormat, &QCheckBox::toggled, this, &ExportQueryDialog::on_checkBoxToggled);
+
+    ui->textbox_decimalSeparator->setText(QLocale::system().decimalPoint());
+    ui->textbox_thousandSeparator->setText(QLocale::system().groupSeparator());
+
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "settings");
+    settings.beginGroup("Export");
+
+    if (settings.contains("dateFormat"))
+    {
+        ui->checkbox_customDateFormat->setChecked(true);
+        ui->combobox_dateFormat->setCurrentText(settings.value("dateFormat").toString());
+    }
+
+    if (settings.contains("timeFormat"))
+    {
+        ui->checkbox_customTimeFormat->setChecked(true);
+        ui->combobox_timeFormat->setCurrentText(settings.value("timeFormat").toString());
+    }
+
+    if (settings.contains("timestampFormat"))
+    {
+        ui->checkbox_customTimestampFormat->setChecked(true);
+        ui->combobox_timestampFormat->setCurrentText(settings.value("timestampFormat").toString());
+    }
+
+    ui->checkbox_includeHeader->setChecked(settings.value("includeHeader", true).toBool());
+    ui->checkbox_quoteStringColumns->setChecked(settings.value("quoteStringColumns", true).toBool());
+    ui->linedit_outputFilePath->setText(settings.value("lastFile", "").toString());
+    m_outputFilePath = settings.value("lastFile", "").toString();
+
+    settings.endGroup();
 
     refreshText();
 }
@@ -47,6 +95,35 @@ QString ExportQueryDialog::quoteSymbol()
     return ui->combobox_quote->currentText();
 }
 
+QHash<QString, QString> ExportQueryDialog::formatOverrides()
+{
+    QHash<QString, QString> formatOverrides;
+
+    if (ui->checkbox_customDateFormat->isChecked() && !ui->combobox_dateFormat->currentText().isEmpty())
+        formatOverrides["dateFormat"] = ui->combobox_dateFormat->currentText();
+    if (ui->checkbox_customTimeFormat->isChecked() && !ui->combobox_timeFormat->currentText().isEmpty())
+        formatOverrides["timeFormat"] = ui->combobox_timeFormat->currentText();
+    if (ui->checkbox_customTimestampFormat->isChecked() && !ui->combobox_timestampFormat->currentText().isEmpty())
+        formatOverrides["timestampFormat"] = ui->combobox_timestampFormat->currentText();
+
+    return formatOverrides;
+}
+
+QLocale ExportQueryDialog::locale()
+{
+    return m_locale;
+}
+
+bool ExportQueryDialog::includeHeader()
+{
+    return ui->checkbox_includeHeader->isChecked();
+}
+
+bool ExportQueryDialog::quoteStringColumns()
+{
+    return ui->checkbox_quoteStringColumns->isChecked();
+}
+
 void ExportQueryDialog::on_linedit_outputFilePath_textChanged(const QString &arg1)
 {
     if (!arg1.isEmpty())
@@ -62,18 +139,38 @@ void ExportQueryDialog::checkFilename(const QString text)
 
 void ExportQueryDialog::refreshText()
 {
-    QString delimiter = ui->combobox_delimiter->currentText();
-    QString quoteSymbol = ui->combobox_delimiter->currentText();
+    QString delimiter = ui->combobox_delimiter->currentText() == "<tab>" ? "\t" : ui->combobox_delimiter->currentText();
+    QString quoteSymbol = ui->combobox_quote->currentText();
 
-    ui->textedit_preview->clear();
+    ui->textbox_preview->clear();
 
-    Csv csv(delimiter, quoteSymbol);
+    bool quoteStringColumns = ui->checkbox_quoteStringColumns->isChecked();
+    bool includeHeader = ui->checkbox_includeHeader->isChecked();
 
-    ui->textedit_preview->appendPlainText(csv.writeSelectionToString(m_model, ui->checkbox_includeHeader->isChecked(), 10));
+    Csv csv(delimiter, quoteSymbol, includeHeader, quoteStringColumns, m_locale, formatOverrides());
+
+    ui->textbox_preview->appendPlainText(csv.writeSelectionToString(m_model, ui->checkbox_includeHeader->isChecked(), 10));
 }
 
 void ExportQueryDialog::on_checkBoxStateChanged(int)
 {
+    refreshText();
+}
+
+void ExportQueryDialog::on_checkBoxToggled(bool)
+{
+    ui->textbox_decimalSeparator->setText(m_locale.decimalPoint());
+    ui->textbox_thousandSeparator->setText(m_locale.groupSeparator());
+
+    if (!ui->checkbox_customDateFormat->isChecked())
+        ui->combobox_dateFormat->setCurrentText(m_locale.dateFormat(QLocale::ShortFormat));
+
+    if (!ui->checkbox_customTimeFormat->isChecked())
+        ui->combobox_timeFormat->setCurrentText(m_locale.timeFormat(QLocale::ShortFormat));
+
+    if (!ui->checkbox_customTimestampFormat->isChecked())
+        ui->combobox_timestampFormat->setCurrentText(m_locale.dateTimeFormat(QLocale::ShortFormat));
+
     refreshText();
 }
 
@@ -82,8 +179,35 @@ void ExportQueryDialog::on_comboboxCurrentTextChanged(QString)
     refreshText();
 }
 
-
 void ExportQueryDialog::on_comboboxCurrentIndexChanged(int)
 {
     refreshText();
+}
+
+void ExportQueryDialog::on_buttonBox_accepted()
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "settings");
+    settings.beginGroup("Export");
+
+    if (ui->checkbox_customDateFormat->isChecked() &&  !ui->combobox_dateFormat->currentText().isEmpty())
+        settings.setValue("dateFormat", ui->combobox_dateFormat->currentText());
+    else
+        settings.remove("dateFormat");
+
+    if (ui->checkbox_customTimestampFormat->isChecked() && !ui->combobox_timestampFormat->currentText().isEmpty())
+        settings.setValue("timestampFormat", ui->combobox_timestampFormat->currentText());
+    else
+        settings.remove("timestampFormat");
+
+    if (ui->checkbox_customTimeFormat->isChecked() && !ui->combobox_timeFormat->currentText().isEmpty())
+        settings.setValue("timeFormat", ui->combobox_timeFormat->currentText());
+    else
+        settings.remove("timeFormat");
+
+    settings.setValue("includeHeader", ui->checkbox_includeHeader->isChecked());
+    settings.setValue("quoteStringColumns", ui->checkbox_quoteStringColumns->isChecked());
+
+    settings.setValue("lastFile", ui->linedit_outputFilePath->text());
+
+    settings.endGroup();
 }

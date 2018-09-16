@@ -18,7 +18,13 @@ void TableView::keyPressEvent(QKeyEvent *event)
     {
         if (event->matches(QKeySequence::Copy))
         {
-            QString text = Csv("\t", "\"").writeSelectionToString(model(), selectionModel()->selection());
+            QHash<QString, QString> parameters;
+            parameters["timeFormat"] = "HH:mm:ss";
+            parameters["timestampFormat"] = "yyyy-MM-ddTHH:mm:ss";
+            parameters["dateFormat"] = "yyyy-MM-dd";
+
+            QString text = Csv("\t", "\"", true, true, QLocale::system(), parameters).writeSelectionToString(model(), selectionModel()->selection());
+
             QApplication::clipboard()->setText(text);
         }
         else
