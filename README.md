@@ -80,6 +80,11 @@ make
 ./goat
 ```
 
+## Snap
+```
+snap install goat --edge --devmode
+```
+
 # Contributing
 
 Contributions are very welcome!
