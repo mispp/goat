@@ -24,8 +24,10 @@ What works:
 - basic syntax highlighter
 - opening and saving files
 - queries can be cancelled
-    - works currently only on postgres
-- coloring of NULL values in results grid
+    - works on postgres and mysql
+- coloring
+    - NULL values in results grid
+    - results grid shows data in different color based on datatype
 - export data
     - c/p from results grid
     - export dialog which re-executes query and saves data to csv
@@ -92,14 +94,16 @@ and not to mention
 
 # Recognitions
 
-Icons used are called Silk. From [here](http://www.famfamfam.com/lab/icons/silk/).
+UI icons used are called Silk. From [here](http://www.famfamfam.com/lab/icons/silk/).
+
+Database icons are Papirus. From [here](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme).
 
 # Screenshots
 
 Main window and connection manager
 
-[![Connection manager](https://i.imgur.com/XES59p0.png)](https://i.imgur.com/XES59p0.png)
+[![Connection manager](https://i.imgur.com/7KQcKMS.png)](https://i.imgur.com/7KQcKMS.png)
 
 Main window and export data dialog
 
-[![Export data](https://i.imgur.com/A3W9qAL.png)](https://i.imgur.com/A3W9qAL.png)
+[![Export data](https://i.imgur.com/2ZtAP1M.png)](https://i.imgur.com/2ZtAP1M.png)
