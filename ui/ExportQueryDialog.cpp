@@ -5,7 +5,8 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
     QDialog(parent),
     ui(new Ui::ExportQueryDialog),
     m_model(model),
-    m_locale(QLocale::system())
+    m_locale(QLocale::system()),
+    m_dataFormatter(DataFormatter())
 {
     ui->setupUi(this);
     ui->textbox_preview->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
@@ -25,7 +26,8 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
     connect(ui->combobox_timestampFormat, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
     connect(ui->combobox_quote, SIGNAL(currentTextChanged(QString)), this, SLOT(on_comboboxCurrentTextChanged(QString)));
     connect(ui->checkbox_includeHeader, &QCheckBox::stateChanged, this, &ExportQueryDialog::on_checkBoxStateChanged);
-    connect(ui->checkbox_quoteStringColumns, &QCheckBox::stateChanged, this, &ExportQueryDialog::on_checkBoxStateChanged);
+    connect(ui->checkbox_alwaysQuoteStringColumns, &QCheckBox::stateChanged, this, &ExportQueryDialog::on_checkBoxStateChanged);
+    connect(ui->checkbox_replaceNewLine, &QCheckBox::stateChanged, this, &ExportQueryDialog::on_checkBoxStateChanged);
 
     connect(ui->checkbox_customDateFormat, &QCheckBox::toggled, ui->combobox_dateFormat, &QComboBox::setEnabled);
     connect(ui->checkbox_customTimeFormat, &QCheckBox::toggled, ui->combobox_timeFormat, &QComboBox::setEnabled);
@@ -60,12 +62,14 @@ ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent)
     }
 
     ui->checkbox_includeHeader->setChecked(settings.value("includeHeader", true).toBool());
-    ui->checkbox_quoteStringColumns->setChecked(settings.value("quoteStringColumns", true).toBool());
+    ui->checkbox_alwaysQuoteStringColumns->setChecked(settings.value("quoteStringColumns", true).toBool());
+    ui->checkbox_replaceNewLine->setChecked(settings.value("replaceNewLine", false).toBool());
     ui->linedit_outputFilePath->setText(settings.value("lastFile", "").toString());
     m_outputFilePath = settings.value("lastFile", "").toString();
 
     settings.endGroup();
 
+    on_checkBoxToggled(false);
     refreshText();
 }
 
@@ -119,9 +123,14 @@ bool ExportQueryDialog::includeHeader()
     return ui->checkbox_includeHeader->isChecked();
 }
 
-bool ExportQueryDialog::quoteStringColumns()
+bool ExportQueryDialog::alwaysQuoteStrings()
 {
-    return ui->checkbox_quoteStringColumns->isChecked();
+    return ui->checkbox_alwaysQuoteStringColumns->isChecked();
+}
+
+bool ExportQueryDialog::replaceNewLine()
+{
+    return ui->checkbox_replaceNewLine->isChecked();
 }
 
 void ExportQueryDialog::on_linedit_outputFilePath_textChanged(const QString &arg1)
@@ -141,15 +150,16 @@ void ExportQueryDialog::refreshText()
 {
     QString delimiter = ui->combobox_delimiter->currentText() == "<tab>" ? "\t" : ui->combobox_delimiter->currentText();
     QString quoteSymbol = ui->combobox_quote->currentText();
+    bool alwaysQuoteStrings = ui->checkbox_alwaysQuoteStringColumns->isChecked();
+    bool replaceNewLine = ui->checkbox_replaceNewLine->isChecked();
+    bool includeHeader = ui->checkbox_includeHeader->isChecked();
+
+    DataFormatter dataFormatter = DataFormatter(delimiter, quoteSymbol, alwaysQuoteStrings, replaceNewLine, formatOverrides());
+    Csv csv(delimiter, includeHeader, dataFormatter);
 
     ui->textbox_preview->clear();
 
-    bool quoteStringColumns = ui->checkbox_quoteStringColumns->isChecked();
-    bool includeHeader = ui->checkbox_includeHeader->isChecked();
-
-    Csv csv(delimiter, quoteSymbol, includeHeader, quoteStringColumns, m_locale, formatOverrides());
-
-    ui->textbox_preview->appendPlainText(csv.writeSelectionToString(m_model, ui->checkbox_includeHeader->isChecked(), 10));
+    ui->textbox_preview->appendPlainText(csv.writeSelectionToString(m_model, 10));
 }
 
 void ExportQueryDialog::on_checkBoxStateChanged(int)
@@ -205,7 +215,8 @@ void ExportQueryDialog::on_buttonBox_accepted()
         settings.remove("timeFormat");
 
     settings.setValue("includeHeader", ui->checkbox_includeHeader->isChecked());
-    settings.setValue("quoteStringColumns", ui->checkbox_quoteStringColumns->isChecked());
+    settings.setValue("quoteStringColumns", ui->checkbox_alwaysQuoteStringColumns->isChecked());
+    settings.setValue("replaceNewLine", ui->checkbox_replaceNewLine->isChecked());
 
     settings.setValue("lastFile", ui->linedit_outputFilePath->text());
 

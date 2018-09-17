@@ -370,13 +370,14 @@ void QueryTab::on_button_exportQueryResults_released()
     {
         QString filename = dialog.outputFilePath();
 
-
         if (filename.isEmpty() || !m_query->isFinished() || !m_query->isSelect())
             return;
 
         QString delimiter = dialog.delimiter() == "<tab>" ? "\t" : dialog.delimiter();
+        bool includeHeader = dialog.includeHeader();
+        DataFormatter dataFormatter = DataFormatter(delimiter, dialog.quoteSymbol(), dialog.alwaysQuoteStrings(), dialog.replaceNewLine(), dialog.formatOverrides());
 
-        Csv csv(delimiter, dialog.quoteSymbol(), dialog.includeHeader(), dialog.quoteStringColumns(), dialog.locale(), dialog.formatOverrides());
+        Csv csv(delimiter, includeHeader, dataFormatter);
 
         ui->button_exportQueryResults->setEnabled(false);
         ui->button_stopExport->setEnabled(true);

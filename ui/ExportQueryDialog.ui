@@ -141,12 +141,19 @@
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QCheckBox" name="checkbox_quoteStringColumns">
+         <widget class="QCheckBox" name="checkbox_alwaysQuoteStringColumns">
           <property name="text">
-           <string>Quote string columns</string>
+           <string>Always quote string columns</string>
           </property>
           <property name="checked">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QCheckBox" name="checkbox_replaceNewLine">
+          <property name="text">
+           <string>Replace new line character with string &quot;\n&quot;</string>
           </property>
          </widget>
         </item>

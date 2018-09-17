@@ -2,6 +2,7 @@
 #define EXPORTQUERYDIALOG_H
 
 #include "src/Csv.h"
+#include "src/DataFormatter.h"
 
 #include <QDebug>
 #include <QAbstractButton>
@@ -29,7 +30,8 @@ public:
     QLocale locale();
     QHash<QString, QString> formatOverrides();
     bool includeHeader();
-    bool quoteStringColumns();
+    bool alwaysQuoteStrings();
+    bool replaceNewLine();
 
 public slots:
     void checkFilename(const QString text);
@@ -50,6 +52,7 @@ private:
     QStandardItemModel* m_model;
 
     QLocale m_locale;
+    DataFormatter m_dataFormatter;
 
     void refreshText();
 };
