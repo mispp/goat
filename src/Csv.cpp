@@ -2,9 +2,13 @@
 
 #include <QDebug>
 
-Csv::Csv(QString delimiter, bool includeHeader, DataFormatter dataFormatter) :
+
+Csv::Csv(QString delimiter, QString quoteSymbol, bool includeHeader, bool alwaysQuoteStrings, bool replaceNewLineSymbolWithText, DataFormatter dataFormatter) :
     m_delimiter(delimiter),
+    m_quoteSymbol(quoteSymbol),
     m_includeHeader(includeHeader),
+    m_alwaysQuoteStrings(alwaysQuoteStrings),
+    m_replaceNewLineSymbolWithText(replaceNewLineSymbolWithText),
     m_dataFormatter(dataFormatter)
 {
 
@@ -56,7 +60,11 @@ void Csv::write(QTextStream *stream, QSqlQuery *query, bool* stopFlag)
         QStringList rowData;
         for (int col=0; col < record.count(); ++col)
         {
-            rowData.append(m_dataFormatter.format(record.field(col).value()));
+            QVariant value = record.field(col).value();
+            if (value.type() != QVariant::String)
+                rowData.append(m_dataFormatter.format(value));
+            else
+                rowData.append(escapeAndQuote(value.toString()));
         }
         (*stream) << rowData.join(m_delimiter) << endl;
     }
@@ -122,10 +130,40 @@ QString Csv::writeSelectionToString(QAbstractItemModel *model, int sampleSize)
         QStringList rowContents;
         for (int col=0; col < model->columnCount(); ++col)
         {
-            rowContents.append(m_dataFormatter.format(model->index(row, col).data()));
+            QVariant value = model->index(row, col).data();
+            if (value.type() != QVariant::String)
+                rowContents.append(m_dataFormatter.format(value));
+            else
+                rowContents.append(escapeAndQuote(value.toString()));
         }
         text += rowContents.join(m_delimiter) + "\n";
     }
 
     return text;
 }
+
+QString Csv::escapeAndQuote(QString value)
+{
+    QString processedValue = value;
+
+    if (value.isEmpty())
+        return value;
+
+    if (m_replaceNewLineSymbolWithText && processedValue.contains("\n"))
+        processedValue = processedValue.replace("\n", "\\n");
+
+    if (processedValue.contains("\""))
+        processedValue = processedValue.replace("\"", "\\\"");
+
+    if (processedValue.contains(m_quoteSymbol) && m_quoteSymbol != "\"")
+        processedValue = processedValue.replace(m_quoteSymbol, "\\" + m_quoteSymbol);
+
+    if (m_alwaysQuoteStrings)
+        processedValue = m_quoteSymbol + processedValue + m_quoteSymbol;
+
+    if (processedValue.contains(m_delimiter) && !m_alwaysQuoteStrings)
+        processedValue = processedValue.replace(m_delimiter, "\\" + m_delimiter);
+
+    return processedValue;
+}
+

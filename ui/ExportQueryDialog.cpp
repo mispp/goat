@@ -154,8 +154,8 @@ void ExportQueryDialog::refreshText()
     bool replaceNewLine = ui->checkbox_replaceNewLine->isChecked();
     bool includeHeader = ui->checkbox_includeHeader->isChecked();
 
-    DataFormatter dataFormatter = DataFormatter(delimiter, quoteSymbol, alwaysQuoteStrings, replaceNewLine, formatOverrides());
-    Csv csv(delimiter, includeHeader, dataFormatter);
+    DataFormatter dataFormatter = DataFormatter(formatOverrides());
+    Csv csv(delimiter, quoteSymbol, includeHeader, alwaysQuoteStrings, replaceNewLine, dataFormatter);
 
     ui->textbox_preview->clear();
 

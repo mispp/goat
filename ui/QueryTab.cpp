@@ -375,9 +375,9 @@ void QueryTab::on_button_exportQueryResults_released()
 
         QString delimiter = dialog.delimiter() == "<tab>" ? "\t" : dialog.delimiter();
         bool includeHeader = dialog.includeHeader();
-        DataFormatter dataFormatter = DataFormatter(delimiter, dialog.quoteSymbol(), dialog.alwaysQuoteStrings(), dialog.replaceNewLine(), dialog.formatOverrides());
+        DataFormatter dataFormatter = DataFormatter(dialog.formatOverrides());
 
-        Csv csv(delimiter, includeHeader, dataFormatter);
+        Csv csv(delimiter, dialog.quoteSymbol(), includeHeader, dialog.alwaysQuoteStrings(), dialog.replaceNewLine(), dataFormatter);
 
         ui->button_exportQueryResults->setEnabled(false);
         ui->button_stopExport->setEnabled(true);
