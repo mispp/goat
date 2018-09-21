@@ -27,7 +27,8 @@ SOURCES += \
     src/QueryExporter.cpp \
     src/QueryStopper.cpp \
     src/AbstractQuery.cpp \
-    ui/ExportQueryDialog.cpp
+    ui/ExportQueryDialog.cpp \
+    src/DataFormatter.cpp
 
 
 HEADERS  += \
@@ -49,7 +50,8 @@ HEADERS  += \
     src/QueryExporter.h \
     src/QueryStopper.h \
     src/AbstractQuery.h \
-    ui/ExportQueryDialog.h
+    ui/ExportQueryDialog.h \
+    src/DataFormatter.h
 
 
 FORMS    += \

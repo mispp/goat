@@ -23,7 +23,10 @@ void TableView::keyPressEvent(QKeyEvent *event)
             parameters["timestampFormat"] = "yyyy-MM-ddTHH:mm:ss";
             parameters["dateFormat"] = "yyyy-MM-dd";
 
-            QString text = Csv("\t", "\"", true, true, QLocale::system(), parameters).writeSelectionToString(model(), selectionModel()->selection());
+            //DataFormatter(QHash<QString, QString>()
+            Csv csv("\t", "\"", false, true, false, parameters);
+
+            QString text = csv.writeSelectionToString(model(), selectionModel()->selection());
 
             QApplication::clipboard()->setText(text);
         }
