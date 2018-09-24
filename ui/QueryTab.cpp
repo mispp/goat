@@ -251,6 +251,8 @@ void QueryTab::on_queryFinished(bool isSelect, QSqlRecord header, QStringList me
         }
 
         emit requestNextRowSet(100);
+
+        ui->resultsTabBar->setCurrentIndex(0);
     }
     else
     {
@@ -258,11 +260,12 @@ void QueryTab::on_queryFinished(bool isSelect, QSqlRecord header, QStringList me
         {
             ui->resultsText->appendPlainText(line);
         }
+
+        ui->resultsTabBar->setCurrentIndex(1);
     }
 
     ui->button_selectionQuery->setEnabled(true);
     ui->button_stopQuery->setEnabled(!ui->button_selectionQuery->isEnabled());
-    ui->resultsTabBar->setCurrentIndex(0);
 }
 
 void QueryTab::on_queryFailed(QStringList message)
