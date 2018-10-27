@@ -1,14 +1,18 @@
 # Goat
 
-Goat - something between Heidi (sql) and Toad.
+Database frontend written in QT5 using widgets. At some point it should provide an alternative to tools like mysql workbench and pgadmin.
 
-An attempt in making alternative DB frontend using QT5.
+Goal for the project is to be something between [HeidiSQL](https://www.heidisql.com/) and Toad.
+
+You should probably also take a look at [Sqlgull](https://github.com/asw-dev/sqlgull).
+
+# Introduction
 
 This app was made for 2 reasons:
-1. necessity: there is no app in native toolkit available for linux that has querying functionality (there is a plugin for kate in kde, but this just doesnt work for me; not sure about gnome)
-2. learning: improve my qt skills. i'm not a c++ developer, so please excuse shitty code quality
+1. Necessity: there was no app in native toolkit available for linux that has querying functionality (there is a plugin for kate in kde, but this just doesnt work for me; not sure about gnome). 
+2. Learning: obtain/improve my qt, c++ and git skills. I'm not a c++ developer, so please excuse shitty code quality.
 
-Note: what i learned so far is that i shouldn't commit directly to master. From now on development will be done in the dev branch.
+Note: what i learned so far is that i shouldn't commit directly to master. 
 
 What works:
 - multiple database options
@@ -17,14 +21,13 @@ What works:
     - sqlite
     - odbc
 - connection manager
-    - saves information (warning! connection manager saves unencrypted passwords. always!)
-    - delete connections
-    - based on the driver, set default port to what makes sense
-- queries can be executed with ctrl-enter for current query (query where cursor is currently located), as well as for selection with a button (but not as as script yet)
+    - warning: connection manager currently saves unencrypted passwords
+- querying
+    - ctrl-enter for current query (as in toad)
+    - button click which executes selection
+    - canceling long running queries
 - basic syntax highlighter
 - opening and saving files
-- queries can be cancelled
-    - works on postgres and mysql
 - coloring
     - NULL values in results grid
     - results grid shows data in different color based on datatype
@@ -36,15 +39,14 @@ What works:
 
 Todos:
 - execute query as a script
+- db2 support
+- windows version
 - further improve connection manager
     - option to save or not to save password (per connection)
     - encrypted passwords
 - settings dialog
-- autosave settings
-    - e.g. height of the bottom part of tab
 - import data
 - general code quality improvement
-    - refactoring of querying (move to separate class?)
 
 
 To be considered:
