@@ -8,7 +8,7 @@
 
 #include "src/Connection.h"
 #include "src/ConnectionManager.h"
-#include "ui/QueryTab.h"
+#include "src/QueryTab.h"
 
 namespace Ui {
 class MainWindow;

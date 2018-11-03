@@ -5,7 +5,7 @@
 #include <QSettings>
 #include <QUuid>
 
-#include "ui/ConnectionWidget.h"
+#include "src/ConnectionWidget.h"
 #include "ui_ConnectionWidget.h"
 #include "src/ConnectionManager.h"
 

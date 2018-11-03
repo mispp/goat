@@ -14,20 +14,20 @@ SOURCES += \
     src/ConnectionManager.cpp \
     src/Connection.cpp \
     src/Csv.cpp \
-    ui/TableView.cpp \
-    ui/MainWindow.cpp \
-    ui/CodeEditor.cpp \
-    ui/Highlighter.cpp \
-    ui/AboutDialog.cpp \
-    ui/ConnectionWidget.cpp \
-    ui/ConnectionManagerDialog.cpp \
-    ui/QueryTab.cpp \
+    src/TableView.cpp \
+    src/MainWindow.cpp \
+    src/CodeEditor.cpp \
+    src/Highlighter.cpp \
+    src/AboutDialog.cpp \
+    src/ConnectionWidget.cpp \
+    src/ConnectionManagerDialog.cpp \
+    src/QueryTab.cpp \
     src/StringUtils.cpp \
     src/Query.cpp \
     src/QueryExporter.cpp \
     src/QueryStopper.cpp \
     src/AbstractQuery.cpp \
-    ui/ExportQueryDialog.cpp \
+    src/ExportQueryDialog.cpp \
     src/DataFormatter.cpp
 
 
@@ -35,14 +35,14 @@ HEADERS  += \
     src/ConnectionManager.h \
     src/Connection.h \
     src/Csv.h \
-    ui/TableView.h \
-    ui/MainWindow.h \
-    ui/CodeEditor.h \
-    ui/Highlighter.h \
-    ui/AboutDialog.h \
-    ui/ConnectionWidget.h \
-    ui/ConnectionManagerDialog.h \
-    ui/QueryTab.h \
+    src/TableView.h \
+    src/MainWindow.h \
+    src/CodeEditor.h \
+    src/Highlighter.h \
+    src/AboutDialog.h \
+    src/ConnectionWidget.h \
+    src/ConnectionManagerDialog.h \
+    src/QueryTab.h \
     src/StringUtils.h \
     src/Query.h \
     src/Row.h \
@@ -50,18 +50,18 @@ HEADERS  += \
     src/QueryExporter.h \
     src/QueryStopper.h \
     src/AbstractQuery.h \
-    ui/ExportQueryDialog.h \
+    src/ExportQueryDialog.h \
     src/DataFormatter.h
 
 
 FORMS    += \
-    ui/MainWindow.ui \
-    ui/TableView.ui \
-    ui/AboutDialog.ui \
-    ui/ConnectionWidget.ui \
-    ui/ConnectionManagerDialog.ui \
-    ui/QueryTab.ui \
-    ui/ExportQueryDialog.ui
+    src/MainWindow.ui \
+    src/TableView.ui \
+    src/AboutDialog.ui \
+    src/ConnectionWidget.ui \
+    src/ConnectionManagerDialog.ui \
+    src/QueryTab.ui \
+    src/ExportQueryDialog.ui
 
 DISTFILES += \
     LICENSE \

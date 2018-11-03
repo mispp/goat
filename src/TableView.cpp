@@ -1,4 +1,4 @@
-#include "TableView.h"
+#include "src/TableView.h"
 #include "ui_TableView.h"
 
 #include <QApplication>

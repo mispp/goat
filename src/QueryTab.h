@@ -6,7 +6,7 @@
 #include "src/QueryExporter.h"
 #include "src/QueryStopper.h"
 #include "src/Csv.h"
-#include "ui/ExportQueryDialog.h"
+#include "src/ExportQueryDialog.h"
 
 #include <QPlainTextEdit>
 #include <QString>

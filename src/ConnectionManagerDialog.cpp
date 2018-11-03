@@ -3,7 +3,7 @@
 #include <QSettings>
 #include <QMessageBox>
 
-#include "ui/ConnectionManagerDialog.h"
+#include "src/ConnectionManagerDialog.h"
 #include "ui_ConnectionManagerDialog.h"
 #include "src/ConnectionManager.h"
 
