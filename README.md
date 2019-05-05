@@ -6,6 +6,8 @@ Goal for the project is to be something between [HeidiSQL](https://www.heidisql.
 
 You should probably also take a look at [Sqlgull](https://github.com/asw-dev/sqlgull).
 
+[![Snap Status](https://build.snapcraft.io/badge/mispp/goat.svg)](https://build.snapcraft.io/user/mispp/goat)
+
 # Introduction
 
 This app was made for 2 reasons:
