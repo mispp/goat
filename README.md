@@ -84,6 +84,12 @@ make
 ./goat
 ```
 
+## Archlinux
+
+```
+pacaur -S goat-git
+```
+
 ## Snap
 ```
 snap install goat --edge --devmode
