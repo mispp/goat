@@ -1,7 +1,7 @@
 #ifndef CONNECTIONMANAGERDIALOG_H
 #define CONNECTIONMANAGERDIALOG_H
 
-#include "src/ConnectionManager.h"
+#include "../src/ConnectionManager.h"
 
 #include <QDialog>
 #include <QStandardItemModel>

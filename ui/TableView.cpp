@@ -6,7 +6,7 @@
 #include <QKeyEvent>
 #include <QKeySequence>
 
-#include "src/Csv.h"
+#include "../src/Csv.h"
 
 TableView::TableView(QWidget *parent) : QTableView(parent), ui(new Ui::TableView) { ui->setupUi(this); }
 

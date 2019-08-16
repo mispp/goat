@@ -3,9 +3,9 @@
 #include <QSettings>
 #include <QMessageBox>
 
-#include "ui/ConnectionManagerDialog.h"
+#include "../ui/ConnectionManagerDialog.h"
 #include "ui_ConnectionManagerDialog.h"
-#include "src/ConnectionManager.h"
+#include "../src/ConnectionManager.h"
 
 ConnectionManagerDialog::ConnectionManagerDialog(ConnectionManager *connectionManager, QWidget *parent) : QDialog(parent), ui(new Ui::ConnectionManagerDialog), m_connectionManager(connectionManager)
 {

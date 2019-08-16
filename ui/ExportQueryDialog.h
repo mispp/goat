@@ -1,8 +1,8 @@
 #ifndef EXPORTQUERYDIALOG_H
 #define EXPORTQUERYDIALOG_H
 
-#include "src/Csv.h"
-#include "src/DataFormatter.h"
+#include "../src/Csv.h"
+#include "../src/DataFormatter.h"
 
 #include <QDebug>
 #include <QAbstractButton>

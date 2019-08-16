@@ -1,7 +1,7 @@
 #ifndef CONNECTIONWIDGET_H
 #define CONNECTIONWIDGET_H
 
-#include "src/Connection.h"
+#include "../src/Connection.h"
 
 #include <QStandardItemModel>
 #include <QWidget>

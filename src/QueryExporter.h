@@ -1,8 +1,8 @@
 #ifndef QUERYEXPORTER_H
 #define QUERYEXPORTER_H
 
-#include "src/AbstractQuery.h"
-#include "src/Csv.h"
+#include "../src/AbstractQuery.h"
+#include "../src/Csv.h"
 
 #include <QDebug>
 #include <QUuid>

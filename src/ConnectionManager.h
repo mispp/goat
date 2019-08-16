@@ -4,9 +4,9 @@
 #include <QList>
 #include <QMap>
 #include <QSqlDatabase>
-#include<QStandardItemModel>
+#include <QStandardItemModel>
 
-#include "src/Connection.h"
+#include "../src/Connection.h"
 
 class ConnectionManager : public QObject
 {

@@ -5,9 +5,9 @@
 #include <QSettings>
 #include <QUuid>
 
-#include "ui/ConnectionWidget.h"
+#include "../ui/ConnectionWidget.h"
 #include "ui_ConnectionWidget.h"
-#include "src/ConnectionManager.h"
+#include "../src/ConnectionManager.h"
 
 ConnectionWidget::ConnectionWidget(QWidget *parent) :	QWidget(parent), ui(new Ui::ConnectionWidget)
 {

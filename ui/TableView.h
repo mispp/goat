@@ -1,8 +1,8 @@
 #ifndef TABLEVIEW_H
 #define TABLEVIEW_H
 
-#include "src/DataFormatter.h"
-#include "src/Csv.h"
+#include "../src/DataFormatter.h"
+#include "../src/Csv.h"
 
 #include <QTableView>
 #include <QWidget>

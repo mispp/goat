@@ -1,8 +1,8 @@
-#include "ui/MainWindow.h"
+#include "../ui/MainWindow.h"
 #include "ui_MainWindow.h"
-#include "ui/QueryTab.h"
-#include "ui/AboutDialog.h"
-#include "ui/ConnectionManagerDialog.h"
+#include "../ui/QueryTab.h"
+#include "../ui/AboutDialog.h"
+#include "../ui/ConnectionManagerDialog.h"
 
 #include <QApplication>
 #include <QCloseEvent>

@@ -1,12 +1,12 @@
 #ifndef CONNECTIONTAB_H
 #define CONNECTIONTAB_H
 
-#include "src/ConnectionManager.h"
-#include "src/Query.h"
-#include "src/QueryExporter.h"
-#include "src/QueryStopper.h"
-#include "src/Csv.h"
-#include "ui/ExportQueryDialog.h"
+#include "../src/ConnectionManager.h"
+#include "../src/Query.h"
+#include "../src/QueryExporter.h"
+#include "../src/QueryStopper.h"
+#include "../src/Csv.h"
+#include "../ui/ExportQueryDialog.h"
 
 #include <QPlainTextEdit>
 #include <QString>

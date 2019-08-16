@@ -1,8 +1,8 @@
 #ifndef ABSTRACTQUERY_H
 #define ABSTRACTQUERY_H
 
-#include "src/ConnectionManager.h"
-#include "src/Connection.h"
+#include "../src/ConnectionManager.h"
+#include "../src/Connection.h"
 
 #include <QObject>
 #include <QSqlQuery>

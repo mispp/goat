@@ -1,7 +1,7 @@
 #ifndef QUERYSTOPPER_H
 #define QUERYSTOPPER_H
 
-#include "src/Connection.h"
+#include "../src/Connection.h"
 
 #include <QObject>
 #include <QSqlDatabase>

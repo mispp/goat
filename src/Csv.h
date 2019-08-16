@@ -1,7 +1,7 @@
 #ifndef CSV_H
 #define CSV_H
 
-#include "src/DataFormatter.h"
+#include "../src/DataFormatter.h"
 
 #include <QAbstractItemModel>
 #include <QItemSelectionModel>

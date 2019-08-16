@@ -1,8 +1,8 @@
 #include "../ui/MainWindow.h"
-#include "src/Row.h"
-#include "src/RowSet.h"
-#include "src/Connection.h"
-#include "src/Csv.h"
+#include "../src/Row.h"
+#include "../src/RowSet.h"
+#include "../src/Connection.h"
+#include "../src/Csv.h"
 
 #include <QApplication>
 #include <QDesktopWidget>

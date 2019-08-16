@@ -1,8 +1,8 @@
 #ifndef QUERY_H
 #define QUERY_H
 
-#include "src/AbstractQuery.h"
-#include "src/RowSet.h"
+#include "../src/AbstractQuery.h"
+#include "../src/RowSet.h"
 
 #include <QDebug>
 #include <QUuid>

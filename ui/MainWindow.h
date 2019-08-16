@@ -6,9 +6,9 @@
 #include <QMenu>
 #include <QToolButton>
 
-#include "src/Connection.h"
-#include "src/ConnectionManager.h"
-#include "ui/QueryTab.h"
+#include "../src/Connection.h"
+#include "../src/ConnectionManager.h"
+#include "../ui/QueryTab.h"
 
 namespace Ui {
 class MainWindow;

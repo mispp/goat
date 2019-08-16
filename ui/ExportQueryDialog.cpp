@@ -1,4 +1,4 @@
-#include "ExportQueryDialog.h"
+#include "../ui/ExportQueryDialog.h"
 #include "ui_ExportQueryDialog.h"
 
 ExportQueryDialog::ExportQueryDialog(QStandardItemModel* model, QWidget *parent) :

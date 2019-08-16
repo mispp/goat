@@ -6,7 +6,7 @@
 #include <QStringListModel>
 #include <QString>
 
-#include "ui/Highlighter.h"
+#include "../ui/Highlighter.h"
 
 class CodeEditor : public QPlainTextEdit
 {
