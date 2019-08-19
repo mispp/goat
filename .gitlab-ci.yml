@@ -1,0 +1,20 @@
+image: "archlinux/base"
+
+before_script:
+  - pacman -Syu --noconfirm  
+  - pacman -S --noconfirm qt5-base gcc clang cmake extra-cmake-modules make
+
+build-qmake:
+  script:
+    - mkdir build-qmake
+    - cd build-qmake
+    - qmake ..
+    - make
+
+build-cmake:
+  script:
+    - mkdir build-cmake
+    - cd build-cmake
+    - cmake ..
+    - make
+
